@@ -1,0 +1,77 @@
+﻿using GTRC_Database_API.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace GTRC_Database_API.Controllers
+{
+    [ApiController]
+    [Route("[controller]")]
+    public class CarController : ControllerBase
+    {
+        private readonly DataContext db;
+
+        public CarController(DataContext dataContext)
+        {
+            db = dataContext;
+        }
+
+        [HttpGet()]
+        public async Task<ActionResult<List<Car>>> GetList()
+        {
+            return Ok(await db.Cars.ToListAsync());
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Car>> GetById(int id)
+        {
+            Car? car = await db.Cars.FindAsync(id);
+            if (car is null) { return NotFound(new Car()); }
+            else { return Ok(car); }
+        }
+
+        [HttpGet("/default")]
+        public Car GetNextAvailable()
+        {
+            return Service.SetNextAvailable(new Car());
+        }
+
+        [HttpGet("/nextAvailable")]
+        public Car GetNextAvailable(Car car)
+        {
+            return Service.SetNextAvailable(car);
+        }
+
+        [HttpPut()]
+        public async Task<ActionResult<Car>> UpdateSql(CarDto car)
+        {
+            try { db.Update(car); }
+            catch { return NotFound(new Car()); }
+            await db.SaveChangesAsync();
+            Car? _car = await db.Cars.FindAsync(car.Id);
+            if (_car is null) { return NotFound(new Car()); }
+            else { return Ok(_car); }
+        }
+
+        [HttpPost()]
+        public ActionResult<Car> WriteSql(Car car)
+        {
+            new Car("sdts")
+            db.Cars.Add(Service.SetNextAvailable(car));
+            _ = db.SaveChangesAsync();
+            return Ok(car);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteSql(int id)
+        {
+            Car? car = await db.Cars.FindAsync(id);
+            if (car is null) { return NotFound(); }
+            else
+            {
+                db.Remove(car);
+                await db.SaveChangesAsync();
+                return Ok();
+            }
+        }
+    }
+}

@@ -1,0 +1,5 @@
+﻿@GTRC_Database_API_HostAddress = https://localhost:7151
+
+GET {{GTRC_Database_API_HostAddress}}/car
+
+###

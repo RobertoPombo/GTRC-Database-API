@@ -27,4 +27,8 @@
     <Folder Include="Services\DTOs\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GTRC Basics\GTRC_Basics.csproj" />
+  </ItemGroup>
+
 </Project>

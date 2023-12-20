@@ -30,6 +30,11 @@ namespace GTRC_Database_API.Services
             return car;
         }
 
-        public override List<Car> GetAllAsync() { return iCarContext.GetAll().Result; }
+        //Kann man das in BaseService verschieben? Fehler bei "AddScoped<CarService>()", weil iBaseContext nicht aufgelöst werden kann.
+        public override List<Car> GetAll() { return iCarContext.GetAll().Result; }
+
+        public override Car? GetById(int id) { return iCarContext.GetById(id).Result; }
+
+        public Car GetNextAvailable() { return SetNextAvailable(new Car()); }
     }
 }

@@ -21,7 +21,7 @@ namespace GTRC_Database_API.Services
             if (BaseModel.UniqProps.Count > index && BaseModel.UniqProps[index].Count > 0)
             {
                 int objIndex0 = -1;
-                List<ModelType> list = GetAllAsync();
+                List<ModelType> list = GetAll();
                 if (list.Contains(obj)) { objIndex0 = list.IndexOf(obj); }
                 for (int objIndex = 0; objIndex < list.Count; objIndex++)
                 {
@@ -30,7 +30,7 @@ namespace GTRC_Database_API.Services
                         bool identical = true;
                         foreach (PropertyInfo property in BaseModel.UniqProps[index])
                         {
-                            if (Scripts.GetCastedValue(this, property) != Scripts.GetCastedValue(list[objIndex], property)) { identical = false; break; }
+                            if (Scripts.GetCastedValue(obj!, property) != Scripts.GetCastedValue(list[objIndex]!, property)) { identical = false; break; }
                         }
                         if (identical) { return false; }
                     }
@@ -43,6 +43,8 @@ namespace GTRC_Database_API.Services
 
         public abstract ModelType Validate(ModelType obj);
 
-        public abstract List<ModelType> GetAllAsync();
+        public abstract List<ModelType> GetAll();
+
+        public abstract ModelType? GetById(int id);
     }
 }

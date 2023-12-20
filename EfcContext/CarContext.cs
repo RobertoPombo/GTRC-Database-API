@@ -9,5 +9,6 @@ namespace GTRC_Database_API.EfcContext
     {
         public async Task SaveChanges() { await db.SaveChangesAsync(); }
         public async Task<List<Car>> GetAll() { List<Car> list = await db.Cars.ToListAsync(); return list; }
+        public async Task<Car?> GetById(int id) { return await db.Cars.FindAsync(id); }
     }
 }

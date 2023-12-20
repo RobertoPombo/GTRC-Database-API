@@ -4,5 +4,6 @@
     {
         public Task SaveChanges();
         public Task<List<ModelType>> GetAll();
+        public Task<ModelType?> GetById(int id);
     }
 }

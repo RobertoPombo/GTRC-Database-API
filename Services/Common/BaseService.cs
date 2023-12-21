@@ -2,10 +2,11 @@
 
 using GTRC_Basics;
 using GTRC_Database_API.Models;
+using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public abstract class BaseService<ModelType>
+    public class BaseService<ModelType>(IBaseContext<ModelType> iBaseContext) where ModelType : class, IBaseModel
     {
         public bool IsUnique(ModelType obj)
         {
@@ -39,12 +40,8 @@ namespace GTRC_Database_API.Services
             return true;
         }
 
-        public abstract ModelType SetNextAvailable(ModelType obj);
+        public List<ModelType> GetAll() { return iBaseContext.GetAll().Result; }
 
-        public abstract ModelType Validate(ModelType obj);
-
-        public abstract List<ModelType> GetAll();
-
-        public abstract ModelType? GetById(int id);
+        public ModelType? GetById(int id) { return iBaseContext.GetById(id).Result; }
     }
 }

@@ -5,12 +5,12 @@ using GTRC_Database_API.Services;
 
 namespace GTRC_Database_API.Controllers
 {
-    [ApiController][Route(nameof(Car))]
-    public class CarController(CarService service, BaseService<Car> baseService) : BaseController<Car>(baseService)
+    [ApiController][Route(nameof(Track))]
+    public class TrackController(TrackService service, BaseService<Track> baseService) : BaseController<Track>(baseService)
     {
-        [HttpGet("{id}")] public ActionResult<Car> GetById(int id)
+        [HttpGet("{id}")] public ActionResult<Track> GetById(int id)
         {
-            Car? obj = service.GetById(id);
+            Track? obj = service.GetById(id);
             if (obj is null) { return NotFound(service.GetNextAvailable()); }
             else { return Ok(obj); }
         }

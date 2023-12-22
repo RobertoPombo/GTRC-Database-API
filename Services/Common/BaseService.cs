@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 
 using GTRC_Basics;
-using GTRC_Database_API.Models;
+using GTRC_Basics.Models.Common;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services

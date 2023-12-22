@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-using GTRC_Database_API.Models;
 using GTRC_Database_API.Services;
+using GTRC_Basics.Models.Common;
 
 namespace GTRC_Database_API.Controllers
 {

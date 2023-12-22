@@ -1,4 +1,6 @@
-﻿namespace GTRC_Database_API.Models
+﻿using GTRC_Database_API.Models.Common;
+
+namespace GTRC_Database_API.Models
 {
     public class Track : BaseModel
     {

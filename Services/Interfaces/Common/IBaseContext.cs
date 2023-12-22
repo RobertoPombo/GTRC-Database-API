@@ -1,4 +1,4 @@
-﻿using GTRC_Database_API.Models;
+﻿using GTRC_Basics.Models.Common;
 
 namespace GTRC_Database_API.Services.Interfaces
 {

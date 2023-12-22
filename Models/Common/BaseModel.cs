@@ -2,7 +2,7 @@
 
 using GTRC_Basics;
 
-namespace GTRC_Database_API.Models
+namespace GTRC_Database_API.Models.Common
 {
     public abstract class BaseModel : IBaseModel
     {

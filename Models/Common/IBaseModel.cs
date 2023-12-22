@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace GTRC_Database_API.Models
+namespace GTRC_Database_API.Models.Common
 {
     public interface IBaseModel
     {

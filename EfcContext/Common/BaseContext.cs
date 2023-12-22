@@ -6,7 +6,7 @@ using GTRC_Database_API.Models;
 
 namespace GTRC_Database_API.EfcContext
 {
-    public class BaseContext<ModelType>(DataContext db) : IBaseContext<ModelType> where ModelType : class, IBaseModel
+    public class BaseContext<ModelType>(DataContext db) : IBaseContext<ModelType> where ModelType : class, IBaseModel, new()
     {
         public async Task SaveChanges() { await db.SaveChangesAsync(); }
 

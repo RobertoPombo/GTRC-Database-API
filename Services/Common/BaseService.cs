@@ -6,7 +6,7 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class BaseService<ModelType>(IBaseContext<ModelType> iBaseContext) where ModelType : class, IBaseModel
+    public class BaseService<ModelType>(IBaseContext<ModelType> iBaseContext) where ModelType : class, IBaseModel, new()
     {
         public bool IsUnique(ModelType obj)
         {
@@ -43,5 +43,7 @@ namespace GTRC_Database_API.Services
         public List<ModelType> GetAll() { return iBaseContext.GetAll().Result; }
 
         public ModelType? GetById(int id) { return iBaseContext.GetById(id).Result; }
+
+        public ModelType GetNextAvailable() { return new ModelType(); }//return SetNextAvailable(new ModelType()); }//=> Call in CarService erf.
     }
 }

@@ -29,7 +29,5 @@ namespace GTRC_Database_API.Services
             }
             return obj;
         }
-
-        public Car GetNextAvailable() { return SetNextAvailable(new Car()); }
     }
 }

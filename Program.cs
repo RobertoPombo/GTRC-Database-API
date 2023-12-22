@@ -6,12 +6,12 @@ using GTRC_Database_API.Data;
 using GTRC_Database_API.Services;
 using GTRC_Database_API.Services.Interfaces;
 using GTRC_Database_API.EfcContext;
-using GTRC_Database_API.Models;
 using GTRC_Database_API.Helpers;
 using GTRC_Basics;
 
 string pathSqlConnectionConfig = GlobalValues.DataDirectory + "config sqlConnection.json";
 if (!Directory.Exists(GlobalValues.DataDirectory)) { Directory.CreateDirectory(GlobalValues.DataDirectory); }
+if (!File.Exists(pathSqlConnectionConfig)) { File.WriteAllText(pathSqlConnectionConfig, JsonConvert.SerializeObject(new SqlConnectionConfig(), Formatting.Indented), Encoding.Unicode); }
 SqlConnectionConfig sQLConCfg = JsonConvert.DeserializeObject<SqlConnectionConfig>(File.ReadAllText(pathSqlConnectionConfig, Encoding.Unicode)) ?? new();
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,6 +44,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+//GTRC_Database_API.Helpers.HostBuilder.CreateHostBuilder(args).Build().Run();
 
 app.UseHttpsRedirection();
 

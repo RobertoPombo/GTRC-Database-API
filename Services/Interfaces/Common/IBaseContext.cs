@@ -2,7 +2,7 @@
 
 namespace GTRC_Database_API.Services.Interfaces
 {
-    public interface IBaseContext<ModelType> where ModelType : class, IBaseModel
+    public interface IBaseContext<ModelType> where ModelType : class, IBaseModel, new()
     {
         public Task SaveChanges();
         public Task<List<ModelType>> GetAll();

@@ -8,11 +8,6 @@ namespace GTRC_Database_API.Controllers
     [ApiController][Route(nameof(Car))]
     public class CarController(CarService service, BaseService<Car> baseService) : BaseController<Car>(baseService)
     {
-        [HttpGet("{id}")] public ActionResult<Car> GetById(int id)
-        {
-            Car? obj = service.GetById(id);
-            if (obj is null) { return NotFound(service.GetNextAvailable()); }
-            else { return Ok(obj); }
-        }
+
     }
 }

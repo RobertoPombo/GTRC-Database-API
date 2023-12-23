@@ -2,6 +2,7 @@
 using GTRC_Basics.Models;
 using GTRC_Database_API.Services.DTOs;
 using GTRC_Database_API.Services.Interfaces;
+using System.Reflection;
 
 namespace GTRC_Database_API.Services
 {
@@ -44,6 +45,38 @@ namespace GTRC_Database_API.Services
                 listValues.Add(Scripts.GetCastedValue(objDto.Map(), UniqProps[0][propertyNr]));
             }
             return await GetByUniqProps(listValues);
+        }
+
+        public async Task<List<Track>> GetBy(TrackAddDto objDto)
+        {
+            List<PropertyInfo> properties = [];
+            List<dynamic> values = [];
+            foreach (PropertyInfo property in objDto.GetType().GetProperties())
+            {
+                if (property.GetValue(objDto) is not null)
+                {
+                    foreach (PropertyInfo baseProperty in typeof(Track).GetProperties())
+                    {
+                        if (property.Name == baseProperty.Name)
+                        {
+                            properties.Add(baseProperty);
+                            values.Add(Scripts.GetCastedValue(objDto, property));
+                            break;
+                        }
+                    }
+                }
+            }
+            return await GetBy(properties, values);
+        }
+
+        public async Task<List<Track>> GetByFilter(TrackFilterDto objDto, TrackFilterDto objDtoMin, TrackFilterDto objDtoMax)
+        {
+            List<Track> list = await GetAll();
+            foreach (Track obj in list)
+            {
+
+            }
+            return list;
         }
 
         public async Task<Track?> GetTemp() { return await SetNextAvailable(new Track()); }

@@ -7,5 +7,8 @@ namespace GTRC_Database_API.Services.Interfaces
         public Task SaveChanges();
         public Task<List<ModelType>> GetAll();
         public Task<ModelType?> GetById(int id);
+        public Task Add(ModelType obj);
+        public Task Delete(ModelType obj);
+        public Task Update(ModelType obj);
     }
 }

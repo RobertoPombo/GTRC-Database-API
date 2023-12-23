@@ -1,5 +1,6 @@
 ﻿using GTRC_Basics;
 using GTRC_Basics.Models;
+using GTRC_Database_API.Services.DTOs;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
@@ -14,20 +15,34 @@ namespace GTRC_Database_API.Services
             obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
             obj.Manufacturer = Scripts.RemoveSpaceStartEnd(obj.Manufacturer);
             obj.Model = Scripts.RemoveSpaceStartEnd(obj.Model);
-            obj.Category = Scripts.RemoveSpaceStartEnd(obj.Category);
+            if (!Enum.IsDefined(typeof(CarClass), obj.Class)) { obj.Class = CarClass.General; }
+            obj.WidthMm = Math.Max(obj.WidthMm, 1);
+            obj.LengthMm = Math.Max(obj.LengthMm, 1);
             obj.NameGtrc = Scripts.RemoveSpaceStartEnd(obj.NameGtrc);
             return obj;
         }
 
-        public Car SetNextAvailable(Car obj)
+        public async Task<Car?> SetNextAvailable(Car obj)
         {
             int startValue = obj.AccCarId;
-            while (!IsUnique(obj))
+            while (!await IsUnique(obj))
             {
                 if (obj.AccCarId < int.MaxValue) { obj.AccCarId += 1; } else { obj.AccCarId = minAccCarId; }
-                if (obj.AccCarId == startValue) { break; }
+                if (obj.AccCarId == startValue) { return null; }
             }
             return obj;
         }
+
+        public async Task<Car?> GetByUniqProps(CarUniqPropsDto0 objDto)
+        {
+            List<dynamic> listValues = [];
+            for (int propertyNr = 0; propertyNr < UniqProps[0].Count; propertyNr++)
+            {
+                listValues.Add(Scripts.GetCastedValue(objDto.Map(), UniqProps[0][propertyNr]));
+            }
+            return await GetByUniqProps(listValues);
+        }
+
+        public async Task<Car?> GetTemp() { return await SetNextAvailable(new Car()); }
     }
 }

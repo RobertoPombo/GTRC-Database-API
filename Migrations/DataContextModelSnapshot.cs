@@ -33,9 +33,11 @@ namespace GTRC_Database_API.Migrations
                     b.Property<int>("AccCarId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Class")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LengthMm")
+                        .HasColumnType("int");
 
                     b.Property<string>("Manufacturer")
                         .IsRequired()
@@ -55,6 +57,9 @@ namespace GTRC_Database_API.Migrations
 
                     b.Property<DateOnly>("ReleaseDate")
                         .HasColumnType("date");
+
+                    b.Property<int>("WidthMm")
+                        .HasColumnType("int");
 
                     b.Property<int>("Year")
                         .HasColumnType("int");

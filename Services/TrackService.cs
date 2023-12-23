@@ -1,5 +1,6 @@
 ﻿using GTRC_Basics;
 using GTRC_Basics.Models;
+using GTRC_Database_API.Services.DTOs;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
@@ -22,19 +23,29 @@ namespace GTRC_Database_API.Services
             return obj;
         }
 
-        public Track SetNextAvailable(Track obj)
+        public async Task<Track?> SetNextAvailable(Track obj)
         {
             int nr = 1;
             string defID = obj.AccTrackId;
             if (Scripts.SubStr(defID, -2, 1) == "_") { defID = Scripts.SubStr(defID, 0, defID.Length - 2); }
-            while (!IsUnique(obj))
+            while (!await IsUnique(obj))
             {
                 obj.AccTrackId = defID + "_" + nr.ToString();
-                nr++; if (nr == int.MaxValue) { break; }
+                nr++; if (nr == int.MaxValue) { return null; }
             }
             return obj;
         }
 
-        public Track GetNextAvailable() { return SetNextAvailable(new Track()); }
+        public async Task<Track?> GetByUniqProps(TrackUniqPropsDto0 objDto)
+        {
+            List<dynamic> listValues = [];
+            for (int propertyNr = 0; propertyNr < UniqProps[0].Count; propertyNr++)
+            {
+                listValues.Add(Scripts.GetCastedValue(objDto.Map(), UniqProps[0][propertyNr]));
+            }
+            return await GetByUniqProps(listValues);
+        }
+
+        public async Task<Track?> GetTemp() { return await SetNextAvailable(new Track()); }
     }
 }

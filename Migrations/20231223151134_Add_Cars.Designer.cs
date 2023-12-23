@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GTRC_Database_API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231219221208_Add_Cars")]
+    [Migration("20231223151134_Add_Cars")]
     partial class Add_Cars
     {
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace GTRC_Database_API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("GTRC_Database_API.Models.Car", b =>
+            modelBuilder.Entity("GTRC_Basics.Models.Car", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -33,12 +33,14 @@ namespace GTRC_Database_API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AccCarID")
+                    b.Property<int>("AccCarId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Class")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LengthMm")
+                        .HasColumnType("int");
 
                     b.Property<string>("Manufacturer")
                         .IsRequired()
@@ -52,12 +54,15 @@ namespace GTRC_Database_API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name_GTRC")
+                    b.Property<string>("NameGtrc")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateOnly>("ReleaseDate")
                         .HasColumnType("date");
+
+                    b.Property<int>("WidthMm")
+                        .HasColumnType("int");
 
                     b.Property<int>("Year")
                         .HasColumnType("int");
@@ -65,6 +70,40 @@ namespace GTRC_Database_API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Cars");
+                });
+
+            modelBuilder.Entity("GTRC_Basics.Models.Track", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccTimePenDT")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AccTrackId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameGtrc")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PitBoxesCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ServerSlotsCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tracks");
                 });
 #pragma warning restore 612, 618
         }

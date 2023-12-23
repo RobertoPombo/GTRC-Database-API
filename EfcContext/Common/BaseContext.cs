@@ -13,5 +13,11 @@ namespace GTRC_Database_API.EfcContext
         public async Task<List<ModelType>> GetAll() { List<ModelType> list = await db.Set<ModelType>().ToListAsync(); return list; }
 
         public async Task<ModelType?> GetById(int id) { return await db.Set<ModelType>().FindAsync(id); }
+
+        public async Task Add(ModelType obj) { db.Set<ModelType>().Add(obj); await SaveChanges(); }
+
+        public async Task Delete(ModelType obj) { db.Remove(obj); await SaveChanges(); }
+
+        public async Task Update(ModelType obj) { db.Update(obj); await SaveChanges(); }
     }
 }

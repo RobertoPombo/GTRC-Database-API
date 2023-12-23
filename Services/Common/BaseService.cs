@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Reflection;
+﻿using System.Reflection;
 
 using GTRC_Basics;
 using GTRC_Basics.Models.Common;
-using GTRC_Database_API.Helpers;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
@@ -66,19 +63,19 @@ namespace GTRC_Database_API.Services
         {
             if (UniqProps.Count > index && UniqProps[index].Count > 0 && UniqProps[index].Count == values.Count)
             {
-                List<ModelType> list = await GetBy(UniqProps[index], values, true);
+                List<ModelType> list = await GetByProps(UniqProps[index], values, true);
                 if (list.Count == 1) { return list[0]; }
                 else { return null; }
             }
             return null;
         }
 
-        public async Task<List<ModelType>> GetBy(PropertyInfo property, dynamic _value, bool firstOnly = false)
+        public async Task<List<ModelType>> GetByProps(PropertyInfo property, dynamic _value, bool firstOnly = false)
         {
-            return await GetBy([property], [_value], firstOnly);
+            return await GetByProps([property], [_value], firstOnly);
         }
 
-        public async Task<List<ModelType>> GetBy(List<PropertyInfo> properties, List<dynamic> values, bool firstOnly = false)
+        public async Task<List<ModelType>> GetByProps(List<PropertyInfo> properties, List<dynamic> values, bool firstOnly = false)
         {
             List<ModelType> _list = [];
             List<ModelType> list = await GetAll();

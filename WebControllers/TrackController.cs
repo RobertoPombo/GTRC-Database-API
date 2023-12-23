@@ -16,14 +16,14 @@ namespace GTRC_Database_API.Controllers
             else { return Ok(obj); }
         }
 
-        [HttpGet("Get/By")] public async Task<ActionResult<List<Track>>> GetBy([FromQuery] TrackAddDto objDto)
+        [HttpGet("Get/By")] public async Task<ActionResult<List<Track>>> GetByProps([FromQuery] TrackAddDto objDto)
         {
-            return Ok(await service.GetBy(objDto));
+            return Ok(await service.GetByProps(objDto));
         }
 
-        [HttpGet("Get/ByFilter")] public async Task<ActionResult<List<Track>>> GetByFilter([FromQuery] TrackFilterDto objDto, [FromQuery] TrackFilterDto objDtoMin, [FromQuery] TrackFilterDto objDtoMax)
+        [HttpGet("Get/ByFilter")] public async Task<ActionResult<List<Track>>> GetByFilter([FromQuery] TrackFilterDtos objDto)
         {
-            return Ok(await service.GetByFilter(objDto, objDtoMin, objDtoMax));
+            return Ok(await service.GetByFilter(objDto));
         }
 
         [HttpGet("Get/Temp")] public async Task<ActionResult<Track>> GetTemp()

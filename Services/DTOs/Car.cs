@@ -1,8 +1,20 @@
-﻿using GTRC_Basics;
+﻿using System.ComponentModel.DataAnnotations;
+
+using GTRC_Basics;
 using GTRC_Basics.Models;
 
 namespace GTRC_Database_API.Services.DTOs
 {
+    public class CarUniqPropsDto0 : Mapper<Car>
+    {
+        [Required] public int AccCarId { get; set; } = GlobalValues.NoID;
+
+        public override Car Map(Car obj) { obj.AccCarId = AccCarId; return obj; }
+
+        public override void ReMap(Car obj) { AccCarId = obj.AccCarId; }
+    }
+
+
     public class CarAddDto : Mapper<Car>
     {
         public int? AccCarId { get; set; }
@@ -44,5 +56,33 @@ namespace GTRC_Database_API.Services.DTOs
             LengthMm = obj.LengthMm;
             NameGtrc = obj.NameGtrc;
         }
+    }
+
+
+    public class CarUpdateDto : CarAddDto
+    {
+        [Required] public int Id { get; set; } = GlobalValues.NoID;
+
+        public override Car Map(Car obj) { obj.Id = Id; return base.Map(obj); }
+
+        public override void ReMap(Car obj) { base.ReMap(obj); obj.Id = Id; }
+    }
+
+
+    public class CarFilterDto : CarAddDto
+    {
+        public int? Id { get; set; }
+
+        public override Car Map(Car obj) { obj.Id = Id ?? obj.Id; return base.Map(obj); }
+
+        public override void ReMap(Car obj) { Id = obj.Id; }
+    }
+
+
+    public class CarFilterDtos
+    {
+        public CarFilterDto Filter { get; set; } = new();
+        public CarFilterDto FilterMin { get; set; } = new();
+        public CarFilterDto FilterMax { get; set; } = new();
     }
 }

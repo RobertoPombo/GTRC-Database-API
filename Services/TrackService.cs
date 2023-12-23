@@ -2,6 +2,7 @@
 using GTRC_Basics.Models;
 using GTRC_Database_API.Services.DTOs;
 using GTRC_Database_API.Services.Interfaces;
+using System;
 using System.Reflection;
 
 namespace GTRC_Database_API.Services
@@ -47,36 +48,80 @@ namespace GTRC_Database_API.Services
             return await GetByUniqProps(listValues);
         }
 
-        public async Task<List<Track>> GetBy(TrackAddDto objDto)
+        public async Task<List<Track>> GetByProps(TrackAddDto objDto)
         {
             List<PropertyInfo> properties = [];
             List<dynamic> values = [];
-            foreach (PropertyInfo property in objDto.GetType().GetProperties())
+            foreach (PropertyInfo filterProperty in typeof(TrackAddDto).GetType().GetProperties())
             {
-                if (property.GetValue(objDto) is not null)
+                if (filterProperty.GetValue(objDto) is not null)
                 {
-                    foreach (PropertyInfo baseProperty in typeof(Track).GetProperties())
+                    foreach (PropertyInfo property in typeof(Track).GetProperties())
                     {
-                        if (property.Name == baseProperty.Name)
+                        if (filterProperty.Name == property.Name)
                         {
-                            properties.Add(baseProperty);
-                            values.Add(Scripts.GetCastedValue(objDto, property));
+                            properties.Add(property);
+                            values.Add(Scripts.GetCastedValue(objDto, filterProperty));
                             break;
                         }
                     }
                 }
             }
-            return await GetBy(properties, values);
+            return await GetByProps(properties, values);
         }
 
-        public async Task<List<Track>> GetByFilter(TrackFilterDto objDto, TrackFilterDto objDtoMin, TrackFilterDto objDtoMax)
+        public async Task<List<Track>> GetByFilter(TrackFilterDtos objDto)
         {
+            List<string> numericalTypes = ["System.Int16", "System.Int32", "System.Int64", "System.UInt16", "System.UInt32", "System.UInt64", "System.Single", "System.Double", "System.Decimal", "System.DateTime"];
             List<Track> list = await GetAll();
+            List<Track> filteredList = [];
             foreach (Track obj in list)
             {
-
+                bool isInList = true;
+                foreach (PropertyInfo filterProperty in typeof(TrackFilterDto).GetProperties())
+                {
+                    var filter = filterProperty.GetValue(objDto.Filter);
+                    var filterMin = filterProperty.GetValue(objDto.FilterMin);
+                    var filterMax = filterProperty.GetValue(objDto.FilterMax);
+                    if (filter is not null || filterMin is not null || filterMax is not null)
+                    {
+                        string strFilter = filter?.ToString()?.ToLower() ?? "";
+                        string strFilterMin = filterMin?.ToString()?.ToLower() ?? "";
+                        string strFilterMax = filterMax?.ToString()?.ToLower() ?? "";
+                        foreach (PropertyInfo property in typeof(Track).GetProperties())
+                        {
+                            if (filterProperty.Name == property.Name)
+                            {
+                                var castedValue = Scripts.GetCastedValue(obj, property);
+                                string strValue = castedValue.ToString().ToLower();
+                                if (!strValue.Contains(strFilter)) { isInList = false; }
+                                else if (numericalTypes.Contains(property.PropertyType.ToString()))
+                                {
+                                    if (filterMin is not null)
+                                    {
+                                        var castedFilterMin = Scripts.CastValue(property, filterMin);
+                                        if (castedValue < castedFilterMin) { isInList = false; }
+                                    }
+                                    if (filterMax is not null)
+                                    {
+                                        var castedFilterMax = Scripts.CastValue(property, filterMax);
+                                        if (castedValue > castedFilterMax) { isInList = false; }
+                                    }
+                                }
+                                else if ((strFilterMin.Length > 0 && string.Compare(strValue, strFilterMin) == -1)
+                                    || (strFilterMax.Length > 0 && string.Compare(strValue, strFilterMax) == 1))
+                                {
+                                    isInList = false;
+                                }
+                                break;
+                            }
+                        }
+                        if (!isInList) { break; }
+                    }
+                }
+                if (isInList) { filteredList.Add(obj); }
             }
-            return list;
+            return filteredList;
         }
 
         public async Task<Track?> GetTemp() { return await SetNextAvailable(new Track()); }

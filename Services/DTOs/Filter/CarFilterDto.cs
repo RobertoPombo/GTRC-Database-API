@@ -6,8 +6,8 @@ namespace GTRC_Database_API.Services.DTOs
     {
         public int? Id { get; set; }
 
-        public override Car Map() { Car obj = base.Map(); obj.Id = Id ?? obj.Id; return obj; }
+        public override Car Map(Car obj) { obj.Id = Id ?? obj.Id; return base.Map(obj); }
 
-        public override void Map(Car obj) { Id = obj.Id; }
+        public override void ReMap(Car obj) { Id = obj.Id; }
     }
 }

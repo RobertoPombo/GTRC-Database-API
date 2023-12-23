@@ -9,8 +9,8 @@ namespace GTRC_Database_API.Services.DTOs
     {
         [Required] public int AccCarId { get; set; } = GlobalValues.NoID;
 
-        public override Car Map() { Car obj = new() { AccCarId = AccCarId }; return obj; }
+        public override Car Map(Car obj) { obj.AccCarId = AccCarId; return obj; }
 
-        public override void Map(Car obj) { AccCarId = obj.AccCarId; }
+        public override void ReMap(Car obj) { AccCarId = obj.AccCarId; }
     }
 }

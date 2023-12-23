@@ -6,8 +6,8 @@ namespace GTRC_Database_API.Services.DTOs
     {
         public int? Id { get; set; }
 
-        public override Track Map() { Track obj = base.Map(); obj.Id = Id ?? obj.Id; return obj; }
+        public override Track Map(Track obj) { obj.Id = Id ?? obj.Id; return base.Map(obj); }
 
-        public override void Map(Track obj) { Id = obj.Id; }
+        public override void ReMap(Track obj) { Id = obj.Id; }
     }
 }

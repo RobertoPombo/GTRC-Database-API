@@ -11,9 +11,8 @@ namespace GTRC_Database_API.Services.DTOs
         public int? AccTimePenDT { get; set; }
         public string? NameGtrc { get; set; }
 
-        public override Track Map()
+        public override Track Map(Track obj)
         {
-            Track obj = new();
             obj.AccTrackId = AccTrackId ?? obj.AccTrackId;
             obj.Name = Name ?? obj.Name;
             obj.PitBoxesCount = PitBoxesCount ?? obj.PitBoxesCount;
@@ -23,7 +22,7 @@ namespace GTRC_Database_API.Services.DTOs
             return obj;
         }
 
-        public override void Map(Track obj)
+        public override void ReMap(Track obj)
         {
             AccTrackId = obj.AccTrackId;
             Name = obj.Name;

@@ -27,7 +27,19 @@ namespace GTRC_Database_API.Controllers
         {
             Car? obj = await service.SetNextAvailable(service.Validate(objDto.Map()));
             if (obj is null) { return BadRequest(new Car()); }
-            else { await service.Add(obj); CarUniqPropsDto0 objDto0 = new(); objDto0.Map(obj); return Ok(await service.GetByUniqProps(objDto0)); }
+            else { await service.Add(obj); CarUniqPropsDto0 objDto0 = new(); objDto0.ReMap(obj); return Ok(await service.GetByUniqProps(objDto0)); }
+        }
+
+        [HttpPut("Update")] public async Task<ActionResult<Car>> Update(CarUpdateDto objDto)
+        {
+            Car? obj = await service.GetById(objDto.Id);
+            if (obj is null) { return NotFound(new Car()); }
+            else
+            {
+                obj = await service.SetNextAvailable(service.Validate(objDto.Map(obj)));
+                if (obj is null) { return BadRequest(await service.GetById(objDto.Id)); }
+                else { await service.Update(obj); return Ok(obj); }
+            }
         }
     }
 }

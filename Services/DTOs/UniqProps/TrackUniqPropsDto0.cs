@@ -8,8 +8,8 @@ namespace GTRC_Database_API.Services.DTOs
     {
         [Required] public string AccTrackId { get; set; } = "";
 
-        public override Track Map() { Track obj = new() { AccTrackId = AccTrackId }; return obj; }
+        public override Track Map(Track obj) { obj.AccTrackId = AccTrackId; return obj; }
 
-        public override void Map(Track obj) { AccTrackId = obj.AccTrackId; }
+        public override void ReMap(Track obj) { AccTrackId = obj.AccTrackId; }
     }
 }

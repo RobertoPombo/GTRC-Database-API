@@ -12,24 +12,24 @@ namespace GTRC_Database_API.Services
 
         public Track Validate(Track obj)
         {
-            obj.AccTrackID = Scripts.RemoveSpaceStartEnd(obj.AccTrackID);
-            if (obj.AccTrackID.Length == 0 ) { obj.AccTrackID = Track.DefaultAccTrackID; }
+            obj.AccTrackId = Scripts.RemoveSpaceStartEnd(obj.AccTrackId);
+            if (obj.AccTrackId.Length == 0 ) { obj.AccTrackId = Track.DefaultAccTrackID; }
             obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
             obj.PitBoxesCount = Math.Max(obj.PitBoxesCount, minPitBoxesCount);
             obj.ServerSlotsCount = Math.Max(obj.ServerSlotsCount, minServerSlotsCount);
             obj.AccTimePenDT = Math.Max(obj.AccTimePenDT, minAccTimePenDT);
-            obj.Name_GTRC = Scripts.RemoveSpaceStartEnd(obj.Name_GTRC);
+            obj.NameGtrc = Scripts.RemoveSpaceStartEnd(obj.NameGtrc);
             return obj;
         }
 
         public Track SetNextAvailable(Track obj)
         {
             int nr = 1;
-            string defID = obj.AccTrackID;
+            string defID = obj.AccTrackId;
             if (Scripts.SubStr(defID, -2, 1) == "_") { defID = Scripts.SubStr(defID, 0, defID.Length - 2); }
             while (!IsUnique(obj))
             {
-                obj.AccTrackID = defID + "_" + nr.ToString();
+                obj.AccTrackId = defID + "_" + nr.ToString();
                 nr++; if (nr == int.MaxValue) { break; }
             }
             return obj;

@@ -10,22 +10,22 @@ namespace GTRC_Database_API.Services
 
         public Car Validate(Car obj)
         {
-            obj.AccCarID = Math.Max(obj.AccCarID, minAccCarId);
+            obj.AccCarId = Math.Max(obj.AccCarId, minAccCarId);
             obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
             obj.Manufacturer = Scripts.RemoveSpaceStartEnd(obj.Manufacturer);
             obj.Model = Scripts.RemoveSpaceStartEnd(obj.Model);
             obj.Category = Scripts.RemoveSpaceStartEnd(obj.Category);
-            obj.Name_GTRC = Scripts.RemoveSpaceStartEnd(obj.Name_GTRC);
+            obj.NameGtrc = Scripts.RemoveSpaceStartEnd(obj.NameGtrc);
             return obj;
         }
 
         public Car SetNextAvailable(Car obj)
         {
-            int startValue = obj.AccCarID;
+            int startValue = obj.AccCarId;
             while (!IsUnique(obj))
             {
-                if (obj.AccCarID < int.MaxValue) { obj.AccCarID += 1; } else { obj.AccCarID = minAccCarId; }
-                if (obj.AccCarID == startValue) { break; }
+                if (obj.AccCarId < int.MaxValue) { obj.AccCarId += 1; } else { obj.AccCarId = minAccCarId; }
+                if (obj.AccCarId == startValue) { break; }
             }
             return obj;
         }

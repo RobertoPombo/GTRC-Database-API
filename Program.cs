@@ -24,11 +24,20 @@ builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(sQLCo
 builder.Services.AddScoped(typeof(BaseService<>));
 builder.Services.AddScoped(typeof(IBaseContext<>), typeof(BaseContext<>));
 
+builder.Services.AddScoped<ColorService>();
+builder.Services.AddScoped<IColorContext, ColorContext>();
+
 builder.Services.AddScoped<CarService>();
 builder.Services.AddScoped<ICarContext, CarContext>();
 
 builder.Services.AddScoped<TrackService>();
 builder.Services.AddScoped<ITrackContext, TrackContext>();
+
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IUserContext, UserContext>();
+
+builder.Services.AddScoped<SeriesService>();
+builder.Services.AddScoped<ISeriesContext, SeriesContext>();
 
 
 var app = builder.Build();

@@ -1,6 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using System.Text;
 
 using GTRC_Database_API.Data;
 using GTRC_Database_API.Services;

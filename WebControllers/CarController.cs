@@ -12,7 +12,7 @@ namespace GTRC_Database_API.Controllers
         [HttpGet("Get/ByUniqProps")] public async Task<ActionResult<Car>> GetByUniqProps([FromQuery] CarUniqPropsDto0 objDto)
         {
             Car? obj = await service.GetByUniqProps(objDto);
-            if (obj is null) { return NotFound(new Car()); }
+            if (obj is null) { return NotFound(); }
             else { return Ok(obj); }
         }
 
@@ -23,30 +23,30 @@ namespace GTRC_Database_API.Controllers
 
         [HttpGet("Get/ByFilter")] public async Task<ActionResult<List<Car>>> GetByFilter([FromQuery] CarFilterDtos objDto)
         {
-            return Ok(await service.GetByFilter(objDto));
+            return Ok(await service.GetByFilter(objDto.Filter, objDto.FilterMin, objDto.FilterMax));
         }
 
         [HttpGet("Get/Temp")] public async Task<ActionResult<Car>> GetTemp()
         {
             Car? obj = await service.GetTemp();
-            if (obj is null) { return BadRequest(new Car()); }
+            if (obj is null) { return BadRequest(); }
             else { return Ok(obj); }
         }
 
         [HttpPost("Add")] public async Task<ActionResult<Car>> Add(CarAddDto objDto)
         {
-            Car? obj = await service.SetNextAvailable(service.Validate(objDto.Map()));
-            if (obj is null) { return BadRequest(new Car()); }
+            Car? obj = await service.SetNextAvailable(CarService.Validate(objDto.Map()));
+            if (obj is null) { return BadRequest(); }
             else { await service.Add(obj); CarUniqPropsDto0 objDto0 = new(); objDto0.ReMap(obj); return Ok(await service.GetByUniqProps(objDto0)); }
         }
 
         [HttpPut("Update")] public async Task<ActionResult<Car>> Update(CarUpdateDto objDto)
         {
             Car? obj = await service.GetById(objDto.Id);
-            if (obj is null) { return NotFound(new Car()); }
+            if (obj is null) { return NotFound(); }
             else
             {
-                obj = await service.SetNextAvailable(service.Validate(objDto.Map(obj)));
+                obj = await service.SetNextAvailable(CarService.Validate(objDto.Map(obj)));
                 if (obj is null) { return BadRequest(await service.GetById(objDto.Id)); }
                 else { await service.Update(obj); return Ok(obj); }
             }

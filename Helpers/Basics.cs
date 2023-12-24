@@ -10,6 +10,8 @@ namespace GTRC_Database_API.Helpers
 {
     public static class Basics
     {
+        public static readonly List<Type> ModelTypeList = [typeof(Car), typeof(Track)];
+
         public static void SetUniqueProperties()
         {
             Dictionary<DtoType, Type> DtoModelsCar = [];
@@ -35,6 +37,19 @@ namespace GTRC_Database_API.Helpers
             if (!Directory.Exists(GlobalValues.DataDirectory)) { Directory.CreateDirectory(GlobalValues.DataDirectory); }
             if (!File.Exists(pathSqlConnectionConfig)) { File.WriteAllText(pathSqlConnectionConfig, JsonConvert.SerializeObject(new SqlConnectionConfig(), Formatting.Indented), Encoding.Unicode); }
             return JsonConvert.DeserializeObject<SqlConnectionConfig>(File.ReadAllText(pathSqlConnectionConfig, Encoding.Unicode)) ?? new();
+        }
+
+        public static bool IsForeignId(string propertyName)
+        {
+            if (propertyName.Length > 2 && propertyName[^2..] == "Id")
+            {
+                foreach (Type type in ModelTypeList)
+                {
+                    if (propertyName[..^2] == type.Name) { return true; }
+                }
+                return false;
+            }
+            return false;
         }
     }
 }

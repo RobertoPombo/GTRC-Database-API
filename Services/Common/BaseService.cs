@@ -70,52 +70,99 @@ namespace GTRC_Database_API.Services
             return true;
         }
 
-        public async Task<ModelType?> GetByUniqProp(dynamic _value, int index = 0)
+        public async Task<ModelType?> GetByUniqProps(dynamic objDto, int index = 0)
         {
-            if (UniqProps.Count > index && UniqProps[index].Count == 1)
+            if (UniqProps.Count > index && UniqProps[index].Count > 0 && UniqProps[index].Count == Scripts.GetPropertyList(objDto.GetType()).Count)
             {
-                return await GetByUniqProps([_value], index);
-            }
-            return null;
-        }
-
-        public async Task<ModelType?> GetByUniqProps(List<dynamic> values, int index = 0)
-        {
-            if (UniqProps.Count > index && UniqProps[index].Count > 0 && UniqProps[index].Count == values.Count)
-            {
-                List<ModelType> list = await GetByProps(UniqProps[index], values, true);
+                List<ModelType> list = await GetByProps(objDto, true, index);
                 if (list.Count == 1) { return list[0]; }
                 else { return null; }
             }
             return null;
         }
 
-        public async Task<List<ModelType>> GetByProps(PropertyInfo property, dynamic _value, bool firstOnly = false)
-        {
-            return await GetByProps([property], [_value], firstOnly);
-        }
-
-        public async Task<List<ModelType>> GetByProps(List<PropertyInfo> properties, List<dynamic> values, bool firstOnly = false)
+        public async Task<List<ModelType>> GetByProps(dynamic objDto, bool firstOnly = false, int indexUniqProps = -1)
         {
             List<ModelType> _list = [];
             List<ModelType> list = await GetAll();
-            if (properties.Count > 0 && properties.Count == values.Count)
+            List<PropertyInfo> listProps = Scripts.GetPropertyList(typeof(ModelType));
+            if (firstOnly && indexUniqProps >= 0 && indexUniqProps < UniqProps.Count) { listProps = UniqProps[indexUniqProps]; }
+            foreach (ModelType obj in list)
             {
-                foreach (ModelType _obj in list)
+                bool found = true;
+                foreach (PropertyInfo property in listProps)
                 {
-                    bool found = true;
-                    for (int propertyNr = 0; propertyNr < properties.Count; propertyNr++)
+                    foreach (PropertyInfo filterProperty in objDto.GetType().GetProperties())
                     {
-                        if (Scripts.GetCastedValue(_obj, properties[propertyNr]) != Scripts.CastValue(properties[propertyNr], values[propertyNr]))
+                        if (filterProperty.Name == property.Name && filterProperty.GetValue(objDto) is not null && property.GetValue(obj) is not null)
                         {
-                            found = false;
+                            if (Scripts.GetCastedValue(obj, property) != Scripts.GetCastedValue(objDto, filterProperty))
+                            {
+                                found = false;
+                                break;
+                            }
                             break;
                         }
                     }
-                    if (found) { _list.Add(_obj); if (firstOnly) { return _list; } }
                 }
+                if (found) { _list.Add(obj); if (firstOnly) { return _list; } }
             }
             return _list;
+        }
+
+        public async Task<List<ModelType>> GetByFilter(dynamic objFilter, dynamic objFilterMin, dynamic objFilterMax)
+        {
+            List<ModelType> list = await GetAll();
+            List<ModelType> filteredList = [];
+            List<PropertyInfo> listModelProps = Scripts.GetPropertyList(typeof(ModelType));
+            List<PropertyInfo> listFilterProps = Scripts.GetPropertyList(objFilter.GetType());
+            foreach (ModelType obj in list)
+            {
+                bool isInList = true;
+                foreach (PropertyInfo filterProperty in listFilterProps)
+                {
+                    var filter = filterProperty.GetValue(objFilter);
+                    var filterMin = filterProperty.GetValue(objFilterMin);
+                    var filterMax = filterProperty.GetValue(objFilterMax);
+                    if (filter is not null || filterMin is not null || filterMax is not null)
+                    {
+                        string strFilter = filter?.ToString()?.ToLower() ?? "";
+                        string strFilterMin = filterMin?.ToString()?.ToLower() ?? "";
+                        string strFilterMax = filterMax?.ToString()?.ToLower() ?? "";
+                        foreach (PropertyInfo property in listModelProps)
+                        {
+                            if (filterProperty.Name == property.Name)
+                            {
+                                var castedValue = Scripts.GetCastedValue(obj, property);
+                                string strValue = castedValue.ToString().ToLower();
+                                if (!strValue.Contains(strFilter)) { isInList = false; }
+                                else if (GlobalValues.numericalTypes.Contains(property.PropertyType.ToString()))
+                                {
+                                    if (filterMin is not null)
+                                    {
+                                        var castedFilterMin = Scripts.CastValue(property, filterMin);
+                                        if (castedValue < castedFilterMin) { isInList = false; }
+                                    }
+                                    if (filterMax is not null)
+                                    {
+                                        var castedFilterMax = Scripts.CastValue(property, filterMax);
+                                        if (castedValue > castedFilterMax) { isInList = false; }
+                                    }
+                                }
+                                else if ((strFilterMin.Length > 0 && string.Compare(strValue, strFilterMin) == -1)
+                                    || (strFilterMax.Length > 0 && string.Compare(strValue, strFilterMax) == 1))
+                                {
+                                    isInList = false;
+                                }
+                                break;
+                            }
+                        }
+                        if (!isInList) { break; }
+                    }
+                }
+                if (isInList) { filteredList.Add(obj); }
+            }
+            return filteredList;
         }
 
         public async Task SaveChanges() { await iBaseContext.SaveChanges(); }

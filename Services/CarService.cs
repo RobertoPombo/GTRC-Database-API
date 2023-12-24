@@ -2,17 +2,14 @@
 
 using GTRC_Basics;
 using GTRC_Basics.Models;
-using GTRC_Database_API.Helpers;
 using GTRC_Database_API.Services.DTOs;
 using GTRC_Database_API.Services.Interfaces;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Newtonsoft.Json.Linq;
 
 namespace GTRC_Database_API.Services
 {
     public class CarService(ICarContext iCarContext, IBaseContext<Car> iBaseContext) : BaseService<Car>(iBaseContext)
     {
-        private readonly int minAccCarId = 0;
+        private static readonly int minAccCarId = 0;
 
         public Car Validate(Car obj)
         {

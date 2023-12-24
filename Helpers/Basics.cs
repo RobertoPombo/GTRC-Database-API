@@ -1,8 +1,10 @@
-﻿using GTRC_Basics;
+﻿using Newtonsoft.Json;
+using System.Text;
+
+using GTRC_Basics;
 using GTRC_Basics.Models;
 using GTRC_Database_API.Services;
-using Newtonsoft.Json;
-using System.Text;
+using GTRC_Database_API.Services.DTOs;
 
 namespace GTRC_Database_API.Helpers
 {
@@ -10,8 +12,21 @@ namespace GTRC_Database_API.Helpers
     {
         public static void SetUniqueProperties()
         {
-            BaseService<Car>.ListUniqProps[typeof(Car)] = [[typeof(Car).GetProperty(nameof(Car.AccCarId))!]];
-            BaseService<Track>.ListUniqProps[typeof(Track)] = [[typeof(Track).GetProperty(nameof(Track.AccTrackId))!]];
+            Dictionary<DtoType, Type> DtoModelsCar = [];
+            DtoModelsCar[DtoType.Add] = typeof(CarAddDto);
+            DtoModelsCar[DtoType.Update] = typeof(CarUpdateDto);
+            DtoModelsCar[DtoType.Filter] = typeof(CarFilterDto);
+            DtoModelsCar[DtoType.Filters] = typeof(CarFilterDtos);
+            BaseService<Car>.DictDtoModels[typeof(Car)] = DtoModelsCar;
+            BaseService<Car>.DictUniqPropsDtoModels[typeof(Car)] = [typeof(CarUniqPropsDto0)];
+
+            Dictionary<DtoType, Type> DtoModelsTrack = [];
+            DtoModelsTrack[DtoType.Add] = typeof(TrackAddDto);
+            DtoModelsTrack[DtoType.Update] = typeof(TrackUpdateDto);
+            DtoModelsTrack[DtoType.Filter] = typeof(TrackFilterDto);
+            DtoModelsTrack[DtoType.Filters] = typeof(TrackFilterDtos);
+            BaseService<Track>.DictDtoModels[typeof(Track)] = DtoModelsTrack;
+            BaseService<Track>.DictUniqPropsDtoModels[typeof(Track)] = [typeof(TrackUniqPropsDto0)];
         }
 
         public static SqlConnectionConfig GetSqlConnection()

@@ -8,13 +8,33 @@ namespace GTRC_Database_API.Services
 {
     public class BaseService<ModelType> where ModelType : class, IBaseModel, new()
     {
-        public static readonly Dictionary<Type, List<List<PropertyInfo>>> ListUniqProps = [];
+        public static readonly Dictionary<Type, Dictionary<DtoType, Type>> DictDtoModels = [];
+        public static readonly Dictionary<Type, List<Type>> DictUniqPropsDtoModels = [];
+        public readonly Dictionary<DtoType, Type> DtoModels = [];
+        public readonly List<Type> UniqPropsDtoModels = [];
         public readonly List<List<PropertyInfo>> UniqProps = [[]];
         public IBaseContext<ModelType> iBaseContext;
 
         public BaseService(IBaseContext<ModelType> _iBaseContext)
         {
-            if (ListUniqProps.ContainsKey(typeof(ModelType))) { UniqProps = ListUniqProps[typeof(ModelType)]; }
+            if (DictDtoModels.ContainsKey(typeof(ModelType))) { DtoModels = DictDtoModels[typeof(ModelType)]; }
+            if (DictUniqPropsDtoModels.ContainsKey(typeof(ModelType)))
+            {
+                UniqProps = [];
+                UniqPropsDtoModels = DictUniqPropsDtoModels[typeof(ModelType)];
+                foreach (Type uniqPropDto in UniqPropsDtoModels)
+                {
+                    List<PropertyInfo> propertyList = [];
+                    foreach (PropertyInfo property in uniqPropDto.GetProperties())
+                    {
+                        foreach (PropertyInfo baseProperty in typeof(ModelType).GetProperties())
+                        {
+                            if (property.Name == baseProperty.Name) { propertyList.Add(baseProperty); }
+                        }
+                    }
+                    UniqProps.Add(propertyList);
+                }
+            }
             iBaseContext = _iBaseContext;
         }
 

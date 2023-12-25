@@ -6,7 +6,6 @@ using GTRC_Database_API.Services.Interfaces;
 using GTRC_Database_API.EfcContext;
 using GTRC_Database_API.Helpers;
 
-Basics.SetUniqueProperties();
 SqlConnectionConfig sQLConCfg = Basics.GetSqlConnection();
 
 var builder = WebApplication.CreateBuilder(args);

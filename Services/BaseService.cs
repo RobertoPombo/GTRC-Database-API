@@ -8,8 +8,6 @@ namespace GTRC_Database_API.Services
 {
     public class BaseService<ModelType> where ModelType : class, IBaseModel, new()
     {
-        public static readonly Dictionary<Type, Dictionary<DtoType, Type>> DictDtoModels = [];
-        public static readonly Dictionary<Type, List<Type>> DictUniqPropsDtoModels = [];
         public readonly Dictionary<DtoType, Type> DtoModels = [];
         public readonly List<Type> UniqPropsDtoModels = [];
         public readonly List<List<PropertyInfo>> UniqProps = [[]];
@@ -17,11 +15,11 @@ namespace GTRC_Database_API.Services
 
         public BaseService(IBaseContext<ModelType> _iBaseContext)
         {
-            if (DictDtoModels.ContainsKey(typeof(ModelType))) { DtoModels = DictDtoModels[typeof(ModelType)]; }
-            if (DictUniqPropsDtoModels.ContainsKey(typeof(ModelType)))
+            if (GlobalValues.DictDtoModels.ContainsKey(typeof(ModelType))) { DtoModels = GlobalValues.DictDtoModels[typeof(ModelType)]; }
+            if (GlobalValues.DictUniqPropsDtoModels.ContainsKey(typeof(ModelType)))
             {
                 UniqProps = [];
-                UniqPropsDtoModels = DictUniqPropsDtoModels[typeof(ModelType)];
+                UniqPropsDtoModels = GlobalValues.DictUniqPropsDtoModels[typeof(ModelType)];
                 foreach (Type uniqPropDto in UniqPropsDtoModels)
                 {
                     List<PropertyInfo> propertyList = [];

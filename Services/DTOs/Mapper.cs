@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-
+using GTRC_Basics;
 using GTRC_Basics.Models.Common;
 
 namespace GTRC_Database_API.Services.DTOs
@@ -37,7 +37,7 @@ namespace GTRC_Database_API.Services.DTOs
             {
                 foreach (PropertyInfo objProperty in obj.GetType().GetProperties())
                 {
-                    if (property.Name == objProperty.Name && property.GetValue(this) is not null && property.GetValue(this) != objProperty.GetValue(obj)) { return false; }
+                    if (property.Name == objProperty.Name && property.GetValue(this) is not null && Scripts.GetCastedValue(this, property) != Scripts.GetCastedValue(obj, objProperty)) { return false; }
                 }
             }
             return true;

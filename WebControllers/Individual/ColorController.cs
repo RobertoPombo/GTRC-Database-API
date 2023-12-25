@@ -18,7 +18,7 @@ namespace GTRC_Database_API.Controllers
             else { return Ok(obj); }
         }
 
-        [HttpGet("Get/By")]
+        [HttpGet("Get/ByProps")]
         public async Task<ActionResult<List<Color>>> GetByProps([FromQuery] ColorAddDto objDto)
         {
             return Ok(await service.GetByProps(objDto));

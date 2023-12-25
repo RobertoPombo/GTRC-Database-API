@@ -16,7 +16,7 @@ namespace GTRC_Database_API.Controllers
             else { return Ok(obj); }
         }
 
-        [HttpGet("Get/By")] public async Task<ActionResult<List<Track>>> GetByProps([FromQuery] TrackAddDto objDto)
+        [HttpGet("Get/ByProps")] public async Task<ActionResult<List<Track>>> GetByProps([FromQuery] TrackAddDto objDto)
         {
             return Ok(await service.GetByProps(objDto));
         }

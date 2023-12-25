@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 
 using GTRC_Basics.Models;
-using GTRC_Database_API.Services.DTOs;
+using GTRC_Basics.Models.DTOs;
 
 namespace GTRC_Database_API.Helpers
 {

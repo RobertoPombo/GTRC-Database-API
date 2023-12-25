@@ -4,7 +4,7 @@ using System.Text;
 using GTRC_Basics;
 using GTRC_Basics.Models;
 using GTRC_Database_API.Services;
-using GTRC_Database_API.Services.DTOs;
+using GTRC_Basics.Models.DTOs;
 
 namespace GTRC_Database_API.Helpers
 {

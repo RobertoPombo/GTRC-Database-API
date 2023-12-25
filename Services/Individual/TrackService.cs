@@ -21,7 +21,7 @@ namespace GTRC_Database_API.Services
             string delimiter = "_";
             string defName = obj.AccTrackId;
             string[] defNameList = defName.Split(delimiter);
-            if (defNameList.Length > 1 && Int32.TryParse(defNameList[^1], out _)) { defName = defName[..^(defNameList[^1].Length - delimiter.Length)]; }
+            if (defNameList.Length > 1 && Int32.TryParse(defNameList[^1], out _)) { defName = defName[..^(defNameList[^1].Length + delimiter.Length)]; }
             while (!await IsUnique(obj))
             {
                 obj.AccTrackId = defName + delimiter + nr.ToString();

@@ -8,13 +8,13 @@ KNOWN ISSUES:
 - ...
 
 CLIENT:
-- Localhost/IP:Port config M, VM & V.xaml
+- Localhost/IP:Port config View.xaml
 - ThemeColor refresh anpassen
 - DatabaseVM auf API umrüsten
 
 BASICS & API:
 - Season, Event Tables implementieren und .ToMany Beziehungen testen
-- Delete(bool force) Unterscheidung implementieren
+- Delete(bool force) Unterscheidung einbauen
 - DataFieldM.idList implementieren
 - Restliche Models implementieren
 

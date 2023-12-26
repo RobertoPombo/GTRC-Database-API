@@ -10,53 +10,30 @@ namespace GTRC_Database_API.Controllers
     [Route(nameof(Series))]
     public class SeriesController(SeriesService service, BaseService<Series> baseService) : BaseController<Series>(baseService)
     {
-        [HttpGet("Get/ByUniqProps")]
-        public async Task<ActionResult<Series?>> GetByUniqProps([FromQuery] SeriesUniqPropsDto0 objDto)
-        {
-            Series? obj = await service.GetByUniqProps(objDto);
-            if (obj is null) { return NotFound(obj); }
-            else { return Ok(obj); }
-        }
-
-        [HttpGet("Get/ByProps")]
-        public async Task<ActionResult<List<Series>>> GetByProps([FromQuery] SeriesAddDto objDto)
-        {
-            return Ok(await service.GetByProps(objDto));
-        }
-
-        [HttpGet("Get/ByFilter")]
-        public async Task<ActionResult<List<Series>>> GetByFilter([FromQuery] SeriesFilterDtos objDto)
-        {
-            return Ok(await service.GetByFilter(objDto.Filter, objDto.FilterMin, objDto.FilterMax));
-        }
-
-        [HttpGet("Get/Temp")]
-        public async Task<ActionResult<Series?>> GetTemp()
+        [HttpGet("Get/Temp")] public async Task<ActionResult<Series?>> GetTemp()
         {
             Series? obj = await service.GetTemp();
             if (obj is null) { return BadRequest(obj); }
             else { return Ok(obj); }
         }
 
-        [HttpPost("Add")]
-        public async Task<ActionResult<Series?>> Add(SeriesAddDto objDto)
+        [HttpPost("Add")] public async Task<ActionResult<Series?>> Add(AddDto<Series> objDto)
         {
-            Series? obj = await service.SetNextAvailable(SeriesService.Validate(objDto.Map()));
+            Series? obj = await service.SetNextAvailable(SeriesService.Validate(objDto.Dto.Map()));
             if (obj is null) { return BadRequest(obj); }
-            else if (!objDto.IsSimilar(obj)) { return Conflict(obj); }
-            else { await service.Add(obj); SeriesUniqPropsDto0 objDto0 = new(); objDto0.ReMap(obj); return Ok(await service.GetByUniqProps(objDto0)); }
+            else if (!objDto.Dto.IsSimilar(obj)) { return Conflict(obj); }
+            else { await service.Add(obj); UniqPropsDto<Series> uniqPropsDto = new(); uniqPropsDto.Dto.ReMap(obj); return Ok(await service.GetByUniqProps(uniqPropsDto)); }
         }
 
-        [HttpPut("Update")]
-        public async Task<ActionResult<Series?>> Update(SeriesUpdateDto objDto)
+        [HttpPut("Update")] public async Task<ActionResult<Series?>> Update(UpdateDto<Series> objDto)
         {
-            Series? obj = await service.GetById(objDto.Id);
+            Series? obj = await service.GetById(objDto.Dto.Id);
             if (obj is null) { return NotFound(obj); }
             else
             {
-                obj = await service.SetNextAvailable(SeriesService.Validate(objDto.Map(obj)));
-                if (obj is null) { return BadRequest(await service.GetById(objDto.Id)); }
-                else if (!objDto.IsSimilar(obj)) { return Conflict(obj); }
+                obj = await service.SetNextAvailable(SeriesService.Validate(objDto.Dto.Map(obj)));
+                if (obj is null) { return BadRequest(await service.GetById(objDto.Dto.Id)); }
+                else if (!objDto.Dto.IsSimilar(obj)) { return Conflict(obj); }
                 else { await service.Update(obj); return Ok(obj); }
             }
         }

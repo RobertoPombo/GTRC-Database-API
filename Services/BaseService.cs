@@ -2,6 +2,7 @@
 
 using GTRC_Basics;
 using GTRC_Basics.Models.Common;
+using GTRC_Basics.Models.DTOs;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
@@ -68,18 +69,18 @@ namespace GTRC_Database_API.Services
             return true;
         }
 
-        public async Task<ModelType?> GetByUniqProps(dynamic objDto, int index = 0)
+        public async Task<ModelType?> GetByUniqProps(UniqPropsDto<ModelType> objDto)
         {
-            if (UniqProps.Count > index && UniqProps[index].Count > 0 && UniqProps[index].Count == Scripts.GetPropertyList(objDto.GetType()).Count)
+            if (UniqProps.Count > objDto.Index && UniqProps[objDto.Index].Count > 0 && UniqProps[objDto.Index].Count == Scripts.GetPropertyList(objDto.Dto.GetType()).Count)
             {
-                List<ModelType> list = await GetByProps(objDto, true, index);
+                List<ModelType> list = await GetByProps(Mapper<ModelType>.Map(objDto, new AddDto<ModelType>().Dto), true, objDto.Index);
                 if (list.Count == 1) { return list[0]; }
                 else { return null; }
             }
             return null;
         }
 
-        public async Task<List<ModelType>> GetByProps(dynamic objDto, bool firstOnly = false, int indexUniqProps = -1)
+        public async Task<List<ModelType>> GetByProps(AddDto<ModelType> objDto, bool firstOnly = false, int indexUniqProps = -1)
         {
             List<ModelType> _list = [];
             List<ModelType> list = await GetAll();
@@ -90,11 +91,11 @@ namespace GTRC_Database_API.Services
                 bool found = true;
                 foreach (PropertyInfo property in listProps)
                 {
-                    foreach (PropertyInfo filterProperty in objDto.GetType().GetProperties())
+                    foreach (PropertyInfo filterProperty in objDto.Dto.GetType().GetProperties())
                     {
-                        if (filterProperty.Name == property.Name && filterProperty.GetValue(objDto) is not null && property.GetValue(obj) is not null)
+                        if (filterProperty.Name == property.Name && filterProperty.GetValue(objDto.Dto) is not null && property.GetValue(obj) is not null)
                         {
-                            if (Scripts.GetCastedValue(obj, property) != Scripts.GetCastedValue(objDto, filterProperty))
+                            if (Scripts.GetCastedValue(obj, property) != Scripts.GetCastedValue(objDto.Dto, filterProperty))
                             {
                                 found = false;
                                 break;
@@ -108,7 +109,7 @@ namespace GTRC_Database_API.Services
             return _list;
         }
 
-        public async Task<List<ModelType>> GetByFilter(dynamic objFilter, dynamic objFilterMin, dynamic objFilterMax)
+        public async Task<List<ModelType>> GetByFilter(FilterDto<ModelType> objFilter, FilterDto<ModelType> objFilterMin, FilterDto<ModelType> objFilterMax)
         {
             List<ModelType> list = await GetAll();
             List<ModelType> filteredList = [];
@@ -119,9 +120,9 @@ namespace GTRC_Database_API.Services
                 bool isInList = true;
                 foreach (PropertyInfo filterProperty in listFilterProps)
                 {
-                    var filter = filterProperty.GetValue(objFilter);
-                    var filterMin = filterProperty.GetValue(objFilterMin);
-                    var filterMax = filterProperty.GetValue(objFilterMax);
+                    var filter = filterProperty.GetValue(objFilter.Dto);
+                    var filterMin = filterProperty.GetValue(objFilterMin.Dto);
+                    var filterMax = filterProperty.GetValue(objFilterMax.Dto);
                     if (filter is not null || filterMin is not null || filterMax is not null)
                     {
                         string strFilter = filter?.ToString()?.ToLower() ?? string.Empty;

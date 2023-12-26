@@ -8,13 +8,15 @@ KNOWN ISSUES:
 - ...
 
 CLIENT:
-- Localhost/IP:Port config View.xaml
 - ThemeColor refresh anpassen
 - DatabaseVM auf API umrüsten
+- Filter speichern und laden
+- Dtos => HttpContent konvertieren | The best overloaded method match for 'System.Net.Http.HttpClient.PostAsync(string, System.Net.Http.HttpContent)' has some invalid arguments
 
 BASICS & API:
 - Season, Event Tables implementieren und .ToMany Beziehungen testen
-- Delete(bool force) Unterscheidung einbauen
+- IsChild() & DeleteAllChilds(int newID = -1) Methoden sowie Delete(bool force) Unterscheidung einbauen
+- Get/ByIdAsString & Get/ByIdAsDict Requests einbauen
 - DataFieldM.idList implementieren
 - Restliche Models implementieren
 

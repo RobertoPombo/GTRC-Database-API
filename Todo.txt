@@ -8,10 +8,11 @@ KNOWN ISSUES:
 - ...
 
 CLIENT:
-- ThemeColor refresh anpassen
-- DatabaseVM auf API umrüsten
-- Filter speichern und laden
-- Dtos => HttpContent konvertieren | The best overloaded method match for 'System.Net.Http.HttpClient.PostAsync(string, System.Net.Http.HttpContent)' has some invalid arguments
+- Internal Server Error bei + beheben
+- Filter speichern, laden und annwenden
+- Sort-Funktionen im ListView wiederherstellen
+- DbObjectView Dropdown für Enums
+- ColorPreview in DbListView anzeigen
 
 BASICS & API:
 - Season, Event Tables implementieren und .ToMany Beziehungen testen

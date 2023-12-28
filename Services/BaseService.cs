@@ -73,7 +73,9 @@ namespace GTRC_Database_API.Services
         {
             if (UniqProps.Count > objDto.Index && UniqProps[objDto.Index].Count > 0 && UniqProps[objDto.Index].Count == Scripts.GetPropertyList(objDto.Dto.GetType()).Count)
             {
-                List<ModelType> list = await GetByProps(Mapper<ModelType>.Map(objDto, new AddDto<ModelType>().Dto), true, objDto.Index);
+                AddDto<ModelType> addDto = new();
+                addDto.Dto = Mapper<ModelType>.Map(objDto.Dto, addDto.Dto);
+                List <ModelType> list = await GetByProps(addDto, true, objDto.Index);
                 if (list.Count == 1) { return list[0]; }
                 else { return null; }
             }
@@ -114,7 +116,7 @@ namespace GTRC_Database_API.Services
             List<ModelType> list = await GetAll();
             List<ModelType> filteredList = [];
             List<PropertyInfo> listModelProps = Scripts.GetPropertyList(typeof(ModelType));
-            List<PropertyInfo> listFilterProps = Scripts.GetPropertyList(objFilter.GetType());
+            List<PropertyInfo> listFilterProps = Scripts.GetPropertyList(objFilter.Dto.GetType());
             foreach (ModelType obj in list)
             {
                 bool isInList = true;

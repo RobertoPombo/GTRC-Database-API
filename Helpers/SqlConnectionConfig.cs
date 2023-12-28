@@ -1,4 +1,6 @@
-﻿namespace GTRC_Database_API.Helpers
+﻿using System.Text.Json.Serialization;
+
+namespace GTRC_Database_API.Helpers
 {
     public class SqlConnectionConfig
     {
@@ -14,7 +16,7 @@
         public int Port { get; set; } = 1433;
         public string UserID { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
-        public string ConnectionString
+        [JsonIgnore] public string ConnectionString
         {
             get
             {

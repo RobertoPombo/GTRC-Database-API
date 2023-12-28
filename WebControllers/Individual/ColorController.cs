@@ -10,6 +10,26 @@ namespace GTRC_Database_API.Controllers
     [Route(nameof(Color))]
     public class ColorController(ColorService service, BaseService<Color> baseService) : BaseController<Color>(baseService)
     {
+        [HttpGet("Get/ByUniqProps/0")] public async Task<ActionResult<Color?>> GetByUniqProps([FromQuery] ColorUniqPropsDto0 objDto)
+        {
+            UniqPropsDto<Color> _objDto = new() { Index = 0, Dto = objDto };
+            Color? obj = await service.GetByUniqProps(_objDto);
+            if (obj is null) { return NotFound(obj); }
+            else { return Ok(obj); }
+        }
+
+        [HttpGet("Get/ByProps")] public async Task<ActionResult<List<Color>>> GetByProps([FromQuery] ColorAddDto objDto)
+        {
+            AddDto<Color> _objDto = new() { Dto = objDto };
+            return Ok(await service.GetByProps(_objDto));
+        }
+
+        [HttpGet("Get/ByFilter")] public async Task<ActionResult<List<Color>>> GetByFilter([FromQuery] ColorFilterDtos objDto)
+        {
+            FilterDtos<Color> _objDto = new() { Dto = objDto };
+            return Ok(await service.GetByFilter(_objDto.Filter, _objDto.FilterMin, _objDto.FilterMax));
+        }
+
         [HttpGet("Get/Temp")] public async Task<ActionResult<Color?>> GetTemp()
         {
             Color? obj = await service.GetTemp();
@@ -17,23 +37,23 @@ namespace GTRC_Database_API.Controllers
             else { return Ok(obj); }
         }
 
-        [HttpPost("Add")] public async Task<ActionResult<Color?>> Add(AddDto<Color> objDto)
+        [HttpPost("Add")] public async Task<ActionResult<Color?>> Add(ColorAddDto objDto)
         {
-            Color? obj = await service.SetNextAvailable(ColorService.Validate(objDto.Dto.Map()));
+            Color? obj = await service.SetNextAvailable(ColorService.Validate(objDto.Map()));
             if (obj is null) { return BadRequest(obj); }
-            else if (!objDto.Dto.IsSimilar(obj)) { return Conflict(obj); }
+            else if (!objDto.IsSimilar(obj)) { return Conflict(obj); }
             else { await service.Add(obj); UniqPropsDto<Color> uniqPropsDto = new(); uniqPropsDto.Dto.ReMap(obj); return Ok(await service.GetByUniqProps(uniqPropsDto)); }
         }
 
-        [HttpPut("Update")] public async Task<ActionResult<Color?>> Update(UpdateDto<Color> objDto)
+        [HttpPut("Update")] public async Task<ActionResult<Color?>> Update(ColorUpdateDto objDto)
         {
-            Color? obj = await service.GetById(objDto.Dto.Id);
+            Color? obj = await service.GetById(objDto.Id);
             if (obj is null) { return NotFound(obj); }
             else
             {
-                obj = await service.SetNextAvailable(ColorService.Validate(objDto.Dto.Map(obj)));
-                if (obj is null) { return BadRequest(await service.GetById(objDto.Dto.Id)); }
-                else if (!objDto.Dto.IsSimilar(obj)) { return Conflict(obj); }
+                obj = await service.SetNextAvailable(ColorService.Validate(objDto.Map(obj)));
+                if (obj is null) { return BadRequest(await service.GetById(objDto.Id)); }
+                else if (!objDto.IsSimilar(obj)) { return Conflict(obj); }
                 else { await service.Update(obj); return Ok(obj); }
             }
         }

@@ -10,6 +10,26 @@ namespace GTRC_Database_API.Controllers
     [Route(nameof(Track))]
     public class TrackController(TrackService service, BaseService<Track> baseService) : BaseController<Track>(baseService)
     {
+        [HttpGet("Get/ByUniqProps/0")] public async Task<ActionResult<Track?>> GetByUniqProps([FromQuery] TrackUniqPropsDto0 objDto)
+        {
+            UniqPropsDto<Track> _objDto = new() { Index = 0, Dto = objDto };
+            Track? obj = await service.GetByUniqProps(_objDto);
+            if (obj is null) { return NotFound(obj); }
+            else { return Ok(obj); }
+        }
+
+        [HttpGet("Get/ByProps")] public async Task<ActionResult<List<Track>>> GetByProps([FromQuery] TrackAddDto objDto)
+        {
+            AddDto<Track> _objDto = new() { Dto = objDto };
+            return Ok(await service.GetByProps(_objDto));
+        }
+
+        [HttpGet("Get/ByFilter")] public async Task<ActionResult<List<Track>>> GetByFilter([FromQuery] TrackFilterDtos objDto)
+        {
+            FilterDtos<Track> _objDto = new() { Dto = objDto };
+            return Ok(await service.GetByFilter(_objDto.Filter, _objDto.FilterMin, _objDto.FilterMax));
+        }
+
         [HttpGet("Get/Temp")] public async Task<ActionResult<Track?>> GetTemp()
         {
             Track? obj = await service.GetTemp();
@@ -17,23 +37,23 @@ namespace GTRC_Database_API.Controllers
             else { return Ok(obj); }
         }
 
-        [HttpPost("Add")] public async Task<ActionResult<Track?>> Add(AddDto<Track> objDto)
+        [HttpPost("Add")] public async Task<ActionResult<Track?>> Add(TrackAddDto objDto)
         {
-            Track? obj = await service.SetNextAvailable(TrackService.Validate(objDto.Dto.Map()));
+            Track? obj = await service.SetNextAvailable(TrackService.Validate(objDto.Map()));
             if (obj is null) { return BadRequest(obj); }
-            else if (!objDto.Dto.IsSimilar(obj)) { return Conflict(obj); }
+            else if (!objDto.IsSimilar(obj)) { return Conflict(obj); }
             else { await service.Add(obj); UniqPropsDto<Track> uniqPropsDto = new(); uniqPropsDto.Dto.ReMap(obj); return Ok(await service.GetByUniqProps(uniqPropsDto)); }
         }
 
-        [HttpPut("Update")] public async Task<ActionResult<Track?>> Update(UpdateDto<Track> objDto)
+        [HttpPut("Update")] public async Task<ActionResult<Track?>> Update(TrackUpdateDto objDto)
         {
-            Track? obj = await service.GetById(objDto.Dto.Id);
+            Track? obj = await service.GetById(objDto.Id);
             if (obj is null) { return NotFound(obj); }
             else
             {
-                obj = await service.SetNextAvailable(TrackService.Validate(objDto.Dto.Map(obj)));
-                if (obj is null) { return BadRequest(await service.GetById(objDto.Dto.Id)); }
-                else if (!objDto.Dto.IsSimilar(obj)) { return Conflict(obj); }
+                obj = await service.SetNextAvailable(TrackService.Validate(objDto.Map(obj)));
+                if (obj is null) { return BadRequest(await service.GetById(objDto.Id)); }
+                else if (!objDto.IsSimilar(obj)) { return Conflict(obj); }
                 else { await service.Update(obj); return Ok(obj); }
             }
         }

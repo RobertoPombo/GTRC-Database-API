@@ -10,7 +10,7 @@ namespace GTRC_Database_API.Controllers
     [Route(nameof(User))]
     public class UserController(UserService service, BaseService<User> baseService) : BaseController<User>(baseService)
     {
-        [HttpGet("Get/ByUniqProps/0")] public async Task<ActionResult<User?>> GetByUniqProps([FromQuery] UserUniqPropsDto0 objDto)
+        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<User?>> GetByUniqProps(UserUniqPropsDto0 objDto)
         {
             UniqPropsDto<User> _objDto = new() { Index = 0, Dto = objDto };
             User? obj = await service.GetByUniqProps(_objDto);
@@ -18,7 +18,7 @@ namespace GTRC_Database_API.Controllers
             else { return Ok(obj); }
         }
 
-        [HttpGet("Get/ByUniqProps/1")] public async Task<ActionResult<User?>> GetByUniqProps([FromQuery] UserUniqPropsDto1 objDto)
+        [HttpPut("Get/ByUniqProps/1")] public async Task<ActionResult<User?>> GetByUniqProps(UserUniqPropsDto1 objDto)
         {
             UniqPropsDto<User> _objDto = new() { Index = 1, Dto = objDto };
             User? obj = await service.GetByUniqProps(_objDto);
@@ -26,13 +26,13 @@ namespace GTRC_Database_API.Controllers
             else { return Ok(obj); }
         }
 
-        [HttpGet("Get/ByProps")] public async Task<ActionResult<List<User>>> GetByProps([FromQuery] UserAddDto objDto)
+        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<User>>> GetByProps(UserAddDto objDto)
         {
             AddDto<User> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByProps(_objDto));
         }
 
-        [HttpGet("Get/ByFilter")] public async Task<ActionResult<List<User>>> GetByFilter([FromQuery] UserFilterDtos objDto)
+        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<User>>> GetByFilter(UserFilterDtos objDto)
         {
             FilterDtos<User> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByFilter(_objDto.Filter, _objDto.FilterMin, _objDto.FilterMax));

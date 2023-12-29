@@ -10,7 +10,7 @@ namespace GTRC_Database_API.Controllers
     [Route(nameof(Color))]
     public class ColorController(ColorService service, BaseService<Color> baseService) : BaseController<Color>(baseService)
     {
-        [HttpGet("Get/ByUniqProps/0")] public async Task<ActionResult<Color?>> GetByUniqProps([FromQuery] ColorUniqPropsDto0 objDto)
+        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Color?>> GetByUniqProps(ColorUniqPropsDto0 objDto)
         {
             UniqPropsDto<Color> _objDto = new() { Index = 0, Dto = objDto };
             Color? obj = await service.GetByUniqProps(_objDto);
@@ -18,13 +18,13 @@ namespace GTRC_Database_API.Controllers
             else { return Ok(obj); }
         }
 
-        [HttpGet("Get/ByProps")] public async Task<ActionResult<List<Color>>> GetByProps([FromQuery] ColorAddDto objDto)
+        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<Color>>> GetByProps(ColorAddDto objDto)
         {
             AddDto<Color> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByProps(_objDto));
         }
 
-        [HttpGet("Get/ByFilter")] public async Task<ActionResult<List<Color>>> GetByFilter([FromQuery] ColorFilterDtos objDto)
+        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<Color>>> GetByFilter(ColorFilterDtos objDto)
         {
             FilterDtos<Color> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByFilter(_objDto.Filter, _objDto.FilterMin, _objDto.FilterMax));

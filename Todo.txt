@@ -8,14 +8,14 @@ KNOWN ISSUES:
 - ...
 
 CLIENT:
-- Internal Server Error bei + beheben
-- Filter speichern, laden und annwenden
+- 100s Timeout Crash beheben
 - Sort-Funktionen im ListView wiederherstellen
 - DbObjectView Dropdown für Enums
-- ColorPreview in DbListView anzeigen
+- ColorPreview in DbListView anzeigen (Kommentare in UserService beachten)
 
 BASICS & API:
 - Season, Event Tables implementieren und .ToMany Beziehungen testen
+- CastValue für Objekte/ObjektIds anpassen
 - IsChild() & DeleteAllChilds(int newID = -1) Methoden sowie Delete(bool force) Unterscheidung einbauen
 - Get/ByIdAsString & Get/ByIdAsDict Requests einbauen
 - DataFieldM.idList implementieren

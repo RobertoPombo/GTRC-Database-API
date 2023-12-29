@@ -60,7 +60,7 @@ namespace GTRC_Database_API.Services
                         bool identical = true;
                         foreach (PropertyInfo property in UniqProps[index])
                         {
-                            if (Scripts.GetCastedValue(obj!, property) != Scripts.GetCastedValue(list[objIndex]!, property)) { identical = false; break; }
+                            if (Scripts.GetCastedValue(obj, property) != Scripts.GetCastedValue(list[objIndex], property)) { identical = false; break; }
                         }
                         if (identical) { return false; }
                     }
@@ -97,11 +97,7 @@ namespace GTRC_Database_API.Services
                     {
                         if (filterProperty.Name == property.Name && filterProperty.GetValue(objDto.Dto) is not null && property.GetValue(obj) is not null)
                         {
-                            if (Scripts.GetCastedValue(obj, property) != Scripts.GetCastedValue(objDto.Dto, filterProperty))
-                            {
-                                found = false;
-                                break;
-                            }
+                            if (Scripts.GetCastedValue(obj, property) != Scripts.GetCastedValue(objDto.Dto, filterProperty)) { found = false; break; }
                             break;
                         }
                     }
@@ -135,20 +131,14 @@ namespace GTRC_Database_API.Services
                             if (filterProperty.Name == property.Name)
                             {
                                 var castedValue = Scripts.GetCastedValue(obj, property);
-                                string strValue = castedValue.ToString().ToLower();
+                                string strValue = castedValue?.ToString().ToLower() ?? 0;
                                 if (!strValue.Contains(strFilter)) { isInList = false; }
-                                else if (GlobalValues.numericalTypes.Contains(property.PropertyType.ToString()))
+                                else if (GlobalValues.numericalTypes.Contains(property.PropertyType))
                                 {
-                                    if (filterMin is not null)
-                                    {
-                                        var castedFilterMin = Scripts.CastValue(property, filterMin);
-                                        if (castedValue < castedFilterMin) { isInList = false; }
-                                    }
-                                    if (filterMax is not null)
-                                    {
-                                        var castedFilterMax = Scripts.CastValue(property, filterMax);
-                                        if (castedValue > castedFilterMax) { isInList = false; }
-                                    }
+                                    var castedFilterMin = Scripts.CastValue(property, filterMin);
+                                    var castedFilterMax = Scripts.CastValue(property, filterMax);
+                                    if (castedFilterMin is not null) { if (castedValue is null || castedValue < castedFilterMin) { isInList = false; } }
+                                    if (castedFilterMax is not null) { if (castedValue is null || castedValue > castedFilterMax) { isInList = false; } }
                                 }
                                 else if ((strFilterMin.Length > 0 && string.Compare(strValue, strFilterMin) == -1)
                                     || (strFilterMax.Length > 0 && string.Compare(strValue, strFilterMax) == 1))

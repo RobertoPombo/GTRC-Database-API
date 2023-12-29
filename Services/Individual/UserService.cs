@@ -58,12 +58,12 @@ namespace GTRC_Database_API.Services
             else { return null; }
         }
 
-        public static string GetFullName(string firstName, string lastName)
+        public static string GetFullName(string firstName, string lastName) // in FullDto verschieben und bei Http Anfragen mit zurückgeben
         {
             return firstName + " " + lastName;
         }
 
-        public static string GetShortName(string firstName, string lastName)
+        public static string GetShortName(string firstName, string lastName) // in FullDto verschieben und bei Http Anfragen mit zurückgeben
         {
             string _shortName = string.Empty;
             List<char> cList = [' ', '-'];

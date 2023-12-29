@@ -10,7 +10,7 @@ namespace GTRC_Database_API.Controllers
     [Route(nameof(Car))]
     public class CarController(CarService service, BaseService<Car> baseService) : BaseController<Car>(baseService)
     {
-        [HttpGet("Get/ByUniqProps/0")] public async Task<ActionResult<Car?>> GetByUniqProps([FromQuery] CarUniqPropsDto0 objDto)
+        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Car?>> GetByUniqProps(CarUniqPropsDto0 objDto)
         {
             UniqPropsDto<Car> _objDto = new() { Index = 0, Dto = objDto };
             Car? obj = await service.GetByUniqProps(_objDto);
@@ -18,13 +18,13 @@ namespace GTRC_Database_API.Controllers
             else { return Ok(obj); }
         }
 
-        [HttpGet("Get/ByProps")] public async Task<ActionResult<List<Car>>> GetByProps([FromQuery] CarAddDto objDto)
+        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<Car>>> GetByProps(CarAddDto objDto)
         {
             AddDto<Car> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByProps(_objDto));
         }
 
-        [HttpGet("Get/ByFilter")] public async Task<ActionResult<List<Car>>> GetByFilter([FromQuery] CarFilterDtos objDto)
+        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<Car>>> GetByFilter(CarFilterDtos objDto)
         {
             FilterDtos<Car> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByFilter(_objDto.Filter, _objDto.FilterMin, _objDto.FilterMax));

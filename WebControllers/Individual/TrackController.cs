@@ -10,7 +10,7 @@ namespace GTRC_Database_API.Controllers
     [Route(nameof(Track))]
     public class TrackController(TrackService service, BaseService<Track> baseService) : BaseController<Track>(baseService)
     {
-        [HttpGet("Get/ByUniqProps/0")] public async Task<ActionResult<Track?>> GetByUniqProps([FromQuery] TrackUniqPropsDto0 objDto)
+        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Track?>> GetByUniqProps(TrackUniqPropsDto0 objDto)
         {
             UniqPropsDto<Track> _objDto = new() { Index = 0, Dto = objDto };
             Track? obj = await service.GetByUniqProps(_objDto);
@@ -18,13 +18,13 @@ namespace GTRC_Database_API.Controllers
             else { return Ok(obj); }
         }
 
-        [HttpGet("Get/ByProps")] public async Task<ActionResult<List<Track>>> GetByProps([FromQuery] TrackAddDto objDto)
+        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<Track>>> GetByProps(TrackAddDto objDto)
         {
             AddDto<Track> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByProps(_objDto));
         }
 
-        [HttpGet("Get/ByFilter")] public async Task<ActionResult<List<Track>>> GetByFilter([FromQuery] TrackFilterDtos objDto)
+        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<Track>>> GetByFilter(TrackFilterDtos objDto)
         {
             FilterDtos<Track> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByFilter(_objDto.Filter, _objDto.FilterMin, _objDto.FilterMax));

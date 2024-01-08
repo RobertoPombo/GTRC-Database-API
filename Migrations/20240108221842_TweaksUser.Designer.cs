@@ -4,6 +4,7 @@ using GTRC_Database_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GTRC_Database_API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240108221842_TweaksUser")]
+    partial class TweaksUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,90 +95,6 @@ namespace GTRC_Database_API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Colors");
-                });
-
-            modelBuilder.Entity("GTRC_Basics.Models.Season", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("BopLatestModelOnly")
-                        .HasColumnType("bit");
-
-                    b.Property<byte>("CarChangeLimit")
-                        .HasColumnType("tinyint");
-
-                    b.Property<byte>("CarLimitBallast")
-                        .HasColumnType("tinyint");
-
-                    b.Property<byte>("CarLimitRegisterLimit")
-                        .HasColumnType("tinyint");
-
-                    b.Property<byte>("CarLimitRestrictor")
-                        .HasColumnType("tinyint");
-
-                    b.Property<DateTime>("DateBoPFreeze")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateCarChangeLimit")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateRegisterLimit")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DaysIgnoreCarLimits")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("FormationLapType")
-                        .HasColumnType("int");
-
-                    b.Property<byte>("GainBallast")
-                        .HasColumnType("tinyint");
-
-                    b.Property<byte>("GainRestrictor")
-                        .HasColumnType("tinyint");
-
-                    b.Property<byte>("GridSlotsLimit")
-                        .HasColumnType("tinyint");
-
-                    b.Property<bool>("GroupCarLimits")
-                        .HasColumnType("bit");
-
-                    b.Property<byte>("MaxDriversPerEntry")
-                        .HasColumnType("tinyint");
-
-                    b.Property<byte>("MinDriversPerEntry")
-                        .HasColumnType("tinyint");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte>("NoShowLimit")
-                        .HasColumnType("tinyint");
-
-                    b.Property<int>("SeriesId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ShortDescription")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte>("SignOutLimit")
-                        .HasColumnType("tinyint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SeriesId");
-
-                    b.ToTable("Seasons");
                 });
 
             modelBuilder.Entity("GTRC_Basics.Models.Series", b =>
@@ -281,17 +200,6 @@ namespace GTRC_Database_API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("GTRC_Basics.Models.Season", b =>
-                {
-                    b.HasOne("GTRC_Basics.Models.Series", "Series")
-                        .WithMany()
-                        .HasForeignKey("SeriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Series");
                 });
 #pragma warning restore 612, 618
         }

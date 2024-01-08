@@ -11,6 +11,7 @@ namespace GTRC_Database_API.Data
         public DbSet<Track> Tracks { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Series> Series { get; set; }
+        public DbSet<Season> Seasons { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

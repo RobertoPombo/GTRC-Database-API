@@ -5,7 +5,7 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.EfcContext
 {
-    public class DriverDatetimeContext(DataContext db) : IDriverDatetimeContext
+    public class UserDatetimeContext(DataContext db) : IUserDatetimeContext
     {
 
     }

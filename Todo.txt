@@ -8,9 +8,7 @@ KNOWN ISSUES:
 - ...
 
 BASICS & API:
-- User Tabelle wird nicht bei Programmstart geladen
-- Bei GenericDatabaseVM.Update() neuen httpRequest.GetById stellen statt LoadSql() aufzurufen
-- Season, Event Tables implementieren und .ToMany Beziehungen testen
+- Season, Event, SeasonCarClass Tables implementieren und .ToMany Beziehungen testen
 - CastValue für Objekte/ObjektIds anpassen
 - IsChild() & DeleteAllChilds(int newID = -1) Methoden sowie Delete(bool force) Unterscheidung einbauen
 - Get/ByIdAsString & Get/ByIdAsDict Requests einbauen

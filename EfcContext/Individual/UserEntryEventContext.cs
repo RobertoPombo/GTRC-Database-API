@@ -5,7 +5,7 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.EfcContext
 {
-    public class DriverOrganizationContext(DataContext db) : IDriverOrganizationContext
+    public class UserEntryEventContext(DataContext db) : IUserEntryEventContext
     {
 
     }

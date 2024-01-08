@@ -4,7 +4,7 @@ namespace GTRC_Database_API.Helpers
 {
     public class SqlConnectionConfig
     {
-        private static readonly string defConStr = "Data Source=@\\@,@;Initial Catalog=@;User ID=@;Password=@;Integrated Security=True;TrustServerCertificate=true";
+        private static readonly string defConStr = "Data Source=@\\@,@;Initial Catalog=@;User ID=@;Password=@;Integrated Security=True@;TrustServerCertificate=true";
 
         public SqlConnectionConfig() { }
 

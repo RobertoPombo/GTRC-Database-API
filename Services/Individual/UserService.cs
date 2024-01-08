@@ -57,5 +57,121 @@ namespace GTRC_Database_API.Services
             if (IsValidSteamId(steamId)) { return steamId; }
             else { return null; }
         }
+
+        public List<string> GetName3DigitsOptions(User user)
+        {
+            List<string> listFirstNames; List<string> listLastNames;
+            List<string> tempListN3D = [];
+            listFirstNames = FilterLetters4N3D(user.FirstName);
+            listLastNames = FilterLetters4N3D(user.LastName);
+            List<string> listAllNames = [.. listFirstNames, .. listLastNames];
+            tempListN3D = AddN3D(tempListN3D, user.Name3Digits);
+            string n3D = "";
+            foreach (string _name in listLastNames) { n3D += _name[0]; }
+            tempListN3D = AddN3D(tempListN3D, n3D);
+            n3D = "";
+            foreach (string _name in listAllNames) { n3D += _name[0]; }
+            tempListN3D = AddN3D(tempListN3D, n3D);
+            foreach (string _name in listLastNames) { tempListN3D = AddN3D(tempListN3D, _name); }
+            n3D = "";
+            foreach (string _name in listLastNames) { n3D += _name; }
+            tempListN3D = AddN3D(tempListN3D, n3D);
+            foreach (string _fname in listFirstNames)
+            {
+                n3D = _fname[..1];
+                foreach (string _name in listLastNames) { n3D += _name; }
+                tempListN3D = AddN3D(tempListN3D, n3D);
+            }
+            n3D = "";
+            foreach (string _name in listLastNames)
+            {
+                n3D += _name[..1] + Scripts.StrRemoveVocals(_name[1..]);
+            }
+            tempListN3D = AddN3D(tempListN3D, n3D);
+            foreach (string _fname in listFirstNames)
+            {
+                n3D = _fname[..1];
+                foreach (string _name in listLastNames)
+                {
+                    n3D += _name[..1] + Scripts.StrRemoveVocals(_name[1..]);
+                }
+                tempListN3D = AddN3D(tempListN3D, n3D);
+            }
+            foreach (string _fname in listFirstNames) { tempListN3D = AddN3D(tempListN3D, _fname); }
+            n3D = "";
+            foreach (string _name in listLastNames)
+            {
+                n3D += _name[..1] + Scripts.StrRemoveVocals(_name[1..]);
+            }
+            if (n3D.Length > 2)
+            {
+                for (int charNr1 = 1; charNr1 < n3D.Length - 1; charNr1++)
+                {
+                    for (int charNr2 = charNr1 + 1; charNr2 < n3D.Length; charNr2++)
+                    {
+                        tempListN3D = AddN3D(tempListN3D, n3D[..1] + n3D[charNr1] + n3D[charNr2]);
+                    }
+                }
+            }
+            foreach (string _fname in listFirstNames)
+            {
+                n3D = _fname[..1];
+                foreach (string _name in listLastNames)
+                {
+                    n3D += _name[..1] + Scripts.StrRemoveVocals(_name[1..]);
+                }
+                if (n3D.Length > 2)
+                {
+                    for (int charNr = 2; charNr < n3D.Length; charNr++)
+                    {
+                        tempListN3D = AddN3D(tempListN3D, n3D[..2] + n3D[charNr]);
+                    }
+                }
+            }
+            n3D = "";
+            foreach (string _name in listLastNames) { n3D += Scripts.StrRemoveVocals(_name[1..]); }
+            if (n3D.Length > 2)
+            {
+                for (int charNr1 = 1; charNr1 < n3D.Length - 1; charNr1++)
+                {
+                    for (int charNr2 = charNr1 + 1; charNr2 < n3D.Length; charNr2++)
+                    {
+                        tempListN3D = AddN3D(tempListN3D, n3D[..1] + n3D[..1] + n3D[charNr2]);
+                    }
+                }
+            }
+            foreach (string _fname in listFirstNames)
+            {
+                n3D = _fname[..1];
+                foreach (string _name in listLastNames) { n3D += _name; }
+                if (n3D.Length > 2)
+                {
+                    for (int charNr = 2; charNr < n3D.Length; charNr++)
+                    {
+                        tempListN3D = AddN3D(tempListN3D, n3D[..2] + n3D[charNr]);
+                    }
+                }
+            }
+            n3D = "";
+            foreach (string _name in listAllNames) { n3D += _name; }
+            n3D += "XXX";
+            return AddN3D(tempListN3D, n3D);
+        }
+
+        public static List<string> AddN3D(List<string> tempListN3D, string n3D)
+        {
+            if (n3D.Length > 2 && !tempListN3D.Contains(n3D[..3])) { tempListN3D.Add(n3D[..3]); }
+            return tempListN3D;
+        }
+
+        public static List<string> FilterLetters4N3D(string name)
+        {
+            name = Scripts.StrRemoveSpecialLetters(name);
+            name = name.ToUpper();
+            name = name.Replace("-", " ");
+            List<string> nameList = [];
+            foreach (string _name in name.Split(' ')) { if (_name.Length > 0) { nameList.Add(_name); } }
+            return nameList;
+        }
     }
 }

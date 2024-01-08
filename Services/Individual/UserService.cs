@@ -57,33 +57,5 @@ namespace GTRC_Database_API.Services
             if (IsValidSteamId(steamId)) { return steamId; }
             else { return null; }
         }
-
-        public static string GetFullName(string firstName, string lastName) // in FullDto verschieben und bei Http Anfragen mit zurückgeben
-        {
-            return firstName + " " + lastName;
-        }
-
-        public static string GetShortName(string firstName, string lastName) // in FullDto verschieben und bei Http Anfragen mit zurückgeben
-        {
-            string _shortName = string.Empty;
-            List<char> cList = [' ', '-'];
-            if (firstName is not null)
-            {
-                for (int index = 0; index < firstName.Length - 1; index++)
-                {
-                    if (_shortName.Length == 0 && !cList.Contains(firstName[index]))
-                    {
-                        _shortName = firstName[index].ToString() + ".";
-                    }
-                    else if (cList.Contains(firstName[index]) && !cList.Contains(firstName[index + 1]))
-                    {
-                        _shortName += firstName[index].ToString() + firstName[index + 1].ToString() + ".";
-                    }
-                }
-                _shortName += " " + lastName;
-            }
-            else { _shortName = lastName; }
-            return _shortName;
-        }
     }
 }

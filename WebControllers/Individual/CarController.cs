@@ -18,6 +18,14 @@ namespace GTRC_Database_API.Controllers
             else { return Ok(obj); }
         }
 
+        [HttpPut("Get/ByUniqProps/1")] public async Task<ActionResult<Car?>> GetByUniqProps(CarUniqPropsDto1 objDto)
+        {
+            UniqPropsDto<Car> _objDto = new() { Index = 1, Dto = objDto };
+            Car? obj = await service.GetByUniqProps(_objDto);
+            if (obj is null) { return NotFound(obj); }
+            else { return Ok(obj); }
+        }
+
         [HttpPut("Get/ByProps")] public async Task<ActionResult<List<Car>>> GetByProps(CarAddDto objDto)
         {
             AddDto<Car> _objDto = new() { Dto = objDto };
@@ -39,10 +47,18 @@ namespace GTRC_Database_API.Controllers
 
         [HttpPost("Add")] public async Task<ActionResult<Car?>> Add(CarAddDto objDto)
         {
-            Car? obj = await service.SetNextAvailable(CarService.Validate(objDto.Map()));
+            Car? obj = await service.SetNextAvailable(objDto.Dto2Model());
             if (obj is null) { return BadRequest(obj); }
             else if (!objDto.IsSimilar(obj)) { return Conflict(obj); }
-            else { await service.Add(obj); UniqPropsDto<Car> uniqPropsDto = new(); uniqPropsDto.Dto.ReMap(obj); return Ok(await service.GetByUniqProps(uniqPropsDto)); }
+            else
+            {
+                await service.Add(obj);
+                UniqPropsDto<Car> uniqPropsDto = new();
+                uniqPropsDto.Dto.Model2Dto(obj);
+                obj = await service.GetByUniqProps(uniqPropsDto);
+                if (obj is null) { return NotFound(obj); }
+                else { return Ok(obj); }
+            }
         }
 
         [HttpPut("Update")] public async Task<ActionResult<Car?>> Update(CarUpdateDto objDto)
@@ -51,7 +67,7 @@ namespace GTRC_Database_API.Controllers
             if (obj is null) { return NotFound(obj); }
             else
             {
-                obj = await service.SetNextAvailable(CarService.Validate(objDto.Map(obj)));
+                obj = await service.SetNextAvailable(objDto.Dto2Model(obj));
                 if (obj is null) { return BadRequest(await service.GetById(objDto.Id)); }
                 else if (!objDto.IsSimilar(obj)) { return Conflict(obj); }
                 else { await service.Update(obj); return Ok(obj); }

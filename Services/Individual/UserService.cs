@@ -1,17 +1,21 @@
 ﻿using GTRC_Basics;
 using GTRC_Basics.Models;
+using GTRC_Basics.Models.DTOs;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
     public class UserService(IUserContext iUserContext, IBaseContext<User> iBaseContext) : BaseService<User>(iBaseContext)
     {
-        public static User Validate(User obj)
+        public User? Validate(User? obj)
         {
-            if (!IsValidSteamId(obj.SteamId)) { obj.SteamId = User.MinSteamId; }
-            if (!IsValidDiscordId(obj.DiscordId)) { obj.DiscordId = User.NoDiscordId; }
+            if (obj is null) { return null; }
+            if (!Scripts.IsValidSteamId(obj.SteamId)) { obj.SteamId = GlobalValues.NoSteamId; }
+            if (!Scripts.IsValidDiscordId(obj.DiscordId)) { obj.DiscordId = GlobalValues.NoDiscordId; }
             obj.FirstName = Scripts.RemoveSpaceStartEnd(obj.FirstName);
+            if (obj.FirstName == string.Empty) { return null; }
             obj.LastName = Scripts.RemoveSpaceStartEnd(obj.LastName);
+            if (obj.LastName == string.Empty) { return null; }
             if (obj.RegisterDate > DateTime.UtcNow || obj.RegisterDate < GlobalValues.DateTimeMinValue) { obj.RegisterDate = DateTime.UtcNow; }
             if (obj.BanDate < obj.RegisterDate) { obj.BanDate = obj.RegisterDate; }
             if (obj.Name3Digits.Length == 3) { obj.Name3Digits = obj.Name3Digits.ToUpper(); } else { obj.Name3Digits = string.Empty; }
@@ -20,52 +24,47 @@ namespace GTRC_Database_API.Services
             return obj;
         }
 
-        public async Task<User?> SetNextAvailable(User obj)
+        public async Task<User?> SetNextAvailable(User? obj)
         {
-            ulong startValue = obj.SteamId;
-            while (!await IsUnique(obj, 0))
+            obj = Validate(obj);
+            if (obj is null) { return null; }
+
+            ulong? startValue = obj.SteamId;
+            while (!await IsUnique(obj, 0) && obj.SteamId != GlobalValues.NoSteamId)
             {
-                if (obj.SteamId < User.MaxSteamId) { obj.SteamId++; } else { obj.SteamId = User.MinSteamId; }
-                if (obj.SteamId == startValue) { return null; }
+                if (obj.SteamId < GlobalValues.MaxSteamId) { obj.SteamId++; } else { obj.SteamId = GlobalValues.MinSteamId; }
+                if (obj.SteamId == startValue) { obj.SteamId = GlobalValues.NoSteamId; }
             }
+
             startValue = obj.DiscordId;
-            while (!await IsUnique(obj, 1) && obj.DiscordId != User.NoDiscordId)
+            while (!await IsUnique(obj, 1) && obj.DiscordId != GlobalValues.NoDiscordId)
             {
-                if (obj.DiscordId < User.MaxDiscordId) { obj.DiscordId++; } else { obj.DiscordId = User.MinDiscordId; }
-                if (obj.DiscordId == startValue) { return null; }
+                if (obj.DiscordId < GlobalValues.MaxDiscordId) { obj.DiscordId++; } else { obj.DiscordId = GlobalValues.MinDiscordId; }
+                if (obj.DiscordId == startValue) { obj.DiscordId = GlobalValues.NoDiscordId; }
             }
+
             return obj;
         }
 
-        public async Task<User?> GetTemp() { return await SetNextAvailable(Validate(new User())); }
-
-        public static bool IsValidSteamId(ulong steamId)
-        {
-            return steamId >= User.MinSteamId && steamId <= User.MaxSteamId;
-        }
-
-        public static bool IsValidDiscordId(ulong discordId)
-        {
-            return discordId >= User.MinDiscordId && discordId <= User.MaxDiscordId;
-        }
+        public async Task<User?> GetTemp() { return await SetNextAvailable(new User()); }
 
         public static ulong? String2LongSteamID(string? strSteamId)
         {
             ulong steamId = ulong.MinValue;
             strSteamId = new string(strSteamId?.Where(Char.IsNumber).ToArray());
             _ = ulong.TryParse(strSteamId, out steamId);
-            if (IsValidSteamId(steamId)) { return steamId; }
+            if (Scripts.IsValidSteamId(steamId)) { return steamId; }
             else { return null; }
         }
 
-        public List<string> GetName3DigitsOptions(User user)
+        public List<string> GetName3DigitsOptions(UserName3DigitsDto userDto)
         {
             List<string> listFirstNames; List<string> listLastNames;
             List<string> tempListN3D = [];
-            listFirstNames = FilterLetters4N3D(user.FirstName);
-            listLastNames = FilterLetters4N3D(user.LastName);
+            listFirstNames = FilterLetters4N3D(userDto.FirstName);
+            listLastNames = FilterLetters4N3D(userDto.LastName);
             List<string> listAllNames = [.. listFirstNames, .. listLastNames];
-            tempListN3D = AddN3D(tempListN3D, user.Name3Digits);
+            tempListN3D = AddN3D(tempListN3D, userDto.Name3Digits ?? "");
             string n3D = "";
             foreach (string _name in listLastNames) { n3D += _name[0]; }
             tempListN3D = AddN3D(tempListN3D, n3D);

@@ -4,17 +4,17 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class SeriesService(ISeriesContext iSeriesContext, IBaseContext<Series> iBaseContext) : BaseService<Series>(iBaseContext)
+    public class ManufacturerService(IManufacturerContext iManufacturerContext, IBaseContext<Manufacturer> iBaseContext) : BaseService<Manufacturer>(iBaseContext)
     {
-        public Series? Validate(Series? obj)
+        public Manufacturer? Validate(Manufacturer? obj)
         {
             if (obj is null) { return null; }
             obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
-            if (obj.Name == string.Empty) { obj.Name = Series.DefaultName; }
+            if (obj.Name == string.Empty) { obj.Name = Manufacturer.DefaultName; }
             return obj;
         }
 
-        public async Task<Series?> SetNextAvailable(Series? obj)
+        public async Task<Manufacturer?> SetNextAvailable(Manufacturer? obj)
         {
             obj = Validate(obj);
             if (obj is null) { return null; }
@@ -24,7 +24,7 @@ namespace GTRC_Database_API.Services
             string defName = obj.Name;
             string[] defNameList = defName.Split(delimiter);
             if (defNameList.Length > 1 && Int32.TryParse(defNameList[^1], out _)) { defName = defName[..^(defNameList[^1].Length + delimiter.Length)]; }
-            while (!await IsUnique(obj))
+            while (!await IsUnique(obj, 0))
             {
                 obj.Name = defName + delimiter + nr.ToString();
                 nr++; if (nr == int.MaxValue) { return null; }
@@ -33,6 +33,6 @@ namespace GTRC_Database_API.Services
             return obj;
         }
 
-        public async Task<Series?> GetTemp() { return await SetNextAvailable(new Series()); }
+        public async Task<Manufacturer?> GetTemp() { return await SetNextAvailable(new Manufacturer()); }
     }
 }

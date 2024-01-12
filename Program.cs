@@ -16,15 +16,17 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 
-builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(sQLConCfg.ConnectionString));
+builder.Services.AddDbContext<DataContext>(options => options.UseLazyLoadingProxies().UseSqlServer(sQLConCfg.ConnectionString));
 
 builder.Services.AddScoped(typeof(BaseService<>));
 builder.Services.AddScoped(typeof(IBaseContext<>), typeof(BaseContext<>));
 
 builder.Services.AddScoped<ColorService>();
 builder.Services.AddScoped<IColorContext, ColorContext>();
+
+builder.Services.AddScoped<ManufacturerService>();
+builder.Services.AddScoped<IManufacturerContext, ManufacturerContext>();
 
 builder.Services.AddScoped<CarService>();
 builder.Services.AddScoped<ICarContext, CarContext>();
@@ -37,6 +39,9 @@ builder.Services.AddScoped<IUserContext, UserContext>();
 
 builder.Services.AddScoped<SeriesService>();
 builder.Services.AddScoped<ISeriesContext, SeriesContext>();
+
+builder.Services.AddScoped<SeasonService>();
+builder.Services.AddScoped<ISeasonContext, SeasonContext>();
 
 
 var app = builder.Build();

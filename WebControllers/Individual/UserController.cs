@@ -47,10 +47,18 @@ namespace GTRC_Database_API.Controllers
 
         [HttpPost("Add")] public async Task<ActionResult<User?>> Add(UserAddDto objDto)
         {
-            User? obj = await service.SetNextAvailable(UserService.Validate(objDto.Map()));
+            User? obj = await service.SetNextAvailable(objDto.Dto2Model());
             if (obj is null) { return BadRequest(obj); }
             else if (!objDto.IsSimilar(obj)) { return Conflict(obj); }
-            else { await service.Add(obj); UniqPropsDto<User> uniqPropsDto = new(); uniqPropsDto.Dto.ReMap(obj); return Ok(await service.GetByUniqProps(uniqPropsDto)); }
+            else
+            {
+                await service.Add(obj);
+                UniqPropsDto<User> uniqPropsDto = new();
+                uniqPropsDto.Dto.Model2Dto(obj);
+                obj = await service.GetByUniqProps(uniqPropsDto);
+                if (obj is null) { return NotFound(obj); }
+                else { return Ok(obj); }
+            }
         }
 
         [HttpPut("Update")] public async Task<ActionResult<User?>> Update(UserUpdateDto objDto)
@@ -59,11 +67,16 @@ namespace GTRC_Database_API.Controllers
             if (obj is null) { return NotFound(obj); }
             else
             {
-                obj = await service.SetNextAvailable(UserService.Validate(objDto.Map(obj)));
+                obj = await service.SetNextAvailable(objDto.Dto2Model(obj));
                 if (obj is null) { return BadRequest(await service.GetById(objDto.Id)); }
                 else if (!objDto.IsSimilar(obj)) { return Conflict(obj); }
                 else { await service.Update(obj); return Ok(obj); }
             }
+        }
+
+        [HttpPut("Get/Name3DigitsOptions")] public List<string> GetName3DigitsOptions(UserName3DigitsDto userDto)
+        {
+            return service.GetName3DigitsOptions(userDto);
         }
     }
 }

@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GTRC_Database_API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240108222908_AddTableSeason")]
-    partial class AddTableSeason
+    [Migration("20240112194239_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("ProductVersion", "8.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -42,9 +42,8 @@ namespace GTRC_Database_API.Migrations
                     b.Property<int>("LengthMm")
                         .HasColumnType("int");
 
-                    b.Property<string>("Manufacturer")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ManufacturerId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Model")
                         .IsRequired()
@@ -68,6 +67,8 @@ namespace GTRC_Database_API.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ManufacturerId");
 
                     b.ToTable("Cars");
                 });
@@ -95,6 +96,23 @@ namespace GTRC_Database_API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Colors");
+                });
+
+            modelBuilder.Entity("GTRC_Basics.Models.Manufacturer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Manufacturers");
                 });
 
             modelBuilder.Entity("GTRC_Basics.Models.Season", b =>
@@ -135,6 +153,12 @@ namespace GTRC_Database_API.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("DiscordChannelId")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<decimal>("DiscordRoleId")
+                        .HasColumnType("decimal(20,0)");
 
                     b.Property<int>("FormationLapType")
                         .HasColumnType("int");
@@ -246,6 +270,9 @@ namespace GTRC_Database_API.Migrations
                     b.Property<decimal>("DiscordId")
                         .HasColumnType("decimal(20,0)");
 
+                    b.Property<string>("DiscordLoginToken")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<short>("EloRating")
                         .HasColumnType("smallint");
 
@@ -261,10 +288,6 @@ namespace GTRC_Database_API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RefreshToken")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("RegisterDate")
                         .HasColumnType("datetime2");
 
@@ -273,6 +296,9 @@ namespace GTRC_Database_API.Migrations
 
                     b.Property<decimal>("SteamId")
                         .HasColumnType("decimal(20,0)");
+
+                    b.Property<string>("SteamLoginToken")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -286,6 +312,17 @@ namespace GTRC_Database_API.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("GTRC_Basics.Models.Car", b =>
+                {
+                    b.HasOne("GTRC_Basics.Models.Manufacturer", "Manufacturer")
+                        .WithMany("Cars")
+                        .HasForeignKey("ManufacturerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Manufacturer");
+                });
+
             modelBuilder.Entity("GTRC_Basics.Models.Season", b =>
                 {
                     b.HasOne("GTRC_Basics.Models.Series", "Series")
@@ -295,6 +332,11 @@ namespace GTRC_Database_API.Migrations
                         .IsRequired();
 
                     b.Navigation("Series");
+                });
+
+            modelBuilder.Entity("GTRC_Basics.Models.Manufacturer", b =>
+                {
+                    b.Navigation("Cars");
                 });
 #pragma warning restore 612, 618
         }

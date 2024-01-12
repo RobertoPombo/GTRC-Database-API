@@ -7,45 +7,45 @@ using GTRC_Basics.Models.DTOs;
 namespace GTRC_Database_API.Controllers
 {
     [ApiController]
-    [Route(nameof(Series))]
-    public class SeriesController(SeriesService service, BaseService<Series> baseService) : BaseController<Series>(baseService)
+    [Route(nameof(Manufacturer))]
+    public class ManufacturerController(ManufacturerService service, BaseService<Manufacturer> baseService) : BaseController<Manufacturer>(baseService)
     {
-        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Series?>> GetByUniqProps(SeriesUniqPropsDto0 objDto)
+        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Manufacturer?>> GetByUniqProps(ManufacturerUniqPropsDto0 objDto)
         {
-            UniqPropsDto<Series> _objDto = new() { Index = 0, Dto = objDto };
-            Series? obj = await service.GetByUniqProps(_objDto);
+            UniqPropsDto<Manufacturer> _objDto = new() { Index = 0, Dto = objDto };
+            Manufacturer? obj = await service.GetByUniqProps(_objDto);
             if (obj is null) { return NotFound(obj); }
             else { return Ok(obj); }
         }
 
-        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<Series>>> GetByProps(SeriesAddDto objDto)
+        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<Manufacturer>>> GetByProps(ManufacturerAddDto objDto)
         {
-            AddDto<Series> _objDto = new() { Dto = objDto };
+            AddDto<Manufacturer> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByProps(_objDto));
         }
 
-        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<Series>>> GetByFilter(SeriesFilterDtos objDto)
+        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<Manufacturer>>> GetByFilter(ManufacturerFilterDtos objDto)
         {
-            FilterDtos<Series> _objDto = new() { Dto = objDto };
+            FilterDtos<Manufacturer> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByFilter(_objDto.Filter, _objDto.FilterMin, _objDto.FilterMax));
         }
 
-        [HttpGet("Get/Temp")] public async Task<ActionResult<Series?>> GetTemp()
+        [HttpGet("Get/Temp")] public async Task<ActionResult<Manufacturer?>> GetTemp()
         {
-            Series? obj = await service.GetTemp();
+            Manufacturer? obj = await service.GetTemp();
             if (obj is null) { return BadRequest(obj); }
             else { return Ok(obj); }
         }
 
-        [HttpPost("Add")] public async Task<ActionResult<Series?>> Add(SeriesAddDto objDto)
+        [HttpPost("Add")] public async Task<ActionResult<Manufacturer?>> Add(ManufacturerAddDto objDto)
         {
-            Series? obj = await service.SetNextAvailable(objDto.Dto2Model());
+            Manufacturer? obj = await service.SetNextAvailable(objDto.Dto2Model());
             if (obj is null) { return BadRequest(obj); }
             else if (!objDto.IsSimilar(obj)) { return Conflict(obj); }
             else
             {
                 await service.Add(obj);
-                UniqPropsDto<Series> uniqPropsDto = new();
+                UniqPropsDto<Manufacturer> uniqPropsDto = new();
                 uniqPropsDto.Dto.Model2Dto(obj);
                 obj = await service.GetByUniqProps(uniqPropsDto);
                 if (obj is null) { return NotFound(obj); }
@@ -53,9 +53,9 @@ namespace GTRC_Database_API.Controllers
             }
         }
 
-        [HttpPut("Update")] public async Task<ActionResult<Series?>> Update(SeriesUpdateDto objDto)
+        [HttpPut("Update")] public async Task<ActionResult<Manufacturer?>> Update(ManufacturerUpdateDto objDto)
         {
-            Series? obj = await service.GetById(objDto.Id);
+            Manufacturer? obj = await service.GetById(objDto.Id);
             if (obj is null) { return NotFound(obj); }
             else
             {

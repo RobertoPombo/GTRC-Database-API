@@ -5,13 +5,17 @@ namespace GTRC_Database_API.Services
 {
     public class ColorService(IColorContext iColorContext, IBaseContext<Color> iBaseContext) : BaseService<Color>(iBaseContext)
     {
-        public static Color Validate(Color obj)
+        public Color? Validate(Color? obj)
         {
+            if (obj is null) { return null; }
             return obj;
         }
 
-        public async Task<Color?> SetNextAvailable(Color obj)
+        public async Task<Color?> SetNextAvailable(Color? obj)
         {
+            obj = Validate(obj);
+            if (obj is null) { return null; }
+
             if (obj.Alpha == Byte.MinValue) { obj.Alpha = byte.MaxValue; } else { obj.Alpha--; }
             if (obj.Red == Byte.MinValue) { obj.Red = byte.MaxValue; } else { obj.Red--; }
             if (obj.Green == Byte.MinValue) { obj.Green = byte.MaxValue; } else { obj.Green--; }
@@ -33,9 +37,10 @@ namespace GTRC_Database_API.Services
                     }
                 }
             }
+
             return null;
         }
 
-        public async Task<Color?> GetTemp() { return await SetNextAvailable(Validate(new Color())); }
+        public async Task<Color?> GetTemp() { return await SetNextAvailable(new Color()); }
     }
 }

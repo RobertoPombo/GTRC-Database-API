@@ -74,8 +74,8 @@ namespace GTRC_Database_API.Services
             if (UniqProps.Count > objDto.Index && UniqProps[objDto.Index].Count > 0 && UniqProps[objDto.Index].Count == Scripts.GetPropertyList(objDto.Dto.GetType()).Count)
             {
                 AddDto<ModelType> addDto = new();
-                addDto.Dto = Mapper<ModelType>.Map(objDto.Dto, addDto.Dto);
-                List <ModelType> list = await GetByProps(addDto, true, objDto.Index);
+                addDto.Dto = Mapper<ModelType>.Map(objDto.Dto, addDto.Dto, true);
+                List<ModelType> list = await GetByProps(addDto, false, objDto.Index);
                 if (list.Count == 1) { return list[0]; }
                 else { return null; }
             }

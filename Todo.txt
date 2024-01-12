@@ -1,18 +1,17 @@
 KNOWN ISSUES:
-- Api nur über localhost erreichbar
 - Validation erst nach Mapping => bei out of bound updates geht der ursprüngliche in bound Wert verloren
-- Validate & SetNextAvailable in BaseService ziehen/referenzieren.
+- Validate & SetNextAvailable nicht in BaseService verfügbar + DTOs nicht in BaseController vergfügbar
 - BaseContext funktioniert nicht für Models mit Composite Keys (ohne Id)
 - GetByProps, GetByUniqProps benutzen Entity-Feature .Where nicht
-- CastValue/GetCastedValue instabil (vorallem mit Dtos und nullables)
-- ...
+
+SHORT TERM STUFF:
+- 
 
 BASICS & API:
-- Season, Event, SeasonCarClass Tables implementieren und .ToMany Beziehungen testen
-- CastValue für Objekte/ObjektIds anpassen
-- IsChild() & DeleteAllChilds(int newID = -1) Methoden sowie Delete(bool force) Unterscheidung einbauen
-- Get/ByIdAsString & Get/ByIdAsDict Requests einbauen
-- DataFieldM.idList implementieren
+- Delete(force=false) Abfrage einbauen
+- Event, SeasonCarClass Tables implementieren und .ToMany Beziehungen testen
+- Web-Backend (mit Jarno?) anpassen
+- Get/ByIdAsDict Requests einbauen?
 - Restliche Models implementieren
 
 GENERAL:

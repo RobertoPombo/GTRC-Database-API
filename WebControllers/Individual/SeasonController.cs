@@ -7,45 +7,45 @@ using GTRC_Basics.Models.DTOs;
 namespace GTRC_Database_API.Controllers
 {
     [ApiController]
-    [Route(nameof(Series))]
-    public class SeriesController(SeriesService service, BaseService<Series> baseService) : BaseController<Series>(baseService)
+    [Route(nameof(Season))]
+    public class SeasonController(SeasonService service, BaseService<Season> baseService) : BaseController<Season>(baseService)
     {
-        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Series?>> GetByUniqProps(SeriesUniqPropsDto0 objDto)
+        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Season?>> GetByUniqProps(SeasonUniqPropsDto0 objDto)
         {
-            UniqPropsDto<Series> _objDto = new() { Index = 0, Dto = objDto };
-            Series? obj = await service.GetByUniqProps(_objDto);
+            UniqPropsDto<Season> _objDto = new() { Index = 0, Dto = objDto };
+            Season? obj = await service.GetByUniqProps(_objDto);
             if (obj is null) { return NotFound(obj); }
             else { return Ok(obj); }
         }
 
-        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<Series>>> GetByProps(SeriesAddDto objDto)
+        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<Season>>> GetByProps(SeasonAddDto objDto)
         {
-            AddDto<Series> _objDto = new() { Dto = objDto };
+            AddDto<Season> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByProps(_objDto));
         }
 
-        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<Series>>> GetByFilter(SeriesFilterDtos objDto)
+        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<Season>>> GetByFilter(SeasonFilterDtos objDto)
         {
-            FilterDtos<Series> _objDto = new() { Dto = objDto };
+            FilterDtos<Season> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByFilter(_objDto.Filter, _objDto.FilterMin, _objDto.FilterMax));
         }
 
-        [HttpGet("Get/Temp")] public async Task<ActionResult<Series?>> GetTemp()
+        [HttpGet("Get/Temp")] public async Task<ActionResult<Season?>> GetTemp()
         {
-            Series? obj = await service.GetTemp();
+            Season? obj = await service.GetTemp();
             if (obj is null) { return BadRequest(obj); }
             else { return Ok(obj); }
         }
 
-        [HttpPost("Add")] public async Task<ActionResult<Series?>> Add(SeriesAddDto objDto)
+        [HttpPost("Add")] public async Task<ActionResult<Season?>> Add(SeasonAddDto objDto)
         {
-            Series? obj = await service.SetNextAvailable(objDto.Dto2Model());
+            Season? obj = await service.SetNextAvailable(objDto.Dto2Model());
             if (obj is null) { return BadRequest(obj); }
             else if (!objDto.IsSimilar(obj)) { return Conflict(obj); }
             else
             {
                 await service.Add(obj);
-                UniqPropsDto<Series> uniqPropsDto = new();
+                UniqPropsDto<Season> uniqPropsDto = new();
                 uniqPropsDto.Dto.Model2Dto(obj);
                 obj = await service.GetByUniqProps(uniqPropsDto);
                 if (obj is null) { return NotFound(obj); }
@@ -53,9 +53,9 @@ namespace GTRC_Database_API.Controllers
             }
         }
 
-        [HttpPut("Update")] public async Task<ActionResult<Series?>> Update(SeriesUpdateDto objDto)
+        [HttpPut("Update")] public async Task<ActionResult<Season?>> Update(SeasonUpdateDto objDto)
         {
-            Series? obj = await service.GetById(objDto.Id);
+            Season? obj = await service.GetById(objDto.Id);
             if (obj is null) { return NotFound(obj); }
             else
             {

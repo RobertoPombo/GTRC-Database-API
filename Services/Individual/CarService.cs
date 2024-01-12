@@ -4,12 +4,21 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class CarService(ICarContext iCarContext, IBaseContext<Car> iBaseContext) : BaseService<Car>(iBaseContext)
+    public class CarService(ICarContext iCarContext, IBaseContext<Manufacturer> iManufacturerContext, IBaseContext<Car> iBaseContext) : BaseService<Car>(iBaseContext)
     {
-        public static Car Validate(Car obj)
+        public Car? Validate(Car? obj)
         {
+            if (obj is null) { return null; }
             obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
-            obj.Manufacturer = Scripts.RemoveSpaceStartEnd(obj.Manufacturer);
+            if (obj.Name == string.Empty) { obj.Name = Car.DefaultName; }
+            Manufacturer? manufacturer = null;
+            if (obj.Manufacturer is not null) { manufacturer = iManufacturerContext.GetById(obj.Manufacturer.Id).Result; };
+            if (manufacturer is null)
+            {
+                List<Manufacturer> list = iManufacturerContext.GetAll().Result;
+                if (list.Count == 0) { return null; }
+                else { obj.Manufacturer = list[0]; }
+            }
             obj.Model = Scripts.RemoveSpaceStartEnd(obj.Model);
             if (!Enum.IsDefined(typeof(CarClass), obj.Class)) { obj.Class = CarClass.General; }
             obj.WidthMm = Math.Max(obj.WidthMm, (ushort)1);
@@ -18,17 +27,32 @@ namespace GTRC_Database_API.Services
             return obj;
         }
 
-        public async Task<Car?> SetNextAvailable(Car obj)
+        public async Task<Car?> SetNextAvailable(Car? obj)
         {
+            obj = Validate(obj);
+            if (obj is null) { return null; }
+
+            int nr = 1;
+            string delimiter = " #";
+            string defName = obj.Name;
+            string[] defNameList = defName.Split(delimiter);
+            if (defNameList.Length > 1 && Int32.TryParse(defNameList[^1], out _)) { defName = defName[..^(defNameList[^1].Length + delimiter.Length)]; }
+            while (!await IsUnique(obj, 0))
+            {
+                obj.Name = defName + delimiter + nr.ToString();
+                nr++; if (nr == int.MaxValue) { return null; }
+            }
+
             uint startValue = obj.AccCarId;
-            while (!await IsUnique(obj))
+            while (!await IsUnique(obj, 1))
             {
                 if (obj.AccCarId < uint.MaxValue) { obj.AccCarId += 1; } else { obj.AccCarId = uint.MinValue; }
                 if (obj.AccCarId == startValue) { return null; }
             }
+
             return obj;
         }
 
-        public async Task<Car?> GetTemp() { return await SetNextAvailable(Validate(new Car())); }
+        public async Task<Car?> GetTemp() { return await SetNextAvailable(new Car()); }
     }
 }

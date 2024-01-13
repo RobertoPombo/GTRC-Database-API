@@ -364,3 +364,5 @@ FodyWeavers.xsd
 /Migrations/20240112235255_SeasonAddProperties1.cs
 /Migrations/20240112235255_SeasonAddProperties1.Designer.cs
 /Migrations/DataContextModelSnapshot.cs
+/Migrations/20240112194239_InitialCreate.cs
+/Migrations/20240112194239_InitialCreate.cs

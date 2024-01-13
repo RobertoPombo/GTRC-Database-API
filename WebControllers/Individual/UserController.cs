@@ -74,9 +74,11 @@ namespace GTRC_Database_API.Controllers
             }
         }
 
-        [HttpPut("Get/Name3DigitsOptions")] public List<string> GetName3DigitsOptions(UserName3DigitsDto userDto)
+        [HttpGet("Get/Name3DigitsOptions/{id}")] public async Task<ActionResult<List<string>>> GetName3DigitsOptions(int id)
         {
-            return service.GetName3DigitsOptions(userDto);
+            User? obj = await baseService.GetById(id);
+            if (obj is null) { return NotFound(new List<string>()); }
+            else { return Ok(service.GetName3DigitsOptions(obj)); }
         }
     }
 }

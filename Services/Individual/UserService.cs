@@ -57,14 +57,14 @@ namespace GTRC_Database_API.Services
             else { return null; }
         }
 
-        public List<string> GetName3DigitsOptions(UserName3DigitsDto userDto)
+        public List<string> GetName3DigitsOptions(User obj)
         {
             List<string> listFirstNames; List<string> listLastNames;
             List<string> tempListN3D = [];
-            listFirstNames = FilterLetters4N3D(userDto.FirstName);
-            listLastNames = FilterLetters4N3D(userDto.LastName);
+            listFirstNames = FilterLetters4N3D(obj.FirstName);
+            listLastNames = FilterLetters4N3D(obj.LastName);
             List<string> listAllNames = [.. listFirstNames, .. listLastNames];
-            tempListN3D = AddN3D(tempListN3D, userDto.Name3Digits ?? "");
+            tempListN3D = AddN3D(tempListN3D, obj.Name3Digits ?? "");
             string n3D = "";
             foreach (string _name in listLastNames) { n3D += _name[0]; }
             tempListN3D = AddN3D(tempListN3D, n3D);

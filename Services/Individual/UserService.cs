@@ -48,15 +48,6 @@ namespace GTRC_Database_API.Services
 
         public async Task<User?> GetTemp() { return await SetNextAvailable(new User()); }
 
-        public static ulong? String2LongSteamID(string? strSteamId)
-        {
-            ulong steamId = ulong.MinValue;
-            strSteamId = new string(strSteamId?.Where(Char.IsNumber).ToArray());
-            _ = ulong.TryParse(strSteamId, out steamId);
-            if (Scripts.IsValidSteamId(steamId)) { return steamId; }
-            else { return null; }
-        }
-
         public List<string> GetName3DigitsOptions(User obj)
         {
             List<string> listFirstNames; List<string> listLastNames;

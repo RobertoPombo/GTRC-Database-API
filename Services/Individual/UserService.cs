@@ -12,16 +12,16 @@ namespace GTRC_Database_API.Services
             if (!Scripts.IsValidSteamId(obj.SteamId)) { obj.SteamId = GlobalValues.NoSteamId; }
             if (!Scripts.IsValidDiscordId(obj.DiscordId)) { obj.DiscordId = GlobalValues.NoDiscordId; }
             obj.FirstName = Scripts.RemoveSpaceStartEnd(obj.FirstName);
-            if (obj.FirstName == string.Empty) { return null; }
+            if (obj.FirstName == string.Empty) { obj.FirstName = nameof(obj.FirstName); }
             obj.LastName = Scripts.RemoveSpaceStartEnd(obj.LastName);
-            if (obj.LastName == string.Empty) { return null; }
+            if (obj.LastName == string.Empty) { obj.LastName = nameof(obj.LastName); }
             if (obj.RegisterDate > DateTime.UtcNow || obj.RegisterDate < GlobalValues.DateTimeMinValue) { obj.RegisterDate = DateTime.UtcNow; }
             if (obj.BanDate < obj.RegisterDate) { obj.BanDate = obj.RegisterDate; }
             if (obj.Name3Digits.Length == 3) { obj.Name3Digits = obj.Name3Digits.ToUpper(); } else { obj.Name3Digits = string.Empty; }
             obj.EloRating = Math.Min(Math.Max(obj.EloRating, User.MinEloRating), User.MaxEloRating);
             obj.SafetyRating = Math.Min(obj.SafetyRating, User.MaxSafetyRating);
             obj.NickName = Scripts.RemoveSpaceStartEnd(obj.NickName);
-            if (obj.NickName == string.Empty) { return null; }
+            if (obj.NickName == string.Empty) { obj.NickName = nameof(obj.NickName); }
             return obj;
         }
 

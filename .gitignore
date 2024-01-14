@@ -366,3 +366,5 @@ FodyWeavers.xsd
 /Migrations/DataContextModelSnapshot.cs
 /Migrations/20240112194239_InitialCreate.cs
 /Migrations/20240112194239_InitialCreate.cs
+/Migrations/20240114013213_RenameUserNickName.cs
+/Migrations

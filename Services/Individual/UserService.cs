@@ -1,6 +1,5 @@
 ﻿using GTRC_Basics;
 using GTRC_Basics.Models;
-using GTRC_Basics.Models.DTOs;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
@@ -21,6 +20,8 @@ namespace GTRC_Database_API.Services
             if (obj.Name3Digits.Length == 3) { obj.Name3Digits = obj.Name3Digits.ToUpper(); } else { obj.Name3Digits = string.Empty; }
             obj.EloRating = Math.Min(Math.Max(obj.EloRating, User.MinEloRating), User.MaxEloRating);
             obj.SafetyRating = Math.Min(obj.SafetyRating, User.MaxSafetyRating);
+            obj.NickName = Scripts.RemoveSpaceStartEnd(obj.NickName);
+            if (obj.NickName == string.Empty) { return null; }
             return obj;
         }
 

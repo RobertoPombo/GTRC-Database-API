@@ -1,5 +1,6 @@
 ﻿using GTRC_Basics;
 using GTRC_Basics.Models;
+using GTRC_Database_API.EfcContext;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
@@ -12,13 +13,14 @@ namespace GTRC_Database_API.Services
             obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
             if (obj.Name == string.Empty) { obj.Name = Season.DefaultName; }
             Series? series = null;
-            if (obj.Series is not null) { series = iSeriesContext.GetById(obj.Series.Id).Result; };
+            if (obj.Series is not null) { series = iSeriesContext.GetById(obj.SeriesId).Result; };
             if (series is null)
             {
                 List<Series> list = iSeriesContext.GetAll().Result;
                 if (list.Count == 0) { return null; }
                 else { obj.Series = list[0]; obj.SeriesId = list[0].Id; }
             }
+            else { obj.Series = series; }
             if (obj.MinDriversPerEntry < Season.MinMinDriversPerEntry) { obj.MinDriversPerEntry = Season.MinMinDriversPerEntry; }
             if (obj.MinDriversPerEntry > obj.MaxDriversPerEntry) { obj.MinDriversPerEntry = obj.MaxDriversPerEntry; }
             if (obj.DateRegisterLimit < GlobalValues.DateTimeMinValue) { obj.DateRegisterLimit = GlobalValues.DateTimeMinValue; }

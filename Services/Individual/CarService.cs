@@ -12,13 +12,14 @@ namespace GTRC_Database_API.Services
             obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
             if (obj.Name == string.Empty) { obj.Name = Car.DefaultName; }
             Manufacturer? manufacturer = null;
-            if (obj.Manufacturer is not null) { manufacturer = iManufacturerContext.GetById(obj.Manufacturer.Id).Result; };
+            if (obj.Manufacturer is not null) { manufacturer = iManufacturerContext.GetById(obj.ManufacturerId).Result; };
             if (manufacturer is null)
             {
                 List<Manufacturer> list = iManufacturerContext.GetAll().Result;
                 if (list.Count == 0) { return null; }
                 else { obj.Manufacturer = list[0]; obj.ManufacturerId = list[0].Id; }
             }
+            else { obj.Manufacturer = manufacturer; }
             obj.Model = Scripts.RemoveSpaceStartEnd(obj.Model);
             if (!Enum.IsDefined(typeof(CarClass), obj.Class)) { obj.Class = CarClass.General; }
             obj.WidthMm = Math.Max(obj.WidthMm, (ushort)1);

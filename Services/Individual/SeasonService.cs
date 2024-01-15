@@ -17,7 +17,7 @@ namespace GTRC_Database_API.Services
             {
                 List<Series> list = iSeriesContext.GetAll().Result;
                 if (list.Count == 0) { return null; }
-                else { obj.Series = list[0]; }
+                else { obj.Series = list[0]; obj.SeriesId = list[0].Id; }
             }
             if (obj.MinDriversPerEntry < Season.MinMinDriversPerEntry) { obj.MinDriversPerEntry = Season.MinMinDriversPerEntry; }
             if (obj.MinDriversPerEntry > obj.MaxDriversPerEntry) { obj.MinDriversPerEntry = obj.MaxDriversPerEntry; }

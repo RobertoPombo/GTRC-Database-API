@@ -17,7 +17,7 @@ namespace GTRC_Database_API.Services
             {
                 List<Manufacturer> list = iManufacturerContext.GetAll().Result;
                 if (list.Count == 0) { return null; }
-                else { obj.Manufacturer = list[0]; }
+                else { obj.Manufacturer = list[0]; obj.ManufacturerId = list[0].Id; }
             }
             obj.Model = Scripts.RemoveSpaceStartEnd(obj.Model);
             if (!Enum.IsDefined(typeof(CarClass), obj.Class)) { obj.Class = CarClass.General; }

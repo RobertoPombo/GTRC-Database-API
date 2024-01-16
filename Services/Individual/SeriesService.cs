@@ -1,17 +1,25 @@
 ﻿using GTRC_Basics;
 using GTRC_Basics.Models;
-using GTRC_Database_API.EfcContext;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class SeriesService(ISeriesContext iSeriesContext, IBaseContext<Season> iSeasonContext, IBaseContext<Series> iBaseContext) : BaseService<Series>(iBaseContext)
+    public class SeriesService(ISeriesContext iSeriesContext, IBaseContext<Sim> iSimContext, IBaseContext<Season> iSeasonContext, IBaseContext<Series> iBaseContext) : BaseService<Series>(iBaseContext)
     {
         public Series? Validate(Series? obj)
         {
             if (obj is null) { return null; }
             obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
             if (obj.Name == string.Empty) { obj.Name = Series.DefaultName; }
+            Sim? sim = null;
+            if (obj.Sim is not null) { sim = iSimContext.GetById(obj.SimId).Result; };
+            if (sim is null)
+            {
+                List<Sim> list = iSimContext.GetAll().Result;
+                if (list.Count == 0) { return null; }
+                else { obj.Sim = list[0]; obj.SimId = list[0].Id; }
+            }
+            else { obj.Sim = sim; }
             return obj;
         }
 

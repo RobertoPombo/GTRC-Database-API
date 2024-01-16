@@ -25,6 +25,9 @@ builder.Services.AddScoped(typeof(IBaseContext<>), typeof(BaseContext<>));
 builder.Services.AddScoped<ColorService>();
 builder.Services.AddScoped<IColorContext, ColorContext>();
 
+builder.Services.AddScoped<SimService>();
+builder.Services.AddScoped<ISimContext, SimContext>();
+
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IUserContext, UserContext>();
 
@@ -39,6 +42,12 @@ builder.Services.AddScoped<IManufacturerContext, ManufacturerContext>();
 
 builder.Services.AddScoped<CarService>();
 builder.Services.AddScoped<ICarContext, CarContext>();
+
+builder.Services.AddScoped<RoleService>();
+builder.Services.AddScoped<IRoleContext, RoleContext>();
+
+builder.Services.AddScoped<UserRoleService>();
+builder.Services.AddScoped<IUserRoleContext, UserRoleContext>();
 
 builder.Services.AddScoped<SeriesService>();
 builder.Services.AddScoped<ISeriesContext, SeriesContext>();

@@ -1,0 +1,88 @@
+﻿using GTRC_Basics.Models;
+using GTRC_Database_API.Services.Interfaces;
+
+namespace GTRC_Database_API.Services
+{
+    public class UserRoleService(IUserRoleContext iUserRoleContext, IBaseContext<User> iUserContext, IBaseContext<Role> iRoleContext, IBaseContext<UserRole> iBaseContext) : BaseService<UserRole>(iBaseContext)
+    {
+        public UserRole? Validate(UserRole? obj)
+        {
+            if (obj is null) { return null; }
+            User? user = null;
+            if (obj.User is not null) { user = iUserContext.GetById(obj.UserId).Result; };
+            if (user is null)
+            {
+                List<User> list = iUserContext.GetAll().Result;
+                if (list.Count == 0) { return null; }
+                else { obj.User = list[0]; obj.UserId = list[0].Id; }
+            }
+            else { obj.User = user; }
+            Role? role = null;
+            if (obj.Role is not null) { role = iRoleContext.GetById(obj.RoleId).Result; };
+            if (role is null)
+            {
+                List<Role> list = iRoleContext.GetAll().Result;
+                if (list.Count == 0) { return null; }
+                else { obj.Role = list[0]; obj.RoleId = list[0].Id; }
+            }
+            else { obj.Role = role; }
+            return obj;
+        }
+
+        public async Task<UserRole?> SetNextAvailable(UserRole? obj)
+        {
+            obj = Validate(obj);
+            if (obj is null) { return null; }
+
+            int startIndexUser = 0;
+            int startIndexRole = 0;
+            List<int> idListUser = [];
+            List<int> idListRole = [];
+            List<User> listUser = iUserContext.GetAll().Result;
+            List<Role> listRole = iRoleContext.GetAll().Result;
+            for (int index = 0; index < listUser.Count; index++)
+            {
+                idListUser.Add(listUser[index].Id);
+                if (listUser[index].Id == obj.UserId) { startIndexUser = index; }
+            }
+            for (int index = 0; index < listRole.Count; index++)
+            {
+                idListRole.Add(listRole[index].Id);
+                if (listRole[index].Id == obj.RoleId) { startIndexRole = index; }
+            }
+            int indexUser = startIndexUser;
+            int indexRole = startIndexRole;
+
+            while (!await IsUnique(obj))
+            {
+                if (indexRole < idListRole.Count - 1)
+                {
+                    indexRole++;
+                    obj.Role = listRole[indexRole];
+                    obj.RoleId = listRole[indexRole].Id;
+                }
+                else { indexRole = 0; }
+                if (indexRole == startIndexRole)
+                {
+                    if (indexUser < idListUser.Count - 1)
+                    {
+                        indexUser++;
+                        obj.User = listUser[indexUser];
+                        obj.UserId = listUser[indexUser].Id;
+                    }
+                    else { indexUser = 0; }
+                    if (indexUser == startIndexUser) { return null; }
+                }
+            }
+
+            return obj;
+        }
+
+        public async Task<UserRole?> GetTemp() { return await SetNextAvailable(new UserRole()); }
+
+        public async Task<bool> HasChildObjects(int id)
+        {
+            return false;
+        }
+    }
+}

@@ -55,5 +55,10 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<Car?> GetTemp() { return await SetNextAvailable(new Car()); }
+
+        public async Task<bool> HasChildObjects(int id)
+        {
+            return false;
+        }
     }
 }

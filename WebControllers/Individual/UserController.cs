@@ -74,6 +74,14 @@ namespace GTRC_Database_API.Controllers
             }
         }
 
+        [HttpDelete("Delete/{id}/{force}")] public async Task<ActionResult> Delete(int id, bool force=false)
+        {
+            User? obj = await service.GetById(id);
+            if (obj is null) { return NotFound(); }
+            else if (!force && await service.HasChildObjects(obj.Id)) { return Unauthorized(); }
+            else { await service.Delete(obj); return Ok(); }
+        }
+
         [HttpGet("Get/Name3DigitsOptions/{id}")] public async Task<ActionResult<List<string>>> GetName3DigitsOptions(int id)
         {
             User? obj = await baseService.GetById(id);

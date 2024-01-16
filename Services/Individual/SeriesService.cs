@@ -1,10 +1,11 @@
 ﻿using GTRC_Basics;
 using GTRC_Basics.Models;
+using GTRC_Database_API.EfcContext;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class SeriesService(ISeriesContext iSeriesContext, IBaseContext<Series> iBaseContext) : BaseService<Series>(iBaseContext)
+    public class SeriesService(ISeriesContext iSeriesContext, IBaseContext<Season> iSeasonContext, IBaseContext<Series> iBaseContext) : BaseService<Series>(iBaseContext)
     {
         public Series? Validate(Series? obj)
         {
@@ -34,5 +35,12 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<Series?> GetTemp() { return await SetNextAvailable(new Series()); }
+
+        public async Task<bool> HasChildObjects(int id)
+        {
+            List<Season> list = await iSeasonContext.GetAll();
+            foreach (Season obj in list) { if (obj.SeriesId == id) { return true; } }
+            return false;
+        }
     }
 }

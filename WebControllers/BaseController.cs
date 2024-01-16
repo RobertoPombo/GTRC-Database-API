@@ -16,17 +16,5 @@ namespace GTRC_Database_API.Controllers
             if (obj is null) { return NotFound(obj); }
             else { return Ok(obj); }
         }
-
-        [HttpDelete("Delete/{id}/{force}")] public async Task<ActionResult> Delete(int id, bool force=false)
-        {
-            ModelType? obj = await service.GetById(id);
-            if (obj is null) { return NotFound(); }
-            else if (!force) { return Unauthorized(); }
-            else
-            {
-                await service.Delete(obj);
-                return Ok();
-            }
-        }
     }
 }

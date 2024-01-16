@@ -49,6 +49,11 @@ namespace GTRC_Database_API.Services
 
         public async Task<User?> GetTemp() { return await SetNextAvailable(new User()); }
 
+        public async Task<bool> HasChildObjects(int id)
+        {
+            return false;
+        }
+
         public List<string> GetName3DigitsOptions(User obj)
         {
             List<string> listFirstNames; List<string> listLastNames;

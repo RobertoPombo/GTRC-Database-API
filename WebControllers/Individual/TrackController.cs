@@ -73,5 +73,13 @@ namespace GTRC_Database_API.Controllers
                 else { await service.Update(obj); return Ok(obj); }
             }
         }
+
+        [HttpDelete("Delete/{id}/{force}")] public async Task<ActionResult> Delete(int id, bool force=false)
+        {
+            Track? obj = await service.GetById(id);
+            if (obj is null) { return NotFound(); }
+            else if (!force && await service.HasChildObjects(obj.Id)) { return Unauthorized(); }
+            else { await service.Delete(obj); return Ok(); }
+        }
     }
 }

@@ -51,5 +51,10 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<Season?> GetTemp() { return await SetNextAvailable(new Season()); }
+
+        public async Task<bool> HasChildObjects(int id)
+        {
+            return false;
+        }
     }
 }

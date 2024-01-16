@@ -4,17 +4,17 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class ManufacturerService(IManufacturerContext iManufacturerContext, IBaseContext<Car> iCarContext, IBaseContext<Manufacturer> iBaseContext) : BaseService<Manufacturer>(iBaseContext)
+    public class CarclassService(ICarclassContext iCarclassContext, IBaseContext<Car> iCarContext, IBaseContext<SeasonCarclass> iSeasonCarclassContext, IBaseContext<Carclass> iBaseContext) : BaseService<Carclass>(iBaseContext)
     {
-        public Manufacturer? Validate(Manufacturer? obj)
+        public Carclass? Validate(Carclass? obj)
         {
             if (obj is null) { return null; }
             obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
-            if (obj.Name == string.Empty) { obj.Name = Manufacturer.DefaultName; }
+            if (obj.Name == string.Empty) { obj.Name = Carclass.DefaultName; }
             return obj;
         }
 
-        public async Task<Manufacturer?> SetNextAvailable(Manufacturer? obj)
+        public async Task<Carclass?> SetNextAvailable(Carclass? obj)
         {
             obj = Validate(obj);
             if (obj is null) { return null; }
@@ -33,12 +33,14 @@ namespace GTRC_Database_API.Services
             return obj;
         }
 
-        public async Task<Manufacturer?> GetTemp() { return await SetNextAvailable(new Manufacturer()); }
+        public async Task<Carclass?> GetTemp() { return await SetNextAvailable(new Carclass()); }
 
         public async Task<bool> HasChildObjects(int id)
         {
             List<Car> listCar = await iCarContext.GetAll();
-            foreach (Car obj in listCar) { if (obj.ManufacturerId == id) { return true; } }
+            foreach (Car obj in listCar) { if (obj.CarclassId == id) { return true; } }
+            List<SeasonCarclass> listSeasonCarclass = await iSeasonCarclassContext.GetAll();
+            foreach (SeasonCarclass obj in listSeasonCarclass) { if (obj.CarclassId == id) { return true; } }
             return false;
         }
     }

@@ -4,7 +4,7 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class CarService(ICarContext iCarContext, IBaseContext<Manufacturer> iManufacturerContext, IBaseContext<Car> iBaseContext) : BaseService<Car>(iBaseContext)
+    public class CarService(ICarContext iCarContext, IBaseContext<Carclass> iCarclassContext, IBaseContext<Manufacturer> iManufacturerContext, IBaseContext<Car> iBaseContext) : BaseService<Car>(iBaseContext)
     {
         public Car? Validate(Car? obj)
         {
@@ -21,7 +21,15 @@ namespace GTRC_Database_API.Services
             }
             else { obj.Manufacturer = manufacturer; }
             obj.Model = Scripts.RemoveSpaceStartEnd(obj.Model);
-            if (!Enum.IsDefined(typeof(CarClass), obj.Class)) { obj.Class = CarClass.General; }
+            Carclass? carclass = null;
+            if (obj.Carclass is not null) { carclass = iCarclassContext.GetById(obj.CarclassId).Result; };
+            if (carclass is null)
+            {
+                List<Carclass> list = iCarclassContext.GetAll().Result;
+                if (list.Count == 0) { return null; }
+                else { obj.Carclass = list[0]; obj.CarclassId = list[0].Id; }
+            }
+            else { obj.Carclass = carclass; }
             obj.WidthMm = Math.Max(obj.WidthMm, (ushort)1);
             obj.LengthMm = Math.Max(obj.LengthMm, (ushort)1);
             obj.NameGtrc = Scripts.RemoveSpaceStartEnd(obj.NameGtrc);

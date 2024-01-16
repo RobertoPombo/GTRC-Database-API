@@ -38,8 +38,8 @@ namespace GTRC_Database_API.Services
 
         public async Task<bool> HasChildObjects(int id)
         {
-            List<Season> list = await iSeasonContext.GetAll();
-            foreach (Season obj in list) { if (obj.SeriesId == id) { return true; } }
+            List<Season> listSeason = await iSeasonContext.GetAll();
+            foreach (Season obj in listSeason) { if (obj.SeriesId == id) { return true; } }
             return false;
         }
     }

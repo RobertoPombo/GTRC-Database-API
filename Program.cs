@@ -25,23 +25,29 @@ builder.Services.AddScoped(typeof(IBaseContext<>), typeof(BaseContext<>));
 builder.Services.AddScoped<ColorService>();
 builder.Services.AddScoped<IColorContext, ColorContext>();
 
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IUserContext, UserContext>();
+
+builder.Services.AddScoped<TrackService>();
+builder.Services.AddScoped<ITrackContext, TrackContext>();
+
+builder.Services.AddScoped<CarclassService>();
+builder.Services.AddScoped<ICarclassContext, CarclassContext>();
+
 builder.Services.AddScoped<ManufacturerService>();
 builder.Services.AddScoped<IManufacturerContext, ManufacturerContext>();
 
 builder.Services.AddScoped<CarService>();
 builder.Services.AddScoped<ICarContext, CarContext>();
 
-builder.Services.AddScoped<TrackService>();
-builder.Services.AddScoped<ITrackContext, TrackContext>();
-
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<IUserContext, UserContext>();
-
 builder.Services.AddScoped<SeriesService>();
 builder.Services.AddScoped<ISeriesContext, SeriesContext>();
 
 builder.Services.AddScoped<SeasonService>();
 builder.Services.AddScoped<ISeasonContext, SeasonContext>();
+
+builder.Services.AddScoped<SeasonCarclassService>();
+builder.Services.AddScoped<ISeasonCarclassContext, SeasonCarclassContext>();
 
 
 var app = builder.Build();

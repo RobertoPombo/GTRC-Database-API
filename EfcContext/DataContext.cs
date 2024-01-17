@@ -18,6 +18,7 @@ namespace GTRC_Database_API.Data
         public DbSet<Series> Series { get; set; }
         public DbSet<Season> Seasons { get; set; }
         public DbSet<SeasonCarclass> SeasonsCarclasses { get; set; }
+        public DbSet<Event> Events { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

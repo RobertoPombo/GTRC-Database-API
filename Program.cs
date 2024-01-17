@@ -58,6 +58,9 @@ builder.Services.AddScoped<ISeasonContext, SeasonContext>();
 builder.Services.AddScoped<SeasonCarclassService>();
 builder.Services.AddScoped<ISeasonCarclassContext, SeasonCarclassContext>();
 
+builder.Services.AddScoped<EventService>();
+builder.Services.AddScoped<IEventContext, EventContext>();
+
 
 var app = builder.Build();
 

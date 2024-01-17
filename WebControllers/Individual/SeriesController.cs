@@ -66,7 +66,7 @@ namespace GTRC_Database_API.Controllers
             }
         }
 
-        [HttpDelete("Delete/{id}/{force}")] public async Task<ActionResult> Delete(int id, bool force=false)
+        [HttpDelete("Delete/{id}/{force}")] public async Task<ActionResult> Delete(int id, bool force = false)
         {
             Series? obj = await service.GetById(id);
             if (obj is null) { return NotFound(); }

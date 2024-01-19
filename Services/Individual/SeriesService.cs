@@ -4,7 +4,10 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class SeriesService(ISeriesContext iSeriesContext, IBaseContext<Sim> iSimContext, IBaseContext<Season> iSeasonContext, IBaseContext<Series> iBaseContext) : BaseService<Series>(iBaseContext)
+    public class SeriesService(ISeriesContext iSeriesContext,
+        IBaseContext<Sim> iSimContext,
+        IBaseContext<Season> iSeasonContext,
+        IBaseContext<Series> iBaseContext) : BaseService<Series>(iBaseContext)
     {
         public Series? Validate(Series? obj)
         {
@@ -20,6 +23,8 @@ namespace GTRC_Database_API.Services
                 else { obj.Sim = list[0]; obj.SimId = list[0].Id; }
             }
             else { obj.Sim = sim; }
+            if (!Scripts.IsValidDiscordId(obj.DiscordRegistrationChannelId)) { obj.DiscordRegistrationChannelId = GlobalValues.NoDiscordId; }
+            if (!Scripts.IsValidDiscordId(obj.DiscordLogChannelId)) { obj.DiscordLogChannelId = GlobalValues.NoDiscordId; }
             return obj;
         }
 

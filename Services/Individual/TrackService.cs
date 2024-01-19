@@ -4,7 +4,9 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class TrackService(ITrackContext iTrackContext, IBaseContext<Track> iBaseContext) : BaseService<Track>(iBaseContext)
+    public class TrackService(ITrackContext iTrackContext,
+        IBaseContext<BopTrackCar> iBopTrackCarContext,
+        IBaseContext<Track> iBaseContext) : BaseService<Track>(iBaseContext)
     {
         public Track? Validate(Track? obj)
         {
@@ -51,6 +53,8 @@ namespace GTRC_Database_API.Services
 
         public async Task<bool> HasChildObjects(int id)
         {
+            List<BopTrackCar> listBopTrackCar = await iBopTrackCarContext.GetAll();
+            foreach (BopTrackCar obj in listBopTrackCar) { if (obj.TrackId == id) { return true; } }
             return false;
         }
     }

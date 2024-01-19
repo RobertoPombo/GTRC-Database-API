@@ -1,14 +1,15 @@
-﻿using GTRC_Basics.Models;
+﻿using GTRC_Basics;
+using GTRC_Basics.Models;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class SeasonCarclassService(ISeasonCarclassContext iSeasonCarclassContext,
+    public class TeamService(ITeamContext iTeamContext,
         IBaseContext<Season> iSeasonContext,
-        IBaseContext<Carclass> iCarclassContext,
-        IBaseContext<SeasonCarclass> iBaseContext) : BaseService<SeasonCarclass>(iBaseContext)
+        IBaseContext<Organization> iOrganizationContext,
+        IBaseContext<Team> iBaseContext) : BaseService<Team>(iBaseContext)
     {
-        public SeasonCarclass? Validate(SeasonCarclass? obj)
+        public Team? Validate(Team? obj)
         {
             if (obj is null) { return null; }
             Season? season = null;
@@ -20,52 +21,44 @@ namespace GTRC_Database_API.Services
                 else { obj.Season = list[0]; obj.SeasonId = list[0].Id; }
             }
             else { obj.Season = season; }
-            Carclass? carclass = null;
-            if (obj.Carclass is not null) { carclass = iCarclassContext.GetById(obj.CarclassId).Result; };
-            if (carclass is null)
+            obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
+            if (obj.Name == string.Empty) { obj.Name = Team.DefaultName; }
+            Organization? organization = null;
+            if (obj.Organization is not null) { organization = iOrganizationContext.GetById(obj.OrganizationId).Result; };
+            if (organization is null)
             {
-                List<Carclass> list = iCarclassContext.GetAll().Result;
+                List<Organization> list = iOrganizationContext.GetAll().Result;
                 if (list.Count == 0) { return null; }
-                else { obj.Carclass = list[0]; obj.CarclassId = list[0].Id; }
+                else { obj.Organization = list[0]; obj.OrganizationId = list[0].Id; }
             }
-            else { obj.Carclass = carclass; }
+            else { obj.Organization = organization; }
             return obj;
         }
 
-        public async Task<SeasonCarclass?> SetNextAvailable(SeasonCarclass? obj)
+        public async Task<Team?> SetNextAvailable(Team? obj)
         {
             obj = Validate(obj);
             if (obj is null) { return null; }
 
             int startIndexSeason = 0;
-            int startIndexCarclass = 0;
             List<int> idListSeason = [];
-            List<int> idListCarclass = [];
             List<Season> listSeason = iSeasonContext.GetAll().Result;
-            List<Carclass> listCarclass = iCarclassContext.GetAll().Result;
             for (int index = 0; index < listSeason.Count; index++)
             {
                 idListSeason.Add(listSeason[index].Id);
                 if (listSeason[index].Id == obj.SeasonId) { startIndexSeason = index; }
             }
-            for (int index = 0; index < listCarclass.Count; index++)
-            {
-                idListCarclass.Add(listCarclass[index].Id);
-                if (listCarclass[index].Id == obj.CarclassId) { startIndexCarclass = index; }
-            }
             int indexSeason = startIndexSeason;
-            int indexCarclass = startIndexCarclass;
-
+            
+            int nr = 1;
+            string delimiter = " #";
+            string defName = obj.Name;
+            string[] defNameList = defName.Split(delimiter);
+            if (defNameList.Length > 1 && Int32.TryParse(defNameList[^1], out _)) { defName = defName[..^(defNameList[^1].Length + delimiter.Length)]; }
             while (!await IsUnique(obj))
             {
-                if (indexCarclass < idListCarclass.Count - 1)
-                {
-                    indexCarclass++;
-                    obj.Carclass = listCarclass[indexCarclass];
-                    obj.CarclassId = listCarclass[indexCarclass].Id;
-                }
-                else { indexCarclass = 0; }
-                if (indexCarclass == startIndexCarclass)
+                obj.Name = defName + delimiter + nr.ToString();
+                nr++; if (nr == int.MaxValue)
                 {
                     if (indexSeason < idListSeason.Count - 1)
                     {
@@ -81,7 +74,7 @@ namespace GTRC_Database_API.Services
             return obj;
         }
 
-        public async Task<SeasonCarclass?> GetTemp() { return await SetNextAvailable(new SeasonCarclass()); }
+        public async Task<Team?> GetTemp() { return await SetNextAvailable(new Team()); }
 
         public async Task<bool> HasChildObjects(int id)
         {

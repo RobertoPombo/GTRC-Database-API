@@ -3,23 +3,23 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class SeasonCarclassService(ISeasonCarclassContext iSeasonCarclassContext,
-        IBaseContext<Season> iSeasonContext,
+    public class EventCarclassService(IEventCarclassContext iEventCarclassContext,
+        IBaseContext<Event> iEventContext,
         IBaseContext<Carclass> iCarclassContext,
-        IBaseContext<SeasonCarclass> iBaseContext) : BaseService<SeasonCarclass>(iBaseContext)
+        IBaseContext<EventCarclass> iBaseContext) : BaseService<EventCarclass>(iBaseContext)
     {
-        public SeasonCarclass? Validate(SeasonCarclass? obj)
+        public EventCarclass? Validate(EventCarclass? obj)
         {
             if (obj is null) { return null; }
-            Season? season = null;
-            if (obj.Season is not null) { season = iSeasonContext.GetById(obj.SeasonId).Result; };
-            if (season is null)
+            Event? _event = null;
+            if (obj.Event is not null) { _event = iEventContext.GetById(obj.EventId).Result; };
+            if (_event is null)
             {
-                List<Season> list = iSeasonContext.GetAll().Result;
+                List<Event> list = iEventContext.GetAll().Result;
                 if (list.Count == 0) { return null; }
-                else { obj.Season = list[0]; obj.SeasonId = list[0].Id; }
+                else { obj.Event = list[0]; obj.EventId = list[0].Id; }
             }
-            else { obj.Season = season; }
+            else { obj.Event = _event; }
             Carclass? carclass = null;
             if (obj.Carclass is not null) { carclass = iCarclassContext.GetById(obj.CarclassId).Result; };
             if (carclass is null)
@@ -32,28 +32,28 @@ namespace GTRC_Database_API.Services
             return obj;
         }
 
-        public async Task<SeasonCarclass?> SetNextAvailable(SeasonCarclass? obj)
+        public async Task<EventCarclass?> SetNextAvailable(EventCarclass? obj)
         {
             obj = Validate(obj);
             if (obj is null) { return null; }
 
-            int startIndexSeason = 0;
+            int startIndexEvent = 0;
             int startIndexCarclass = 0;
-            List<int> idListSeason = [];
+            List<int> idListEvent = [];
             List<int> idListCarclass = [];
-            List<Season> listSeason = iSeasonContext.GetAll().Result;
+            List<Event> listEvent = iEventContext.GetAll().Result;
             List<Carclass> listCarclass = iCarclassContext.GetAll().Result;
-            for (int index = 0; index < listSeason.Count; index++)
+            for (int index = 0; index < listEvent.Count; index++)
             {
-                idListSeason.Add(listSeason[index].Id);
-                if (listSeason[index].Id == obj.SeasonId) { startIndexSeason = index; }
+                idListEvent.Add(listEvent[index].Id);
+                if (listEvent[index].Id == obj.EventId) { startIndexEvent = index; }
             }
             for (int index = 0; index < listCarclass.Count; index++)
             {
                 idListCarclass.Add(listCarclass[index].Id);
                 if (listCarclass[index].Id == obj.CarclassId) { startIndexCarclass = index; }
             }
-            int indexSeason = startIndexSeason;
+            int indexEvent = startIndexEvent;
             int indexCarclass = startIndexCarclass;
 
             while (!await IsUnique(obj))
@@ -67,21 +67,21 @@ namespace GTRC_Database_API.Services
                 else { indexCarclass = 0; }
                 if (indexCarclass == startIndexCarclass)
                 {
-                    if (indexSeason < idListSeason.Count - 1)
+                    if (indexEvent < idListEvent.Count - 1)
                     {
-                        indexSeason++;
-                        obj.Season = listSeason[indexSeason];
-                        obj.SeasonId = listSeason[indexSeason].Id;
+                        indexEvent++;
+                        obj.Event = listEvent[indexEvent];
+                        obj.EventId = listEvent[indexEvent].Id;
                     }
-                    else { indexSeason = 0; }
-                    if (indexSeason == startIndexSeason) { return null; }
+                    else { indexEvent = 0; }
+                    if (indexEvent == startIndexEvent) { return null; }
                 }
             }
 
             return obj;
         }
 
-        public async Task<SeasonCarclass?> GetTemp() { return await SetNextAvailable(new SeasonCarclass()); }
+        public async Task<EventCarclass?> GetTemp() { return await SetNextAvailable(new EventCarclass()); }
 
         public async Task<bool> HasChildObjects(int id)
         {

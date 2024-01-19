@@ -4,7 +4,9 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class ManufacturerService(IManufacturerContext iManufacturerContext, IBaseContext<Car> iCarContext, IBaseContext<Manufacturer> iBaseContext) : BaseService<Manufacturer>(iBaseContext)
+    public class ManufacturerService(IManufacturerContext iManufacturerContext,
+        IBaseContext<Car> iCarContext,
+        IBaseContext<Manufacturer> iBaseContext) : BaseService<Manufacturer>(iBaseContext)
     {
         public Manufacturer? Validate(Manufacturer? obj)
         {

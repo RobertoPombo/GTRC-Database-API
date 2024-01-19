@@ -5,7 +5,12 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class EventService(IEventContext iEventContext, IBaseContext<Season> iSeasonContext, IBaseContext<Track> iTrackContext, IBaseContext<Event> iBaseContext) : BaseService<Event>(iBaseContext)
+    public class EventService(IEventContext iEventContext,
+        IBaseContext<Season> iSeasonContext,
+        IBaseContext<Track> iTrackContext,
+        IBaseContext<EventCar> iEventCarContext,
+        IBaseContext<EventCarclass> iEventCarclassContext,
+        IBaseContext<Event> iBaseContext) : BaseService<Event>(iBaseContext)
     {
         public Event? Validate(Event? obj)
         {
@@ -98,6 +103,10 @@ namespace GTRC_Database_API.Services
 
         public async Task<bool> HasChildObjects(int id)
         {
+            List<EventCar> listEventCar = await iEventCarContext.GetAll();
+            foreach (EventCar obj in listEventCar) { if (obj.EventId == id) { return true; } }
+            List<EventCarclass> listEventCarclass = await iEventCarclassContext.GetAll();
+            foreach (EventCarclass obj in listEventCarclass) { if (obj.EventId == id) { return true; } }
             return false;
         }
 

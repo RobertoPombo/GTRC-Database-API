@@ -1,6 +1,6 @@
 ﻿namespace GTRC_Database_API.Services.Interfaces
 {
-    public interface IEventEntryContext
+    public interface IEventCarclassContext
     {
 
     }

@@ -4,13 +4,16 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class RoleService(IRoleContext iRoleContext, IBaseContext<UserRole> iUserRoleContext, IBaseContext<Role> iBaseContext) : BaseService<Role>(iBaseContext)
+    public class RoleService(IRoleContext iRoleContext,
+        IBaseContext<UserRole> iUserRoleContext,
+        IBaseContext<Role> iBaseContext) : BaseService<Role>(iBaseContext)
     {
         public Role? Validate(Role? obj)
         {
             if (obj is null) { return null; }
             obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
             if (obj.Name == string.Empty) { obj.Name = Role.DefaultName; }
+            if (!Scripts.IsValidDiscordId(obj.DiscordId)) { obj.DiscordId = GlobalValues.NoDiscordId; }
             return obj;
         }
 

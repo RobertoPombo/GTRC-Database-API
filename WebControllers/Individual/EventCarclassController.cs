@@ -7,47 +7,47 @@ using GTRC_Basics.Models.DTOs;
 namespace GTRC_Database_API.Controllers
 {
     [ApiController]
-    [Route(nameof(Sim))]
-    public class SimController(SimService service, BaseService<Sim> baseService) : BaseController<Sim>(baseService)
+    [Route(nameof(EventCarclass))]
+    public class EventCarclassController(EventCarclassService service, BaseService<EventCarclass> baseService) : BaseController<EventCarclass>(baseService)
     {
-        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Sim?>> GetByUniqProps(SimUniqPropsDto0 objDto)
+        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<EventCarclass?>> GetByUniqProps(EventCarclassUniqPropsDto0 objDto)
         {
-            UniqPropsDto<Sim> _objDto = new() { Index = 0, Dto = objDto };
-            Sim? obj = await service.GetByUniqProps(_objDto);
+            UniqPropsDto<EventCarclass> _objDto = new() { Index = 0, Dto = objDto };
+            EventCarclass? obj = await service.GetByUniqProps(_objDto);
             if (obj is null) { return NotFound(obj); }
             else { return Ok(obj); }
         }
 
-        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<Sim>>> GetByProps(SimAddDto objDto)
+        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<EventCarclass>>> GetByProps(EventCarclassAddDto objDto)
         {
-            AddDto<Sim> _objDto = new() { Dto = objDto };
+            AddDto<EventCarclass> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByProps(_objDto));
         }
 
-        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<Sim>>> GetByFilter(SimFilterDtos objDto)
+        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<EventCarclass>>> GetByFilter(EventCarclassFilterDtos objDto)
         {
-            FilterDtos<Sim> _objDto = new() { Dto = objDto };
+            FilterDtos<EventCarclass> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByFilter(_objDto.Filter, _objDto.FilterMin, _objDto.FilterMax));
         }
 
-        [HttpGet("Get/Temp")] public async Task<ActionResult<Sim?>> GetTemp()
+        [HttpGet("Get/Temp")] public async Task<ActionResult<EventCarclass?>> GetTemp()
         {
-            Sim? obj = await service.GetTemp();
+            EventCarclass? obj = await service.GetTemp();
             if (obj is null) { return BadRequest(obj); }
             else { return Ok(obj); }
         }
 
-        [HttpPost("Add")] public async Task<ActionResult<Sim?>> Add(SimAddDto objDto)
+        [HttpPost("Add")] public async Task<ActionResult<EventCarclass?>> Add(EventCarclassAddDto objDto)
         {
-            Sim? objValidated = service.Validate(objDto.Dto2Model());
-            Sim? obj = await service.SetNextAvailable(objDto.Dto2Model());
+            EventCarclass? objValidated = service.Validate(objDto.Dto2Model());
+            EventCarclass? obj = await service.SetNextAvailable(objDto.Dto2Model());
             if (obj is null || objValidated is null) { return BadRequest(obj); }
             else if (!objDto.IsSimilar(objValidated)) { return StatusCode(406, obj); }
             else if (!objDto.IsSimilar(obj)) { return StatusCode(208, obj); }
             else
             {
                 await service.Add(obj);
-                UniqPropsDto<Sim> uniqPropsDto = new();
+                UniqPropsDto<EventCarclass> uniqPropsDto = new();
                 uniqPropsDto.Dto.Model2Dto(obj);
                 obj = await service.GetByUniqProps(uniqPropsDto);
                 if (obj is null) { return NotFound(obj); }
@@ -55,13 +55,13 @@ namespace GTRC_Database_API.Controllers
             }
         }
 
-        [HttpPut("Update")] public async Task<ActionResult<Sim?>> Update(SimUpdateDto objDto)
+        [HttpPut("Update")] public async Task<ActionResult<EventCarclass?>> Update(EventCarclassUpdateDto objDto)
         {
-            Sim? obj = await service.GetById(objDto.Id);
+            EventCarclass? obj = await service.GetById(objDto.Id);
             if (obj is null) { return NotFound(obj); }
             else
             {
-                Sim? objValidated = service.Validate(objDto.Dto2Model(obj));
+                EventCarclass? objValidated = service.Validate(objDto.Dto2Model(obj));
                 obj = await service.SetNextAvailable(objDto.Dto2Model(obj));
                 if (obj is null || objValidated is null) { return BadRequest(await service.GetById(objDto.Id)); }
                 else if (!objDto.IsSimilar(objValidated)) { return StatusCode(406, obj); }
@@ -72,7 +72,7 @@ namespace GTRC_Database_API.Controllers
 
         [HttpDelete("Delete/{id}/{force}")] public async Task<ActionResult> Delete(int id, bool force = false)
         {
-            Sim? obj = await service.GetById(id);
+            EventCarclass? obj = await service.GetById(id);
             if (obj is null) { return NotFound(); }
             else if (!force && await service.HasChildObjects(obj.Id)) { return StatusCode(405); }
             else { await service.Delete(obj); return Ok(); }

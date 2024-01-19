@@ -4,7 +4,8 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class UserService(IUserContext iUserContext, IBaseContext<User> iBaseContext) : BaseService<User>(iBaseContext)
+    public class UserService(IUserContext iUserContext,
+        IBaseContext<User> iBaseContext) : BaseService<User>(iBaseContext)
     {
         public User? Validate(User? obj)
         {

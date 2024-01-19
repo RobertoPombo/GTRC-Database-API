@@ -4,24 +4,23 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class SimService(ISimContext iSimContext,
-        IBaseContext<Bop> iBopContext,
-        IBaseContext<Series> iSeriesContext,
-        IBaseContext<Sim> iBaseContext) : BaseService<Sim>(iBaseContext)
+    public class BopService(IBopContext iBopContext,
+        IBaseContext<BopTrackCar> iBopTrackCarContext,
+        IBaseContext<Bop> iBaseContext) : BaseService<Bop>(iBaseContext)
     {
-        public Sim? Validate(Sim? obj)
+        public Bop? Validate(Bop? obj)
         {
             if (obj is null) { return null; }
             obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
-            if (obj.Name == string.Empty) { obj.Name = Sim.DefaultName; }
+            if (obj.Name == string.Empty) { obj.Name = Bop.DefaultName; }
             return obj;
         }
 
-        public async Task<Sim?> SetNextAvailable(Sim? obj)
+        public async Task<Bop?> SetNextAvailable(Bop? obj)
         {
             obj = Validate(obj);
             if (obj is null) { return null; }
-
+            
             int nr = 1;
             string delimiter = " #";
             string defName = obj.Name;
@@ -36,12 +35,12 @@ namespace GTRC_Database_API.Services
             return obj;
         }
 
-        public async Task<Sim?> GetTemp() { return await SetNextAvailable(new Sim()); }
+        public async Task<Bop?> GetTemp() { return await SetNextAvailable(new Bop()); }
 
         public async Task<bool> HasChildObjects(int id)
         {
-            List<Series> listSeries = await iSeriesContext.GetAll();
-            foreach (Series obj in listSeries) { if (obj.SimId == id) { return true; } }
+            List<BopTrackCar> listBopTrackCar = await iBopTrackCarContext.GetAll();
+            foreach (BopTrackCar obj in listBopTrackCar) { if (obj.BopId == id) { return true; } }
             return false;
         }
     }

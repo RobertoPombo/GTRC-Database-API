@@ -49,6 +49,12 @@ builder.Services.AddScoped<IRoleContext, RoleContext>();
 builder.Services.AddScoped<UserRoleService>();
 builder.Services.AddScoped<IUserRoleContext, UserRoleContext>();
 
+builder.Services.AddScoped<BopService>();
+builder.Services.AddScoped<IBopContext, BopContext>();
+
+builder.Services.AddScoped<BopTrackCarService>();
+builder.Services.AddScoped<IBopTrackCarContext, BopTrackCarContext>();
+
 builder.Services.AddScoped<SeriesService>();
 builder.Services.AddScoped<ISeriesContext, SeriesContext>();
 
@@ -58,8 +64,23 @@ builder.Services.AddScoped<ISeasonContext, SeasonContext>();
 builder.Services.AddScoped<SeasonCarclassService>();
 builder.Services.AddScoped<ISeasonCarclassContext, SeasonCarclassContext>();
 
+builder.Services.AddScoped<OrganizationService>();
+builder.Services.AddScoped<IOrganizationContext, OrganizationContext>();
+
+builder.Services.AddScoped<OrganizationUserService>();
+builder.Services.AddScoped<IOrganizationUserContext, OrganizationUserContext>();
+
+builder.Services.AddScoped<TeamService>();
+builder.Services.AddScoped<ITeamContext, TeamContext>();
+
 builder.Services.AddScoped<EventService>();
 builder.Services.AddScoped<IEventContext, EventContext>();
+
+builder.Services.AddScoped<EventCarclassService>();
+builder.Services.AddScoped<IEventCarclassContext, EventCarclassContext>();
+
+builder.Services.AddScoped<EventCarService>();
+builder.Services.AddScoped<IEventCarContext, EventCarContext>();
 
 
 var app = builder.Build();

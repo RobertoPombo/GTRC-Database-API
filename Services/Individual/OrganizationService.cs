@@ -4,20 +4,20 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class SimService(ISimContext iSimContext,
-        IBaseContext<Bop> iBopContext,
-        IBaseContext<Series> iSeriesContext,
-        IBaseContext<Sim> iBaseContext) : BaseService<Sim>(iBaseContext)
+    public class OrganizationService(IOrganizationContext iOrganizationContext,
+        IBaseContext<OrganizationUser> iOrganizationUserContext,
+        IBaseContext<Team> iTeamContext,
+        IBaseContext<Organization> iBaseContext) : BaseService<Organization>(iBaseContext)
     {
-        public Sim? Validate(Sim? obj)
+        public Organization? Validate(Organization? obj)
         {
             if (obj is null) { return null; }
             obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
-            if (obj.Name == string.Empty) { obj.Name = Sim.DefaultName; }
+            if (obj.Name == string.Empty) { obj.Name = Organization.DefaultName; }
             return obj;
         }
 
-        public async Task<Sim?> SetNextAvailable(Sim? obj)
+        public async Task<Organization?> SetNextAvailable(Organization? obj)
         {
             obj = Validate(obj);
             if (obj is null) { return null; }
@@ -36,12 +36,14 @@ namespace GTRC_Database_API.Services
             return obj;
         }
 
-        public async Task<Sim?> GetTemp() { return await SetNextAvailable(new Sim()); }
+        public async Task<Organization?> GetTemp() { return await SetNextAvailable(new Organization()); }
 
         public async Task<bool> HasChildObjects(int id)
         {
-            List<Series> listSeries = await iSeriesContext.GetAll();
-            foreach (Series obj in listSeries) { if (obj.SimId == id) { return true; } }
+            List<OrganizationUser> listOrganizationUser = await iOrganizationUserContext.GetAll();
+            foreach (OrganizationUser obj in listOrganizationUser) { if (obj.OrganizationId == id) { return true; } }
+            List<Team> listTeam = await iTeamContext.GetAll();
+            foreach (Team obj in listTeam) { if (obj.OrganizationId == id) { return true; } }
             return false;
         }
     }

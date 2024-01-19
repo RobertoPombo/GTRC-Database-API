@@ -39,9 +39,11 @@ namespace GTRC_Database_API.Controllers
 
         [HttpPost("Add")] public async Task<ActionResult<UserRole?>> Add(UserRoleAddDto objDto)
         {
+            UserRole? objValidated = service.Validate(objDto.Dto2Model());
             UserRole? obj = await service.SetNextAvailable(objDto.Dto2Model());
-            if (obj is null) { return BadRequest(obj); }
-            else if (!objDto.IsSimilar(obj)) { return Conflict(obj); }
+            if (obj is null || objValidated is null) { return BadRequest(obj); }
+            else if (!objDto.IsSimilar(objValidated)) { return StatusCode(406, obj); }
+            else if (!objDto.IsSimilar(obj)) { return StatusCode(208, obj); }
             else
             {
                 await service.Add(obj);
@@ -59,9 +61,11 @@ namespace GTRC_Database_API.Controllers
             if (obj is null) { return NotFound(obj); }
             else
             {
+                UserRole? objValidated = service.Validate(objDto.Dto2Model(obj));
                 obj = await service.SetNextAvailable(objDto.Dto2Model(obj));
-                if (obj is null) { return BadRequest(await service.GetById(objDto.Id)); }
-                else if (!objDto.IsSimilar(obj)) { return Conflict(obj); }
+                if (obj is null || objValidated is null) { return BadRequest(await service.GetById(objDto.Id)); }
+                else if (!objDto.IsSimilar(objValidated)) { return StatusCode(406, obj); }
+                else if (!objDto.IsSimilar(obj)) { return StatusCode(208, obj); }
                 else { await service.Update(obj); return Ok(obj); }
             }
         }
@@ -70,7 +74,7 @@ namespace GTRC_Database_API.Controllers
         {
             UserRole? obj = await service.GetById(id);
             if (obj is null) { return NotFound(); }
-            else if (!force && await service.HasChildObjects(obj.Id)) { return Unauthorized(); }
+            else if (!force && await service.HasChildObjects(obj.Id)) { return StatusCode(405); }
             else { await service.Delete(obj); return Ok(); }
         }
     }

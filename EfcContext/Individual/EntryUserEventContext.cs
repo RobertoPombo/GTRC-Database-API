@@ -5,7 +5,7 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.EfcContext
 {
-    public class EventEntryContext(DataContext db) : IEventEntryContext
+    public class EntryUserEventContext(DataContext db) : IEntryUserEventContext
     {
 
     }

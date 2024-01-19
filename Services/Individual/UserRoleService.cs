@@ -3,7 +3,10 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class UserRoleService(IUserRoleContext iUserRoleContext, IBaseContext<User> iUserContext, IBaseContext<Role> iRoleContext, IBaseContext<UserRole> iBaseContext) : BaseService<UserRole>(iBaseContext)
+    public class UserRoleService(IUserRoleContext iUserRoleContext,
+        IBaseContext<User> iUserContext,
+        IBaseContext<Role> iRoleContext,
+        IBaseContext<UserRole> iBaseContext) : BaseService<UserRole>(iBaseContext)
     {
         public UserRole? Validate(UserRole? obj)
         {

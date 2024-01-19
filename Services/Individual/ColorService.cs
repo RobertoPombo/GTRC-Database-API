@@ -1,10 +1,10 @@
 ﻿using GTRC_Basics.Models;
-using GTRC_Database_API.EfcContext;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class ColorService(IColorContext iColorContext, IBaseContext<Color> iBaseContext) : BaseService<Color>(iBaseContext)
+    public class ColorService(IColorContext iColorContext,
+        IBaseContext<Color> iBaseContext) : BaseService<Color>(iBaseContext)
     {
         public Color? Validate(Color? obj)
         {

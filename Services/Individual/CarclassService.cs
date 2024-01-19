@@ -4,7 +4,11 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class CarclassService(ICarclassContext iCarclassContext, IBaseContext<Car> iCarContext, IBaseContext<SeasonCarclass> iSeasonCarclassContext, IBaseContext<Carclass> iBaseContext) : BaseService<Carclass>(iBaseContext)
+    public class CarclassService(ICarclassContext iCarclassContext,
+        IBaseContext<Car> iCarContext,
+        IBaseContext<SeasonCarclass> iSeasonCarclassContext,
+        IBaseContext<EventCarclass> iEventCarclassContext,
+        IBaseContext<Carclass> iBaseContext) : BaseService<Carclass>(iBaseContext)
     {
         public Carclass? Validate(Carclass? obj)
         {
@@ -41,6 +45,8 @@ namespace GTRC_Database_API.Services
             foreach (Car obj in listCar) { if (obj.CarclassId == id) { return true; } }
             List<SeasonCarclass> listSeasonCarclass = await iSeasonCarclassContext.GetAll();
             foreach (SeasonCarclass obj in listSeasonCarclass) { if (obj.CarclassId == id) { return true; } }
+            List<EventCarclass> listEventCarclass = await iEventCarclassContext.GetAll();
+            foreach (EventCarclass obj in listEventCarclass) { if (obj.CarclassId == id) { return true; } }
             return false;
         }
     }

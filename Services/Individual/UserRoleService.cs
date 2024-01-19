@@ -37,23 +37,14 @@ namespace GTRC_Database_API.Services
             obj = Validate(obj);
             if (obj is null) { return null; }
 
-            int startIndexUser = 0;
             int startIndexRole = 0;
-            List<int> idListUser = [];
             List<int> idListRole = [];
-            List<User> listUser = iUserContext.GetAll().Result;
             List<Role> listRole = iRoleContext.GetAll().Result;
-            for (int index = 0; index < listUser.Count; index++)
-            {
-                idListUser.Add(listUser[index].Id);
-                if (listUser[index].Id == obj.UserId) { startIndexUser = index; }
-            }
             for (int index = 0; index < listRole.Count; index++)
             {
                 idListRole.Add(listRole[index].Id);
                 if (listRole[index].Id == obj.RoleId) { startIndexRole = index; }
             }
-            int indexUser = startIndexUser;
             int indexRole = startIndexRole;
 
             while (!await IsUnique(obj))
@@ -67,6 +58,16 @@ namespace GTRC_Database_API.Services
                 else { indexRole = 0; }
                 if (indexRole == startIndexRole)
                 {
+                    int startIndexUser = 0;
+                    List<int> idListUser = [];
+                    List<User> listUser = iUserContext.GetAll().Result;
+                    for (int index = 0; index < listUser.Count; index++)
+                    {
+                        idListUser.Add(listUser[index].Id);
+                        if (listUser[index].Id == obj.UserId) { startIndexUser = index; }
+                    }
+                    int indexUser = startIndexUser;
+
                     if (indexUser < idListUser.Count - 1)
                     {
                         indexUser++;

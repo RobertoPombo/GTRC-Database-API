@@ -48,16 +48,6 @@ namespace GTRC_Database_API.Services
             obj = Validate(obj);
             if (obj is null) { return null; }
 
-            int startIndexSeason = 0;
-            List<int> idListSeason = [];
-            List<Season> listSeason = iSeasonContext.GetAll().Result;
-            for (int index = 0; index < listSeason.Count; index++)
-            {
-                idListSeason.Add(listSeason[index].Id);
-                if (listSeason[index].Id == obj.SeasonId) { startIndexSeason = index; }
-            }
-            int indexSeason = startIndexSeason;
-            
             int nr = 1;
             string delimiter = " #";
             string defName = obj.Name;
@@ -68,6 +58,16 @@ namespace GTRC_Database_API.Services
                 obj.Name = defName + delimiter + nr.ToString();
                 nr++; if (nr == int.MaxValue)
                 {
+                    int startIndexSeason = 0;
+                    List<int> idListSeason = [];
+                    List<Season> listSeason = iSeasonContext.GetAll().Result;
+                    for (int index = 0; index < listSeason.Count; index++)
+                    {
+                        idListSeason.Add(listSeason[index].Id);
+                        if (listSeason[index].Id == obj.SeasonId) { startIndexSeason = index; }
+                    }
+                    int indexSeason = startIndexSeason;
+
                     if (indexSeason < idListSeason.Count - 1)
                     {
                         indexSeason++;
@@ -85,6 +85,16 @@ namespace GTRC_Database_API.Services
                 if (obj.Date < GlobalValues.DateTimeMaxValue.AddDays(-1)) { obj.Date = obj.Date.AddDays(1); } else { obj.Date = GlobalValues.DateTimeMinValue; }
                 if (obj.Date == startDate)
                 {
+                    int startIndexSeason = 0;
+                    List<int> idListSeason = [];
+                    List<Season> listSeason = iSeasonContext.GetAll().Result;
+                    for (int index = 0; index < listSeason.Count; index++)
+                    {
+                        idListSeason.Add(listSeason[index].Id);
+                        if (listSeason[index].Id == obj.SeasonId) { startIndexSeason = index; }
+                    }
+                    int indexSeason = startIndexSeason;
+
                     if (indexSeason < idListSeason.Count - 1)
                     {
                         indexSeason++;

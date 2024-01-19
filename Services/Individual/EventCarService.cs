@@ -37,23 +37,14 @@ namespace GTRC_Database_API.Services
             obj = Validate(obj);
             if (obj is null) { return null; }
 
-            int startIndexEvent = 0;
             int startIndexCar = 0;
-            List<int> idListEvent = [];
             List<int> idListCar = [];
-            List<Event> listEvent = iEventContext.GetAll().Result;
             List<Car> listCar = iCarContext.GetAll().Result;
-            for (int index = 0; index < listEvent.Count; index++)
-            {
-                idListEvent.Add(listEvent[index].Id);
-                if (listEvent[index].Id == obj.EventId) { startIndexEvent = index; }
-            }
             for (int index = 0; index < listCar.Count; index++)
             {
                 idListCar.Add(listCar[index].Id);
                 if (listCar[index].Id == obj.CarId) { startIndexCar = index; }
             }
-            int indexEvent = startIndexEvent;
             int indexCar = startIndexCar;
 
             while (!await IsUnique(obj))
@@ -67,6 +58,16 @@ namespace GTRC_Database_API.Services
                 else { indexCar = 0; }
                 if (indexCar == startIndexCar)
                 {
+                    int startIndexEvent = 0;
+                    List<int> idListEvent = [];
+                    List<Event> listEvent = iEventContext.GetAll().Result;
+                    for (int index = 0; index < listEvent.Count; index++)
+                    {
+                        idListEvent.Add(listEvent[index].Id);
+                        if (listEvent[index].Id == obj.EventId) { startIndexEvent = index; }
+                    }
+                    int indexEvent = startIndexEvent;
+
                     if (indexEvent < idListEvent.Count - 1)
                     {
                         indexEvent++;

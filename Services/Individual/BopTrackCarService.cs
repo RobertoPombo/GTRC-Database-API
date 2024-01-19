@@ -47,32 +47,14 @@ namespace GTRC_Database_API.Services
             obj = Validate(obj);
             if (obj is null) { return null; }
 
-            int startIndexBop = 0;
-            int startIndexTrack = 0;
             int startIndexCar = 0;
-            List<int> idListBop = [];
-            List<int> idListTrack = [];
             List<int> idListCar = [];
-            List<Bop> listBop = iBopContext.GetAll().Result;
-            List<Track> listTrack = iTrackContext.GetAll().Result;
             List<Car> listCar = iCarContext.GetAll().Result;
-            for (int index = 0; index < listBop.Count; index++)
-            {
-                idListBop.Add(listBop[index].Id);
-                if (listBop[index].Id == obj.BopId) { startIndexBop = index; }
-            }
-            for (int index = 0; index < listTrack.Count; index++)
-            {
-                idListTrack.Add(listTrack[index].Id);
-                if (listTrack[index].Id == obj.TrackId) { startIndexTrack = index; }
-            }
             for (int index = 0; index < listCar.Count; index++)
             {
                 idListCar.Add(listCar[index].Id);
                 if (listCar[index].Id == obj.CarId) { startIndexCar = index; }
             }
-            int indexBop = startIndexBop;
-            int indexTrack = startIndexTrack;
             int indexCar = startIndexCar;
 
             while (!await IsUnique(obj))
@@ -86,6 +68,16 @@ namespace GTRC_Database_API.Services
                 else { indexCar = 0; }
                 if (indexCar == startIndexCar)
                 {
+                    int startIndexTrack = 0;
+                    List<int> idListTrack = [];
+                    List<Track> listTrack = iTrackContext.GetAll().Result;
+                    for (int index = 0; index < listTrack.Count; index++)
+                    {
+                        idListTrack.Add(listTrack[index].Id);
+                        if (listTrack[index].Id == obj.TrackId) { startIndexTrack = index; }
+                    }
+                    int indexTrack = startIndexTrack;
+
                     if (indexTrack < idListTrack.Count - 1)
                     {
                         indexTrack++;
@@ -95,6 +87,16 @@ namespace GTRC_Database_API.Services
                     else { indexTrack = 0; }
                     if (indexTrack == startIndexTrack)
                     {
+                        int startIndexBop = 0;
+                        List<int> idListBop = [];
+                        List<Bop> listBop = iBopContext.GetAll().Result;
+                        for (int index = 0; index < listBop.Count; index++)
+                        {
+                            idListBop.Add(listBop[index].Id);
+                            if (listBop[index].Id == obj.BopId) { startIndexBop = index; }
+                        }
+                        int indexBop = startIndexBop;
+
                         if (indexBop < idListBop.Count - 1)
                         {
                             indexBop++;

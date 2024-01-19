@@ -37,23 +37,14 @@ namespace GTRC_Database_API.Services
             obj = Validate(obj);
             if (obj is null) { return null; }
 
-            int startIndexSeason = 0;
             int startIndexCarclass = 0;
-            List<int> idListSeason = [];
             List<int> idListCarclass = [];
-            List<Season> listSeason = iSeasonContext.GetAll().Result;
             List<Carclass> listCarclass = iCarclassContext.GetAll().Result;
-            for (int index = 0; index < listSeason.Count; index++)
-            {
-                idListSeason.Add(listSeason[index].Id);
-                if (listSeason[index].Id == obj.SeasonId) { startIndexSeason = index; }
-            }
             for (int index = 0; index < listCarclass.Count; index++)
             {
                 idListCarclass.Add(listCarclass[index].Id);
                 if (listCarclass[index].Id == obj.CarclassId) { startIndexCarclass = index; }
             }
-            int indexSeason = startIndexSeason;
             int indexCarclass = startIndexCarclass;
 
             while (!await IsUnique(obj))
@@ -67,6 +58,16 @@ namespace GTRC_Database_API.Services
                 else { indexCarclass = 0; }
                 if (indexCarclass == startIndexCarclass)
                 {
+                    int startIndexSeason = 0;
+                    List<int> idListSeason = [];
+                    List<Season> listSeason = iSeasonContext.GetAll().Result;
+                    for (int index = 0; index < listSeason.Count; index++)
+                    {
+                        idListSeason.Add(listSeason[index].Id);
+                        if (listSeason[index].Id == obj.SeasonId) { startIndexSeason = index; }
+                    }
+                    int indexSeason = startIndexSeason;
+
                     if (indexSeason < idListSeason.Count - 1)
                     {
                         indexSeason++;

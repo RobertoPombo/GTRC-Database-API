@@ -37,7 +37,7 @@ namespace GTRC_Database_API.Services
             else { obj.Carclass = carclass; }
             obj.WidthMm = Math.Max(obj.WidthMm, (ushort)1);
             obj.LengthMm = Math.Max(obj.LengthMm, (ushort)1);
-            obj.NameGtrc = Scripts.RemoveSpaceStartEnd(obj.NameGtrc);
+            obj.NameGoogleSheets = Scripts.RemoveSpaceStartEnd(obj.NameGoogleSheets);
             return obj;
         }
 

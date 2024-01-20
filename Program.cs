@@ -25,9 +25,6 @@ builder.Services.AddScoped(typeof(IBaseContext<>), typeof(BaseContext<>));
 builder.Services.AddScoped<ColorService>();
 builder.Services.AddScoped<IColorContext, ColorContext>();
 
-builder.Services.AddScoped<CommunityService>();
-builder.Services.AddScoped<ICommunityContext, CommunityContext>();
-
 builder.Services.AddScoped<SimService>();
 builder.Services.AddScoped<ISimContext, SimContext>();
 

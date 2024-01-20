@@ -7,7 +7,6 @@ namespace GTRC_Database_API.Data
     public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
     {
         public DbSet<Color> Colors { get; set; }
-        public DbSet<Community> Communities { get; set; }
         public DbSet<Sim> Simulations { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Track> Tracks { get; set; }

@@ -5,21 +5,11 @@ using GTRC_Database_API.Services.Interfaces;
 namespace GTRC_Database_API.Services
 {
     public class UserService(IUserContext iUserContext,
-        IBaseContext<Community> iCommunityContext,
         IBaseContext<User> iBaseContext) : BaseService<User>(iBaseContext)
     {
         public User? Validate(User? obj)
         {
             if (obj is null) { return null; }
-            Community? community = null;
-            if (obj.Community is not null) { community = iCommunityContext.GetById(obj.CommunityId).Result; };
-            if (community is null)
-            {
-                List<Community> list = iCommunityContext.GetAll().Result;
-                if (list.Count == 0) { return null; }
-                else { obj.Community = list[0]; obj.CommunityId = list[0].Id; }
-            }
-            else { obj.Community = community; }
             if (!Scripts.IsValidSteamId(obj.SteamId)) { obj.SteamId = GlobalValues.NoSteamId; }
             if (!Scripts.IsValidDiscordId(obj.DiscordId)) { obj.DiscordId = GlobalValues.NoDiscordId; }
             obj.FirstName = Scripts.RemoveSpaceStartEnd(obj.FirstName);
@@ -45,54 +35,14 @@ namespace GTRC_Database_API.Services
             while (!await IsUnique(obj, 0) && obj.SteamId != GlobalValues.NoSteamId)
             {
                 if (obj.SteamId < GlobalValues.MaxSteamId) { obj.SteamId++; } else { obj.SteamId = GlobalValues.MinSteamId; }
-                if (obj.SteamId == startValue)
-                {
-                    int startIndexCommunity = 0;
-                    List<int> idListCommunity = [];
-                    List<Community> listCommunity = iCommunityContext.GetAll().Result;
-                    for (int index = 0; index < listCommunity.Count; index++)
-                    {
-                        idListCommunity.Add(listCommunity[index].Id);
-                        if (listCommunity[index].Id == obj.CommunityId) { startIndexCommunity = index; }
-                    }
-                    int indexCommunity = startIndexCommunity;
-
-                    if (indexCommunity < idListCommunity.Count - 1)
-                    {
-                        indexCommunity++;
-                        obj.Community = listCommunity[indexCommunity];
-                        obj.CommunityId = listCommunity[indexCommunity].Id;
-                    }
-                    else { indexCommunity = 0; }
-                    if (indexCommunity == startIndexCommunity) { obj.SteamId = GlobalValues.NoSteamId; }
-                }
+                if (obj.SteamId == startValue) { obj.SteamId = GlobalValues.NoSteamId; }
             }
 
             startValue = obj.DiscordId;
             while (!await IsUnique(obj, 1) && obj.DiscordId != GlobalValues.NoDiscordId)
             {
                 if (obj.DiscordId < GlobalValues.MaxDiscordId) { obj.DiscordId++; } else { obj.DiscordId = GlobalValues.MinDiscordId; }
-                if (obj.DiscordId == startValue)
-                {
-                    int startIndexCommunity = 0;
-                    List<int> idListCommunity = [];
-                    List<Community> listCommunity = iCommunityContext.GetAll().Result;
-                    for (int index = 0; index < listCommunity.Count; index++)
-                    {
-                        idListCommunity.Add(listCommunity[index].Id);
-                        if (listCommunity[index].Id == obj.CommunityId) { startIndexCommunity = index; }
-                    }
-                    int indexCommunity = startIndexCommunity;
-
-                    if (indexCommunity < idListCommunity.Count - 1)
-                    {
-                        indexCommunity++;
-                        obj.Community = listCommunity[indexCommunity];
-                        obj.CommunityId = listCommunity[indexCommunity].Id;
-                    }
-                    else { indexCommunity = 0; }
-                    if (indexCommunity == startIndexCommunity) { obj.DiscordId = GlobalValues.NoDiscordId; }
-                }
+                if (obj.DiscordId == startValue) { obj.DiscordId = GlobalValues.NoDiscordId; }
             }
 
             return obj;

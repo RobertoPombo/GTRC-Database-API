@@ -1,6 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using System.Text;
 
 using GTRC_Basics;
 using GTRC_Database_API.Data;
@@ -8,11 +6,7 @@ using GTRC_Database_API.Services;
 using GTRC_Database_API.Services.Interfaces;
 using GTRC_Database_API.EfcContext;
 
-if (!Directory.Exists(GlobalValues.DataDirectory)) { Directory.CreateDirectory(GlobalValues.DataDirectory); }
-string pathSqlConCfg = GlobalValues.DataDirectory + "config dbsql.json";
-if (!File.Exists(pathSqlConCfg)) { File.WriteAllText(pathSqlConCfg, JsonConvert.SerializeObject(SqlConnectionConfig.List, Formatting.Indented), Encoding.Unicode); }
-_ = JsonConvert.DeserializeObject<List<SqlConnectionConfig>>(File.ReadAllText(pathSqlConCfg, Encoding.Unicode)) ?? [];
-if (SqlConnectionConfig.List.Count == 0) { _ = new SqlConnectionConfig(); }
+SqlConnectionConfig.LoadJson();
 SqlConnectionConfig? sqlConCfg = SqlConnectionConfig.GetActiveConnection();
 if (sqlConCfg is null) { sqlConCfg = SqlConnectionConfig.List[0]; sqlConCfg.IsActive = true; }
 

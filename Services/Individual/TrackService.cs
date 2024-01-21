@@ -6,6 +6,7 @@ namespace GTRC_Database_API.Services
 {
     public class TrackService(ITrackContext iTrackContext,
         IBaseContext<BopTrackCar> iBopTrackCarContext,
+        IBaseContext<Event> iEventContext,
         IBaseContext<Track> iBaseContext) : BaseService<Track>(iBaseContext)
     {
         public Track? Validate(Track? obj)
@@ -55,6 +56,8 @@ namespace GTRC_Database_API.Services
         {
             List<BopTrackCar> listBopTrackCar = await iBopTrackCarContext.GetAll();
             foreach (BopTrackCar obj in listBopTrackCar) { if (obj.TrackId == id) { return true; } }
+            List<Event> listEvent = await iEventContext.GetAll();
+            foreach (Event obj in listEvent) { if (obj.TrackId == id) { return true; } }
             return false;
         }
     }

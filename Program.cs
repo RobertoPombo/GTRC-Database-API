@@ -6,6 +6,8 @@ using GTRC_Database_API.Services;
 using GTRC_Database_API.Services.Interfaces;
 using GTRC_Database_API.EfcContext;
 
+
+
 SqlConnectionConfig.LoadJson();
 SqlConnectionConfig? sqlConCfg = SqlConnectionConfig.GetActiveConnection();
 if (sqlConCfg is null) { sqlConCfg = SqlConnectionConfig.List[0]; sqlConCfg.IsActive = true; }

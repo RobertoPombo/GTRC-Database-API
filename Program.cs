@@ -1,23 +1,27 @@
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System.Text;
 
+using GTRC_Basics;
 using GTRC_Database_API.Data;
 using GTRC_Database_API.Services;
 using GTRC_Database_API.Services.Interfaces;
 using GTRC_Database_API.EfcContext;
-using GTRC_Database_API.Helpers;
 
-SqlConnectionConfig sQLConCfg = Basics.GetSqlConnection();
+if (!Directory.Exists(GlobalValues.DataDirectory)) { Directory.CreateDirectory(GlobalValues.DataDirectory); }
+string pathSqlConCfg = GlobalValues.DataDirectory + "config dbsql.json";
+if (!File.Exists(pathSqlConCfg)) { File.WriteAllText(pathSqlConCfg, JsonConvert.SerializeObject(SqlConnectionConfig.List, Formatting.Indented), Encoding.Unicode); }
+_ = JsonConvert.DeserializeObject<List<SqlConnectionConfig>>(File.ReadAllText(pathSqlConCfg, Encoding.Unicode)) ?? [];
+if (SqlConnectionConfig.List.Count == 0) { _ = new SqlConnectionConfig(); }
+SqlConnectionConfig? sqlConCfg = SqlConnectionConfig.GetActiveConnection();
+if (sqlConCfg is null) { sqlConCfg = SqlConnectionConfig.List[0]; sqlConCfg.IsActive = true; }
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<DataContext>(options => options.UseLazyLoadingProxies().UseSqlServer(sQLConCfg.ConnectionString));
+builder.Services.AddDbContext<DataContext>(options => options.UseLazyLoadingProxies().UseSqlServer(sqlConCfg.ConnectionString));
 
 builder.Services.AddScoped(typeof(BaseService<>));
 builder.Services.AddScoped(typeof(IBaseContext<>), typeof(BaseContext<>));
@@ -88,19 +92,14 @@ builder.Services.AddScoped<IContext, Context>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-//GTRC_Database_API.Helpers.HostBuilder.CreateHostBuilder(args).Build().Run();
-
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

@@ -73,6 +73,9 @@ builder.Services.AddScoped<IOrganizationUserContext, OrganizationUserContext>();
 builder.Services.AddScoped<TeamService>();
 builder.Services.AddScoped<ITeamContext, TeamContext>();
 
+builder.Services.AddScoped<EntryService>();
+builder.Services.AddScoped<IEntryContext, EntryContext>();
+
 builder.Services.AddScoped<EventService>();
 builder.Services.AddScoped<IEventContext, EventContext>();
 

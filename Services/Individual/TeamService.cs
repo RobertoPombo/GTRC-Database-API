@@ -5,22 +5,13 @@ using GTRC_Database_API.Services.Interfaces;
 namespace GTRC_Database_API.Services
 {
     public class TeamService(ITeamContext iTeamContext,
-        IBaseContext<Season> iSeasonContext,
         IBaseContext<Organization> iOrganizationContext,
+        IBaseContext<Entry> iEntryContext,
         IBaseContext<Team> iBaseContext) : BaseService<Team>(iBaseContext)
     {
         public Team? Validate(Team? obj)
         {
             if (obj is null) { return null; }
-            Season? season = null;
-            if (obj.Season is not null) { season = iSeasonContext.GetById(obj.SeasonId).Result; };
-            if (season is null)
-            {
-                List<Season> list = iSeasonContext.GetAll().Result;
-                if (list.Count == 0) { return null; }
-                else { obj.Season = list[0]; obj.SeasonId = list[0].Id; }
-            }
-            else { obj.Season = season; }
             obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
             if (obj.Name == string.Empty) { obj.Name = Team.DefaultName; }
             Organization? organization = null;
@@ -48,27 +39,8 @@ namespace GTRC_Database_API.Services
             while (!await IsUnique(obj))
             {
                 obj.Name = defName + delimiter + nr.ToString();
-                nr++; if (nr == int.MaxValue)
-                {
-                    int startIndexSeason = 0;
-                    List<int> idListSeason = [];
-                    List<Season> listSeason = iSeasonContext.GetAll().Result;
-                    for (int index = 0; index < listSeason.Count; index++)
-                    {
-                        idListSeason.Add(listSeason[index].Id);
-                        if (listSeason[index].Id == obj.SeasonId) { startIndexSeason = index; }
-                    }
-                    int indexSeason = startIndexSeason;
-
-                    if (indexSeason < idListSeason.Count - 1)
-                    {
-                        indexSeason++;
-                        obj.Season = listSeason[indexSeason];
-                        obj.SeasonId = listSeason[indexSeason].Id;
-                    }
-                    else { indexSeason = 0; }
-                    if (indexSeason == startIndexSeason) { return null; }
-                }
+                nr++;
+                if (nr == int.MaxValue) { return null; }
             }
 
             return obj;
@@ -78,6 +50,8 @@ namespace GTRC_Database_API.Services
 
         public async Task<bool> HasChildObjects(int id)
         {
+            List<Entry> listEntry = await iEntryContext.GetAll();
+            foreach (Entry obj in listEntry) { if (obj.TeamId == id) { return true; } }
             return false;
         }
     }

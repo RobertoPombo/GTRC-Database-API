@@ -56,7 +56,8 @@ namespace GTRC_Database_API.Services
             while (!await IsUnique(obj, 0))
             {
                 obj.Name = defName + delimiter + nr.ToString();
-                nr++; if (nr == int.MaxValue)
+                nr++;
+                if (nr == int.MaxValue)
                 {
                     int startIndexSeason = 0;
                     List<int> idListSeason = [];

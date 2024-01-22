@@ -29,6 +29,7 @@ namespace GTRC_Database_API.Services
                 else { obj.User = list[0]; obj.UserId = list[0].Id; }
             }
             else { obj.User = user; }
+            if (obj.IsInvited) { obj.IsAdmin = false; }
             return obj;
         }
 

@@ -30,7 +30,8 @@ namespace GTRC_Database_API.Services
             while (!await IsUnique(obj, 0))
             {
                 obj.Name = defName + delimiter + nr.ToString();
-                nr++; if (nr == int.MaxValue) { return null; }
+                nr++;
+                if (nr == int.MaxValue) { return null; }
             }
 
             nr = 1;
@@ -41,7 +42,8 @@ namespace GTRC_Database_API.Services
             while (!await IsUnique(obj, 1))
             {
                 obj.ShortName = defName + delimiter + nr.ToString();
-                nr++; if (nr == int.MaxValue) { return null; }
+                nr++;
+                if (nr == int.MaxValue) { return null; }
             }
 
             return obj;

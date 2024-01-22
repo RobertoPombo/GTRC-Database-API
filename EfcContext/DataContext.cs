@@ -23,6 +23,7 @@ namespace GTRC_Database_API.Data
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<OrganizationUser> OrganizationsUsers { get; set; }
         public DbSet<Team> Teams { get; set; }
+        public DbSet<Entry> Entries { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<EventCarclass> EventsCarclasses { get; set; }
         public DbSet<EventCar> EventsCars { get; set; }

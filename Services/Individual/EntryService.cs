@@ -1,0 +1,91 @@
+﻿using GTRC_Basics;
+using GTRC_Basics.Models;
+using GTRC_Database_API.Services.Interfaces;
+
+namespace GTRC_Database_API.Services
+{
+    public class EntryService(IEntryContext iEntryContext,
+        IBaseContext<Car> iCarContext,
+        IBaseContext<Season> iSeasonContext,
+        IBaseContext<Team> iTeamContext,
+        IBaseContext<Entry> iBaseContext) : BaseService<Entry>(iBaseContext)
+    {
+        public Entry? Validate(Entry? obj)
+        {
+            if (obj is null) { return null; }
+            Season? season = null;
+            if (obj.Season is not null) { season = iSeasonContext.GetById(obj.SeasonId).Result; };
+            if (season is null)
+            {
+                List<Season> list = iSeasonContext.GetAll().Result;
+                if (list.Count == 0) { return null; }
+                else { obj.Season = list[0]; obj.SeasonId = list[0].Id; }
+            }
+            else { obj.Season = season; }
+            obj.RaceNumber = Math.Min(Entry.MaxRaceNumber, Math.Max(Entry.MinRaceNumber, obj.RaceNumber));
+            Team? team = null;
+            if (obj.Team is not null) { team = iTeamContext.GetById(obj.TeamId).Result; };
+            if (team is null)
+            {
+                List<Team> list = iTeamContext.GetAll().Result;
+                if (list.Count == 0) { return null; }
+                else { obj.Team = list[0]; obj.TeamId = list[0].Id; }
+            }
+            else { obj.Team = team; }
+            Car? car = null;
+            if (obj.Car is not null) { car = iCarContext.GetById(obj.CarId).Result; };
+            if (car is null)
+            {
+                List<Car> list = iCarContext.GetAll().Result;
+                if (list.Count == 0) { return null; }
+                else { obj.Car = list[0]; obj.CarId = list[0].Id; }
+            }
+            else { obj.Car = car; }
+            if (obj.RegisterDate > DateTime.UtcNow || obj.RegisterDate < GlobalValues.DateTimeMinValue) { obj.RegisterDate = DateTime.UtcNow; }
+            if (obj.SignOutDate > GlobalValues.DateTimeMaxValue || obj.SignOutDate < obj.RegisterDate) { obj.SignOutDate = GlobalValues.DateTimeMaxValue; }
+            return obj;
+        }
+
+        public async Task<Entry?> SetNextAvailable(Entry? obj)
+        {
+            obj = Validate(obj);
+            if (obj is null) { return null; }
+
+            int startRaceNumber = obj.RaceNumber;
+            while (!await IsUnique(obj))
+            {
+                if (obj.RaceNumber < Entry.MaxRaceNumber) { obj.RaceNumber += 1; } else { obj.RaceNumber = Entry.DefaultRaceNumber; }
+                if (obj.RaceNumber == startRaceNumber)
+                {
+                    int startIndexSeason = 0;
+                    List<int> idListSeason = [];
+                    List<Season> listSeason = iSeasonContext.GetAll().Result;
+                    for (int index = 0; index < listSeason.Count; index++)
+                    {
+                        idListSeason.Add(listSeason[index].Id);
+                        if (listSeason[index].Id == obj.SeasonId) { startIndexSeason = index; }
+                    }
+                    int indexSeason = startIndexSeason;
+
+                    if (indexSeason < idListSeason.Count - 1)
+                    {
+                        indexSeason++;
+                        obj.Season = listSeason[indexSeason];
+                        obj.SeasonId = listSeason[indexSeason].Id;
+                    }
+                    else { indexSeason = 0; }
+                    if (indexSeason == startIndexSeason) { return null; }
+                }
+            }
+
+            return obj;
+        }
+
+        public async Task<Entry?> GetTemp() { return await SetNextAvailable(new Entry()); }
+
+        public async Task<bool> HasChildObjects(int id)
+        {
+            return false;
+        }
+    }
+}

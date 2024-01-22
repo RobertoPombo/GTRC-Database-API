@@ -8,6 +8,7 @@ namespace GTRC_Database_API.Services
         IBaseContext<Carclass> iCarclassContext,
         IBaseContext<Manufacturer> iManufacturerContext,
         IBaseContext<BopTrackCar> iBopTrackCarContext,
+        IBaseContext<Entry> iEntryContext,
         IBaseContext<EventCar> iEventCarContext,
         IBaseContext<Car> iBaseContext) : BaseService<Car>(iBaseContext)
     {
@@ -54,7 +55,8 @@ namespace GTRC_Database_API.Services
             while (!await IsUnique(obj, 0))
             {
                 obj.Name = defName + delimiter + nr.ToString();
-                nr++; if (nr == int.MaxValue) { return null; }
+                nr++;
+                if (nr == int.MaxValue) { return null; }
             }
 
             uint startValue = obj.AccCarId;
@@ -73,6 +75,8 @@ namespace GTRC_Database_API.Services
         {
             List<BopTrackCar> listBopTrackCar = await iBopTrackCarContext.GetAll();
             foreach (BopTrackCar obj in listBopTrackCar) { if (obj.CarId == id) { return true; } }
+            List<Entry> listEntry = await iEntryContext.GetAll();
+            foreach (Entry obj in listEntry) { if (obj.CarId == id) { return true; } }
             List<EventCar> listEventCar = await iEventCarContext.GetAll();
             foreach (EventCar obj in listEventCar) { if (obj.EventId == id) { return true; } }
             return false;

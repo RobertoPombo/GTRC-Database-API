@@ -7,7 +7,7 @@ namespace GTRC_Database_API.Services
     public class SeasonService(ISeasonContext iSeasonContext,
         IBaseContext<Bop> iBopContext,
         IBaseContext<Series> iSeriesContext,
-        IBaseContext<Team> iTeamContext,
+        IBaseContext<Entry> iEntryContext,
         IBaseContext<Event> iEventContext,
         IBaseContext<Season> iBaseContext) : BaseService<Season>(iBaseContext)
     {
@@ -62,7 +62,8 @@ namespace GTRC_Database_API.Services
             while (!await IsUnique(obj))
             {
                 obj.Name = defName + delimiter + nr.ToString();
-                nr++; if (nr == int.MaxValue)
+                nr++;
+                if (nr == int.MaxValue)
                 {
                     int startIndexSeries = 0;
                     List<int> idListSeries = [];
@@ -92,8 +93,8 @@ namespace GTRC_Database_API.Services
 
         public async Task<bool> HasChildObjects(int id)
         {
-            List<Team> listTeam = await iTeamContext.GetAll();
-            foreach (Team obj in listTeam) { if (obj.OrganizationId == id) { return true; } }
+            List<Entry> listEntry = await iEntryContext.GetAll();
+            foreach (Entry obj in listEntry) { if (obj.SeasonId == id) { return true; } }
             List<Event> listEvents = await iEventContext.GetAll();
             foreach (Event obj in listEvents) { if (obj.SeasonId == id) { return true; } }
             return false;

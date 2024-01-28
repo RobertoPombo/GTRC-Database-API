@@ -83,10 +83,5 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<UserRole?> GetTemp() { return await SetNextAvailable(new UserRole()); }
-
-        public async Task<bool> HasChildObjects(int id)
-        {
-            return false;
-        }
     }
 }

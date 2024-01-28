@@ -5,7 +5,6 @@ using GTRC_Database_API.Services.Interfaces;
 namespace GTRC_Database_API.Services
 {
     public class ManufacturerService(IManufacturerContext iManufacturerContext,
-        IBaseContext<Car> iCarContext,
         IBaseContext<Manufacturer> iBaseContext) : BaseService<Manufacturer>(iBaseContext)
     {
         public Manufacturer? Validate(Manufacturer? obj)
@@ -37,12 +36,5 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<Manufacturer?> GetTemp() { return await SetNextAvailable(new Manufacturer()); }
-
-        public async Task<bool> HasChildObjects(int id)
-        {
-            List<Car> listCar = await iCarContext.GetAll();
-            foreach (Car obj in listCar) { if (obj.ManufacturerId == id) { return true; } }
-            return false;
-        }
     }
 }

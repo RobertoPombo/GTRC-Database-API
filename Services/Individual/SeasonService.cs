@@ -7,8 +7,6 @@ namespace GTRC_Database_API.Services
     public class SeasonService(ISeasonContext iSeasonContext,
         IBaseContext<Bop> iBopContext,
         IBaseContext<Series> iSeriesContext,
-        IBaseContext<Entry> iEntryContext,
-        IBaseContext<Event> iEventContext,
         IBaseContext<Season> iBaseContext) : BaseService<Season>(iBaseContext)
     {
         public Season? Validate(Season? obj)
@@ -90,14 +88,5 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<Season?> GetTemp() { return await SetNextAvailable(new Season()); }
-
-        public async Task<bool> HasChildObjects(int id)
-        {
-            List<Entry> listEntry = await iEntryContext.GetAll();
-            foreach (Entry obj in listEntry) { if (obj.SeasonId == id) { return true; } }
-            List<Event> listEvents = await iEventContext.GetAll();
-            foreach (Event obj in listEvents) { if (obj.SeasonId == id) { return true; } }
-            return false;
-        }
     }
 }

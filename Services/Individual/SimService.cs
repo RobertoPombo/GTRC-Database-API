@@ -5,8 +5,6 @@ using GTRC_Database_API.Services.Interfaces;
 namespace GTRC_Database_API.Services
 {
     public class SimService(ISimContext iSimContext,
-        IBaseContext<Bop> iBopContext,
-        IBaseContext<Series> iSeriesContext,
         IBaseContext<Sim> iBaseContext) : BaseService<Sim>(iBaseContext)
     {
         public Sim? Validate(Sim? obj)
@@ -50,12 +48,5 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<Sim?> GetTemp() { return await SetNextAvailable(new Sim()); }
-
-        public async Task<bool> HasChildObjects(int id)
-        {
-            List<Series> listSeries = await iSeriesContext.GetAll();
-            foreach (Series obj in listSeries) { if (obj.SimId == id) { return true; } }
-            return false;
-        }
     }
 }

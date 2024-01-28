@@ -43,10 +43,5 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<Color?> GetTemp() { return await SetNextAvailable(new Color()); }
-
-        public async Task<bool> HasChildObjects(int id)
-        {
-            return false;
-        }
     }
 }

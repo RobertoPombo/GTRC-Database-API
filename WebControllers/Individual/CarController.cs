@@ -8,7 +8,7 @@ namespace GTRC_Database_API.Controllers
 {
     [ApiController]
     [Route(nameof(Car))]
-    public class CarController(CarService service, BaseService<Car> baseService) : BaseController<Car>(baseService)
+    public class CarController(CarService service, BaseService<Car> baseService, FullService<Car> fullService) : BaseController<Car>(baseService, fullService)
     {
         [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Car?>> GetByUniqProps(CarUniqPropsDto0 objDto)
         {
@@ -76,14 +76,6 @@ namespace GTRC_Database_API.Controllers
                 else if (!objDto.IsSimilar(obj)) { return StatusCode(208, obj); }
                 else { await service.Update(obj); return Ok(obj); }
             }
-        }
-
-        [HttpDelete("Delete/{id}/{force}")] public async Task<ActionResult> Delete(int id, bool force = false)
-        {
-            Car? obj = await service.GetById(id);
-            if (obj is null) { return NotFound(); }
-            else if (!force && await service.HasChildObjects(obj.Id)) { return StatusCode(405); }
-            else { await service.Delete(obj); return Ok(); }
         }
     }
 }

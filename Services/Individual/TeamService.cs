@@ -6,7 +6,6 @@ namespace GTRC_Database_API.Services
 {
     public class TeamService(ITeamContext iTeamContext,
         IBaseContext<Organization> iOrganizationContext,
-        IBaseContext<Entry> iEntryContext,
         IBaseContext<Team> iBaseContext) : BaseService<Team>(iBaseContext)
     {
         public Team? Validate(Team? obj)
@@ -47,12 +46,5 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<Team?> GetTemp() { return await SetNextAvailable(new Team()); }
-
-        public async Task<bool> HasChildObjects(int id)
-        {
-            List<Entry> listEntry = await iEntryContext.GetAll();
-            foreach (Entry obj in listEntry) { if (obj.TeamId == id) { return true; } }
-            return false;
-        }
     }
 }

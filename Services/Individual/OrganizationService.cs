@@ -5,8 +5,6 @@ using GTRC_Database_API.Services.Interfaces;
 namespace GTRC_Database_API.Services
 {
     public class OrganizationService(IOrganizationContext iOrganizationContext,
-        IBaseContext<OrganizationUser> iOrganizationUserContext,
-        IBaseContext<Team> iTeamContext,
         IBaseContext<Organization> iBaseContext) : BaseService<Organization>(iBaseContext)
     {
         public Organization? Validate(Organization? obj)
@@ -38,14 +36,5 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<Organization?> GetTemp() { return await SetNextAvailable(new Organization()); }
-
-        public async Task<bool> HasChildObjects(int id)
-        {
-            List<OrganizationUser> listOrganizationUser = await iOrganizationUserContext.GetAll();
-            foreach (OrganizationUser obj in listOrganizationUser) { if (obj.OrganizationId == id) { return true; } }
-            List<Team> listTeam = await iTeamContext.GetAll();
-            foreach (Team obj in listTeam) { if (obj.OrganizationId == id) { return true; } }
-            return false;
-        }
     }
 }

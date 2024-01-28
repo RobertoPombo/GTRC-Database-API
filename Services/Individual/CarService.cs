@@ -7,9 +7,6 @@ namespace GTRC_Database_API.Services
     public class CarService(ICarContext iCarContext,
         IBaseContext<Carclass> iCarclassContext,
         IBaseContext<Manufacturer> iManufacturerContext,
-        IBaseContext<BopTrackCar> iBopTrackCarContext,
-        IBaseContext<Entry> iEntryContext,
-        IBaseContext<EventCar> iEventCarContext,
         IBaseContext<Car> iBaseContext) : BaseService<Car>(iBaseContext)
     {
         public Car? Validate(Car? obj)
@@ -70,16 +67,5 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<Car?> GetTemp() { return await SetNextAvailable(new Car()); }
-
-        public async Task<bool> HasChildObjects(int id)
-        {
-            List<BopTrackCar> listBopTrackCar = await iBopTrackCarContext.GetAll();
-            foreach (BopTrackCar obj in listBopTrackCar) { if (obj.CarId == id) { return true; } }
-            List<Entry> listEntry = await iEntryContext.GetAll();
-            foreach (Entry obj in listEntry) { if (obj.CarId == id) { return true; } }
-            List<EventCar> listEventCar = await iEventCarContext.GetAll();
-            foreach (EventCar obj in listEventCar) { if (obj.EventId == id) { return true; } }
-            return false;
-        }
     }
 }

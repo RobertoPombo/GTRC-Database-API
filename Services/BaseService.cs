@@ -167,5 +167,18 @@ namespace GTRC_Database_API.Services
         public async Task Delete(ModelType obj) { await iBaseContext.Delete(obj); }
 
         public async Task Update(ModelType obj) { await iBaseContext.Update(obj); }
+
+        public async Task<List<ModelType>> GetChildObjects(Type modelType, int id)
+        {
+            PropertyInfo? property = GlobalValues.DictDtoModels[typeof(ModelType)][DtoType.Add].GetProperty(modelType.Name + GlobalValues.Id);
+            if (property is not null)
+            {
+                Type addDtoType = typeof(AddDto<>).MakeGenericType(modelType);
+                AddDto<ModelType> dto = new();
+                property.SetValue(dto.Dto, Scripts.CastValue(property, id));
+                return await GetByProps(dto);
+            }
+            return [];
+        }
     }
 }

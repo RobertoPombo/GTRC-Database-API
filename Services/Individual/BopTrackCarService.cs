@@ -113,10 +113,5 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<BopTrackCar?> GetTemp() { return await SetNextAvailable(new BopTrackCar()); }
-
-        public async Task<bool> HasChildObjects(int id)
-        {
-            return false;
-        }
     }
 }

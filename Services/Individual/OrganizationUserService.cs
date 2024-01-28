@@ -30,6 +30,9 @@ namespace GTRC_Database_API.Services
             }
             else { obj.User = user; }
             if (obj.IsInvited) { obj.IsAdmin = false; }
+            List<OrganizationUser> listOrganizationUsers = GetAdmins(obj.Organization.Id);
+            if (listOrganizationUsers.Count == 0) { obj.IsInvited = false; obj.IsAdmin = true; }
+            else if (listOrganizationUsers.Count == 1 && listOrganizationUsers[0].UserId == obj.UserId) { obj.IsInvited = false; obj.IsAdmin = true; }
             return obj;
         }
 
@@ -85,9 +88,6 @@ namespace GTRC_Database_API.Services
 
         public async Task<OrganizationUser?> GetTemp() { return await SetNextAvailable(new OrganizationUser()); }
 
-        public async Task<bool> HasChildObjects(int id)
-        {
-            return false;
-        }
+        public List<OrganizationUser> GetAdmins(int organizationId) { return iOrganizationUserContext.GetAdmins(organizationId); }
     }
 }

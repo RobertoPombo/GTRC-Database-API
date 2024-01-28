@@ -8,7 +8,7 @@ namespace GTRC_Database_API.Controllers
 {
     [ApiController]
     [Route(nameof(Entry))]
-    public class EntryController(EntryService service, BaseService<Entry> baseService) : BaseController<Entry>(baseService)
+    public class EntryController(EntryService service, BaseService<Entry> baseService, FullService<Entry> fullService) : BaseController<Entry>(baseService, fullService)
     {
         [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Entry?>> GetByUniqProps(EntryUniqPropsDto0 objDto)
         {
@@ -68,14 +68,6 @@ namespace GTRC_Database_API.Controllers
                 else if (!objDto.IsSimilar(obj)) { return StatusCode(208, obj); }
                 else { await service.Update(obj); return Ok(obj); }
             }
-        }
-
-        [HttpDelete("Delete/{id}/{force}")] public async Task<ActionResult> Delete(int id, bool force = false)
-        {
-            Entry? obj = await service.GetById(id);
-            if (obj is null) { return NotFound(); }
-            else if (!force && await service.HasChildObjects(obj.Id)) { return StatusCode(405); }
-            else { await service.Delete(obj); return Ok(); }
         }
     }
 }

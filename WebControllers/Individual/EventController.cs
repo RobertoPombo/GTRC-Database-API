@@ -8,7 +8,7 @@ namespace GTRC_Database_API.Controllers
 {
     [ApiController]
     [Route(nameof(Event))]
-    public class EventController(EventService service, BaseService<Event> baseService) : BaseController<Event>(baseService)
+    public class EventController(EventService service, BaseService<Event> baseService, FullService<Event> fullService) : BaseController<Event>(baseService, fullService)
     {
         [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Event?>> GetByUniqProps(EventUniqPropsDto0 objDto)
         {
@@ -76,14 +76,6 @@ namespace GTRC_Database_API.Controllers
                 else if (!objDto.IsSimilar(obj)) { return StatusCode(208, obj); }
                 else { await service.Update(obj); return Ok(obj); }
             }
-        }
-
-        [HttpDelete("Delete/{id}/{force}")] public async Task<ActionResult> Delete(int id, bool force = false)
-        {
-            Event? obj = await service.GetById(id);
-            if (obj is null) { return NotFound(); }
-            else if (!force && await service.HasChildObjects(obj.Id)) { return StatusCode(405); }
-            else { await service.Delete(obj); return Ok(); }
         }
 
         [HttpGet("Get/Nr/{id}")] public async Task<ActionResult<int?>> GetNr(int id)

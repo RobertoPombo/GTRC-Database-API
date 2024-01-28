@@ -8,7 +8,7 @@ namespace GTRC_Database_API.Controllers
 {
     [ApiController]
     [Route(nameof(Organization))]
-    public class OrganizationController(OrganizationService service, BaseService<Organization> baseService) : BaseController<Organization>(baseService)
+    public class OrganizationController(OrganizationService service, BaseService<Organization> baseService, FullService<Organization> fullService) : BaseController<Organization>(baseService, fullService)
     {
         [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Organization?>> GetByUniqProps(OrganizationUniqPropsDto0 objDto)
         {
@@ -68,14 +68,6 @@ namespace GTRC_Database_API.Controllers
                 else if (!objDto.IsSimilar(obj)) { return StatusCode(208, obj); }
                 else { await service.Update(obj); return Ok(obj); }
             }
-        }
-
-        [HttpDelete("Delete/{id}/{force}")] public async Task<ActionResult> Delete(int id, bool force = false)
-        {
-            Organization? obj = await service.GetById(id);
-            if (obj is null) { return NotFound(); }
-            else if (!force && await service.HasChildObjects(obj.Id)) { return StatusCode(405); }
-            else { await service.Delete(obj); return Ok(); }
         }
     }
 }

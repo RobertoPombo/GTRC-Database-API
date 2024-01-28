@@ -83,10 +83,5 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<EventCar?> GetTemp() { return await SetNextAvailable(new EventCar()); }
-
-        public async Task<bool> HasChildObjects(int id)
-        {
-            return false;
-        }
     }
 }

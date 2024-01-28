@@ -21,6 +21,7 @@ builder.Services.AddDbContext<DataContext>(options => options.UseLazyLoadingProx
 
 builder.Services.AddScoped(typeof(BaseService<>));
 builder.Services.AddScoped(typeof(IBaseContext<>), typeof(BaseContext<>));
+builder.Services.AddScoped(typeof(FullService<>));
 
 builder.Services.AddScoped<ColorService>();
 builder.Services.AddScoped<IColorContext, ColorContext>();

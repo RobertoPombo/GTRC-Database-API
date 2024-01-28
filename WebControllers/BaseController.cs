@@ -2,12 +2,13 @@
 
 using GTRC_Database_API.Services;
 using GTRC_Basics.Models.Common;
+using GTRC_Basics;
 
 namespace GTRC_Database_API.Controllers
 {
     [ApiController]
     [Route(nameof(ModelType))]
-    public class BaseController<ModelType>(BaseService<ModelType> service) : ControllerBase where ModelType : class, IBaseModel, new()
+    public class BaseController<ModelType>(BaseService<ModelType> service, FullService<ModelType> fullService) : ControllerBase where ModelType : class, IBaseModel, new()
     {
         [HttpGet("Get")] public async Task<ActionResult<List<ModelType>>> GetAll() { return Ok(await service.GetAll()); }
 
@@ -16,6 +17,31 @@ namespace GTRC_Database_API.Controllers
             ModelType? obj = await service.GetById(id);
             if (obj is null) { return NotFound(obj); }
             else { return Ok(obj); }
+        }
+
+        [HttpDelete("Delete/{id}/{force}")] public async Task<ActionResult> Delete(int id, bool force = false)
+        {
+            ModelType? obj = await service.GetById(id);
+            if (obj is null) { return NotFound(); }
+            else if (!force && await fullService.HasChildObjects(obj.Id)) { return StatusCode(405); }
+            else { await service.Delete(obj); return Ok(); }
+        }
+
+        [HttpGet("Get/HasChildObjects/{id}")] public async Task<bool> HasChildObjects(int id)
+        {
+            return await fullService.HasChildObjects(id);
+        }
+
+        [HttpGet("Get/{modelTypeName}/{id}")] public async Task<ActionResult<List<dynamic>>> GetChildObjects(string modelTypeName, int id)
+        {
+            foreach (Type modelType in GlobalValues.ModelTypeList)
+            {
+                if (modelType.Name == modelTypeName)
+                {
+                    return Ok(await fullService.Services[modelType].GetChildObjects(typeof(ModelType), id));
+                }
+            }
+            return NotFound(new List<dynamic>());
         }
     }
 }

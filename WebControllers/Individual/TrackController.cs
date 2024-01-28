@@ -8,7 +8,7 @@ namespace GTRC_Database_API.Controllers
 {
     [ApiController]
     [Route(nameof(Track))]
-    public class TrackController(TrackService service, BaseService<Track> baseService) : BaseController<Track>(baseService)
+    public class TrackController(TrackService service, BaseService<Track> baseService, FullService<Track> fullService) : BaseController<Track>(baseService, fullService)
     {
         [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Track?>> GetByUniqProps(TrackUniqPropsDto0 objDto)
         {
@@ -76,14 +76,6 @@ namespace GTRC_Database_API.Controllers
                 else if (!objDto.IsSimilar(obj)) { return StatusCode(208, obj); }
                 else { await service.Update(obj); return Ok(obj); }
             }
-        }
-
-        [HttpDelete("Delete/{id}/{force}")] public async Task<ActionResult> Delete(int id, bool force = false)
-        {
-            Track? obj = await service.GetById(id);
-            if (obj is null) { return NotFound(); }
-            else if (!force && await service.HasChildObjects(obj.Id)) { return StatusCode(405); }
-            else { await service.Delete(obj); return Ok(); }
         }
     }
 }

@@ -8,7 +8,7 @@ namespace GTRC_Database_API.Controllers
 {
     [ApiController]
     [Route(nameof(OrganizationUser))]
-    public class OrganizationUserController(OrganizationUserService service, BaseService<OrganizationUser> baseService) : BaseController<OrganizationUser>(baseService)
+    public class OrganizationUserController(OrganizationUserService service, BaseService<OrganizationUser> baseService, FullService<OrganizationUser> fullService) : BaseController<OrganizationUser>(baseService, fullService)
     {
         [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<OrganizationUser?>> GetByUniqProps(OrganizationUserUniqPropsDto0 objDto)
         {
@@ -70,12 +70,9 @@ namespace GTRC_Database_API.Controllers
             }
         }
 
-        [HttpDelete("Delete/{id}/{force}")] public async Task<ActionResult> Delete(int id, bool force = false)
+        [HttpGet("Get/Admins/{organizationId}")] public ActionResult<OrganizationUser?> GetAdmins(int organizationId)
         {
-            OrganizationUser? obj = await service.GetById(id);
-            if (obj is null) { return NotFound(); }
-            else if (!force && await service.HasChildObjects(obj.Id)) { return StatusCode(405); }
-            else { await service.Delete(obj); return Ok(); }
+            return Ok(service.GetAdmins(organizationId));
         }
     }
 }

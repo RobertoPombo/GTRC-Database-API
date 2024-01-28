@@ -5,7 +5,6 @@ using GTRC_Database_API.Services.Interfaces;
 namespace GTRC_Database_API.Services
 {
     public class BopService(IBopContext iBopContext,
-        IBaseContext<BopTrackCar> iBopTrackCarContext,
         IBaseContext<Bop> iBaseContext) : BaseService<Bop>(iBaseContext)
     {
         public Bop? Validate(Bop? obj)
@@ -37,12 +36,5 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<Bop?> GetTemp() { return await SetNextAvailable(new Bop()); }
-
-        public async Task<bool> HasChildObjects(int id)
-        {
-            List<BopTrackCar> listBopTrackCar = await iBopTrackCarContext.GetAll();
-            foreach (BopTrackCar obj in listBopTrackCar) { if (obj.BopId == id) { return true; } }
-            return false;
-        }
     }
 }

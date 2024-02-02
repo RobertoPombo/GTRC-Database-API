@@ -74,5 +74,14 @@ namespace GTRC_Database_API.Controllers
         {
             return Ok(service.GetAdmins(organizationId));
         }
+
+        [HttpDelete("Delete/{id}/{force}", Order = -1)] public new async Task<ActionResult> Delete(int id, bool force = false)
+        {
+            OrganizationUser? obj = await service.GetById(id);
+            if (obj is null) { return NotFound(); }
+            else if (!force && await fullService.HasChildObjects(obj.Id, true)) { return StatusCode(405); }
+            else if (service.IsOnlyAdmin(obj)) { return StatusCode(405); }
+            else { await service.Delete(obj); return Ok(); }
+        }
     }
 }

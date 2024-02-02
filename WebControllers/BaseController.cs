@@ -23,22 +23,22 @@ namespace GTRC_Database_API.Controllers
         {
             ModelType? obj = await service.GetById(id);
             if (obj is null) { return NotFound(); }
-            else if (!force && await fullService.HasChildObjects(obj.Id)) { return StatusCode(405); }
+            else if (!force && await fullService.HasChildObjects(obj.Id, true)) { return StatusCode(405); }
             else { await service.Delete(obj); return Ok(); }
         }
 
-        [HttpGet("Get/HasChildObjects/{id}")] public async Task<bool> HasChildObjects(int id)
+        [HttpGet("Get/HasChildObjects/{id}/{ignoreCompositeKeys}")] public async Task<bool> HasChildObjects(int id, bool ignoreCompositeKeys = true)
         {
-            return await fullService.HasChildObjects(id);
+            return await fullService.HasChildObjects(id, ignoreCompositeKeys);
         }
 
-        [HttpGet("Get/{modelTypeName}/{id}")] public async Task<ActionResult<List<dynamic>>> GetChildObjects(string modelTypeName, int id)
+        [HttpGet("Get/{modelTypeName}/{id}")] public async Task<ActionResult<List<dynamic>>> GetChildObjects(string modelTypeName, int id, bool ignoreCompositeKeys = false)
         {
             foreach (Type modelType in GlobalValues.ModelTypeList)
             {
                 if (modelType.Name == modelTypeName)
                 {
-                    return Ok(await fullService.Services[modelType].GetChildObjects(typeof(ModelType), id));
+                    return Ok(await fullService.Services[modelType].GetChildObjects(typeof(ModelType), id, ignoreCompositeKeys));
                 }
             }
             return NotFound(new List<dynamic>());

@@ -54,11 +54,11 @@ namespace GTRC_Database_API.Services
             Services[typeof(EventCar)] = EventCarService;
         }
 
-        public async Task<bool> HasChildObjects(int id)
+        public async Task<bool> HasChildObjects(int id, bool ignoreCompositeKeys)
         {
             foreach (Type modelType in GlobalValues.ModelTypeList)
             {
-                if ((await Services[modelType].GetChildObjects(typeof(ModelType), id)).Count > 0) { return true; }
+                if ((await Services[modelType].GetChildObjects(typeof(ModelType), id, ignoreCompositeKeys)).Count > 0) { return true; }
             }
             return false;
         }

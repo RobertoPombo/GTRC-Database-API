@@ -89,5 +89,12 @@ namespace GTRC_Database_API.Services
         public async Task<OrganizationUser?> GetTemp() { return await SetNextAvailable(new OrganizationUser()); }
 
         public List<OrganizationUser> GetAdmins(int organizationId) { return iOrganizationUserContext.GetAdmins(organizationId); }
+
+        public bool IsOnlyAdmin(OrganizationUser obj)
+        {
+            List<OrganizationUser> list = GetAdmins(obj.OrganizationId);
+            if (list.Count == 1 && list[0].UserId == obj.UserId) { return true; }
+            return false;
+        }
     }
 }

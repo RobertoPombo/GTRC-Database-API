@@ -8,39 +8,39 @@ using GTRC_Basics;
 namespace GTRC_Database_API.Controllers
 {
     [ApiController]
-    [Route(nameof(Season))]
-    public class SeasonController(SeasonService service, BaseService<Season> baseService, FullService<Season> fullService) : BaseController<Season>(baseService, fullService)
+    [Route(nameof(UserDatetime))]
+    public class UserDatetimeController(UserDatetimeService service, BaseService<UserDatetime> baseService, FullService<UserDatetime> fullService) : BaseController<UserDatetime>(baseService, fullService)
     {
-        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Season?>> GetByUniqProps(SeasonUniqPropsDto0 objDto)
+        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<UserDatetime?>> GetByUniqProps(UserDatetimeUniqPropsDto0 objDto)
         {
-            UniqPropsDto<Season> _objDto = new() { Index = 0, Dto = objDto };
-            Season? obj = await service.GetByUniqProps(_objDto);
+            UniqPropsDto<UserDatetime> _objDto = new() { Index = 0, Dto = objDto };
+            UserDatetime? obj = await service.GetByUniqProps(_objDto);
             if (obj is null) { return NotFound(obj); }
             else { return Ok(obj); }
         }
 
-        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<Season>>> GetByProps(SeasonAddDto objDto)
+        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<UserDatetime>>> GetByProps(UserDatetimeAddDto objDto)
         {
-            AddDto<Season> _objDto = new() { Dto = objDto };
+            AddDto<UserDatetime> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByProps(_objDto));
         }
 
-        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<Season>>> GetByFilter(SeasonFilterDtos objDto)
+        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<UserDatetime>>> GetByFilter(UserDatetimeFilterDtos objDto)
         {
-            FilterDtos<Season> _objDto = new() { Dto = objDto };
+            FilterDtos<UserDatetime> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByFilter(_objDto.Filter, _objDto.FilterMin, _objDto.FilterMax));
         }
 
-        [HttpGet("Get/Temp")] public async Task<ActionResult<Season?>> GetTemp()
+        [HttpGet("Get/Temp")] public async Task<ActionResult<UserDatetime?>> GetTemp()
         {
-            Season? obj = await service.GetTemp();
+            UserDatetime? obj = await service.GetTemp();
             if (obj is null) { return BadRequest(obj); }
             else { return Ok(obj); }
         }
 
-        [HttpPost("Add")] public async Task<ActionResult<Season?>> Add(SeasonAddDto objDto)
+        [HttpPost("Add")] public async Task<ActionResult<UserDatetime?>> Add(UserDatetimeAddDto objDto)
         {
-            Season? obj = objDto.Dto2Model();
+            UserDatetime? obj = objDto.Dto2Model();
             bool isValid = service.Validate(obj);
             bool isAvailable = await service.SetNextAvailable(obj);
             if (obj is null) { return BadRequest(obj); }
@@ -49,7 +49,7 @@ namespace GTRC_Database_API.Controllers
             else
             {
                 await service.Add(obj);
-                UniqPropsDto<Season> uniqPropsDto = new();
+                UniqPropsDto<UserDatetime> uniqPropsDto = new();
                 uniqPropsDto.Dto.Model2Dto(obj);
                 obj = await service.GetByUniqProps(uniqPropsDto);
                 if (obj is null) { return NotFound(obj); }
@@ -57,9 +57,9 @@ namespace GTRC_Database_API.Controllers
             }
         }
 
-        [HttpPut("Update")] public async Task<ActionResult<Season?>> Update(SeasonUpdateDto objDto)
+        [HttpPut("Update")] public async Task<ActionResult<UserDatetime?>> Update(UserDatetimeUpdateDto objDto)
         {
-            Season? obj = await service.GetById(objDto.Id);
+            UserDatetime? obj = await service.GetById(objDto.Id);
             if (obj is null) { return NotFound(obj); }
             else
             {
@@ -72,7 +72,7 @@ namespace GTRC_Database_API.Controllers
                 else
                 {
                     await service.Update(obj);
-                    await fullService.UpdateChildObjects(typeof(Season), obj);
+                    await fullService.UpdateChildObjects(typeof(UserDatetime), obj);
                     return Ok(obj);
                 }
             }

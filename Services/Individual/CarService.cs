@@ -9,9 +9,11 @@ namespace GTRC_Database_API.Services
         IBaseContext<Manufacturer> iManufacturerContext,
         IBaseContext<Car> iBaseContext) : BaseService<Car>(iBaseContext)
     {
-        public Car? Validate(Car? obj)
+        public bool Validate(Car? obj)
         {
-            if (obj is null) { return null; }
+            bool isValid = true;
+            if (obj is null) { return false; }
+
             obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
             if (obj.Name == string.Empty) { obj.Name = Car.DefaultName; }
             Manufacturer? manufacturer = null;
@@ -19,8 +21,8 @@ namespace GTRC_Database_API.Services
             if (manufacturer is null)
             {
                 List<Manufacturer> list = iManufacturerContext.GetAll().Result;
-                if (list.Count == 0) { return null; }
-                else { obj.Manufacturer = list[0]; obj.ManufacturerId = list[0].Id; }
+                if (list.Count == 0) { obj = null; return false; }
+                else { obj.Manufacturer = list[0]; obj.ManufacturerId = list[0].Id; isValid = false; }
             }
             else { obj.Manufacturer = manufacturer; }
             obj.Model = Scripts.RemoveSpaceStartEnd(obj.Model);
@@ -29,43 +31,46 @@ namespace GTRC_Database_API.Services
             if (carclass is null)
             {
                 List<Carclass> list = iCarclassContext.GetAll().Result;
-                if (list.Count == 0) { return null; }
-                else { obj.Carclass = list[0]; obj.CarclassId = list[0].Id; }
+                if (list.Count == 0) { obj = null; return false; }
+                else { obj.Carclass = list[0]; obj.CarclassId = list[0].Id; isValid = false; }
             }
             else { obj.Carclass = carclass; }
-            obj.WidthMm = Math.Max(obj.WidthMm, (ushort)1);
-            obj.LengthMm = Math.Max(obj.LengthMm, (ushort)1);
+            if (obj.WidthMm < Car.MinWidthMm) { obj.WidthMm = Car.MinWidthMm; isValid = false; }
+            if (obj.LengthMm < Car.MinLengthMm) { obj.LengthMm = Car.MinLengthMm; isValid = false; }
             obj.NameGoogleSheets = Scripts.RemoveSpaceStartEnd(obj.NameGoogleSheets);
-            return obj;
+
+            return isValid;
         }
 
-        public async Task<Car?> SetNextAvailable(Car? obj)
+        public async Task<bool> SetNextAvailable(Car? obj)
         {
-            obj = Validate(obj);
-            if (obj is null) { return null; }
+            bool isAvailable = true;
+            if (obj is null) { return false; }
 
             int nr = 1;
             string delimiter = " #";
             string defName = obj.Name;
             string[] defNameList = defName.Split(delimiter);
-            if (defNameList.Length > 1 && Int32.TryParse(defNameList[^1], out _)) { defName = defName[..^(defNameList[^1].Length + delimiter.Length)]; }
+            if (defNameList.Length > 1 && int.TryParse(defNameList[^1], out _)) { defName = defName[..^(defNameList[^1].Length + delimiter.Length)]; }
             while (!await IsUnique(obj, 0))
             {
+                isAvailable = false;
                 obj.Name = defName + delimiter + nr.ToString();
                 nr++;
-                if (nr == int.MaxValue) { return null; }
+                if (nr == int.MaxValue) { obj = null; return false; }
             }
 
             uint startValue = obj.AccCarId;
             while (!await IsUnique(obj, 1))
             {
+                isAvailable = false;
                 if (obj.AccCarId < uint.MaxValue) { obj.AccCarId += 1; } else { obj.AccCarId = uint.MinValue; }
-                if (obj.AccCarId == startValue) { return null; }
+                if (obj.AccCarId == startValue) { obj = null; return false; }
             }
 
-            return obj;
+            return isAvailable;
         }
 
-        public async Task<Car?> GetTemp() { return await SetNextAvailable(new Car()); }
+        public async Task<Car?> GetTemp() { Car obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
     }
 }

@@ -10,26 +10,29 @@ namespace GTRC_Database_API.Services
         IBaseContext<Team> iTeamContext,
         IBaseContext<Entry> iBaseContext) : BaseService<Entry>(iBaseContext)
     {
-        public Entry? Validate(Entry? obj)
+        public bool Validate(Entry? obj)
         {
-            if (obj is null) { return null; }
+            bool isValid = true;
+            if (obj is null) { return false; }
+
             Season? season = null;
             if (obj.Season is not null) { season = iSeasonContext.GetById(obj.SeasonId).Result; };
             if (season is null)
             {
                 List<Season> list = iSeasonContext.GetAll().Result;
-                if (list.Count == 0) { return null; }
-                else { obj.Season = list[0]; obj.SeasonId = list[0].Id; }
+                if (list.Count == 0) { obj = null; return false; }
+                else { obj.Season = list[0]; obj.SeasonId = list[0].Id; isValid = false; }
             }
             else { obj.Season = season; }
-            obj.RaceNumber = Math.Min(Entry.MaxRaceNumber, Math.Max(Entry.MinRaceNumber, obj.RaceNumber));
+            if (obj.RaceNumber > Entry.MaxRaceNumber) { obj.RaceNumber = Entry.MaxRaceNumber; isValid = false; }
+            else if (obj.RaceNumber < Entry.MinRaceNumber) { obj.RaceNumber = Entry.MinRaceNumber; isValid = false; }
             Team? team = null;
             if (obj.Team is not null) { team = iTeamContext.GetById(obj.TeamId).Result; };
             if (team is null)
             {
                 List<Team> list = iTeamContext.GetAll().Result;
-                if (list.Count == 0) { return null; }
-                else { obj.Team = list[0]; obj.TeamId = list[0].Id; }
+                if (list.Count == 0) { obj = null; return false; }
+                else { obj.Team = list[0]; obj.TeamId = list[0].Id; isValid = false; }
             }
             else { obj.Team = team; }
             Car? car = null;
@@ -37,23 +40,25 @@ namespace GTRC_Database_API.Services
             if (car is null)
             {
                 List<Car> list = iCarContext.GetAll().Result;
-                if (list.Count == 0) { return null; }
-                else { obj.Car = list[0]; obj.CarId = list[0].Id; }
+                if (list.Count == 0) { obj = null; return false; }
+                else { obj.Car = list[0]; obj.CarId = list[0].Id; isValid = false; }
             }
             else { obj.Car = car; }
-            if (obj.RegisterDate > DateTime.UtcNow || obj.RegisterDate < GlobalValues.DateTimeMinValue) { obj.RegisterDate = DateTime.UtcNow; }
-            if (obj.SignOutDate > GlobalValues.DateTimeMaxValue || obj.SignOutDate < obj.RegisterDate) { obj.SignOutDate = GlobalValues.DateTimeMaxValue; }
-            return obj;
+            if (obj.RegisterDate > DateTime.UtcNow || obj.RegisterDate < GlobalValues.DateTimeMinValue) { obj.RegisterDate = DateTime.UtcNow; isValid = false; }
+            if (obj.SignOutDate > GlobalValues.DateTimeMaxValue || obj.SignOutDate < obj.RegisterDate) { obj.SignOutDate = GlobalValues.DateTimeMaxValue; isValid = false; }
+
+            return isValid;
         }
 
-        public async Task<Entry?> SetNextAvailable(Entry? obj)
+        public async Task<bool> SetNextAvailable(Entry? obj)
         {
-            obj = Validate(obj);
-            if (obj is null) { return null; }
+            bool isAvailable = true;
+            if (obj is null) { return false; }
 
             int startRaceNumber = obj.RaceNumber;
             while (!await IsUnique(obj))
             {
+                isAvailable = false;
                 if (obj.RaceNumber < Entry.MaxRaceNumber) { obj.RaceNumber += 1; } else { obj.RaceNumber = Entry.DefaultRaceNumber; }
                 if (obj.RaceNumber == startRaceNumber)
                 {
@@ -74,13 +79,13 @@ namespace GTRC_Database_API.Services
                         obj.SeasonId = listSeason[indexSeason].Id;
                     }
                     else { indexSeason = 0; }
-                    if (indexSeason == startIndexSeason) { return null; }
+                    if (indexSeason == startIndexSeason) { obj = null; return false; }
                 }
             }
 
-            return obj;
+            return isAvailable;
         }
 
-        public async Task<Entry?> GetTemp() { return await SetNextAvailable(new Entry()); }
+        public async Task<Entry?> GetTemp() { Entry obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
     }
 }

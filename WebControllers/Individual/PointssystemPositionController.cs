@@ -8,39 +8,39 @@ using GTRC_Basics;
 namespace GTRC_Database_API.Controllers
 {
     [ApiController]
-    [Route(nameof(Season))]
-    public class SeasonController(SeasonService service, BaseService<Season> baseService, FullService<Season> fullService) : BaseController<Season>(baseService, fullService)
+    [Route(nameof(PointssystemPosition))]
+    public class PointssystemPositionController(PointssystemPositionService service, BaseService<PointssystemPosition> baseService, FullService<PointssystemPosition> fullService) : BaseController<PointssystemPosition>(baseService, fullService)
     {
-        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Season?>> GetByUniqProps(SeasonUniqPropsDto0 objDto)
+        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<PointssystemPosition?>> GetByUniqProps(PointssystemPositionUniqPropsDto0 objDto)
         {
-            UniqPropsDto<Season> _objDto = new() { Index = 0, Dto = objDto };
-            Season? obj = await service.GetByUniqProps(_objDto);
+            UniqPropsDto<PointssystemPosition> _objDto = new() { Index = 0, Dto = objDto };
+            PointssystemPosition? obj = await service.GetByUniqProps(_objDto);
             if (obj is null) { return NotFound(obj); }
             else { return Ok(obj); }
         }
 
-        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<Season>>> GetByProps(SeasonAddDto objDto)
+        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<PointssystemPosition>>> GetByProps(PointssystemPositionAddDto objDto)
         {
-            AddDto<Season> _objDto = new() { Dto = objDto };
+            AddDto<PointssystemPosition> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByProps(_objDto));
         }
 
-        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<Season>>> GetByFilter(SeasonFilterDtos objDto)
+        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<PointssystemPosition>>> GetByFilter(PointssystemPositionFilterDtos objDto)
         {
-            FilterDtos<Season> _objDto = new() { Dto = objDto };
+            FilterDtos<PointssystemPosition> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByFilter(_objDto.Filter, _objDto.FilterMin, _objDto.FilterMax));
         }
 
-        [HttpGet("Get/Temp")] public async Task<ActionResult<Season?>> GetTemp()
+        [HttpGet("Get/Temp")] public async Task<ActionResult<PointssystemPosition?>> GetTemp()
         {
-            Season? obj = await service.GetTemp();
+            PointssystemPosition? obj = await service.GetTemp();
             if (obj is null) { return BadRequest(obj); }
             else { return Ok(obj); }
         }
 
-        [HttpPost("Add")] public async Task<ActionResult<Season?>> Add(SeasonAddDto objDto)
+        [HttpPost("Add")] public async Task<ActionResult<PointssystemPosition?>> Add(PointssystemPositionAddDto objDto)
         {
-            Season? obj = objDto.Dto2Model();
+            PointssystemPosition? obj = objDto.Dto2Model();
             bool isValid = service.Validate(obj);
             bool isAvailable = await service.SetNextAvailable(obj);
             if (obj is null) { return BadRequest(obj); }
@@ -49,7 +49,7 @@ namespace GTRC_Database_API.Controllers
             else
             {
                 await service.Add(obj);
-                UniqPropsDto<Season> uniqPropsDto = new();
+                UniqPropsDto<PointssystemPosition> uniqPropsDto = new();
                 uniqPropsDto.Dto.Model2Dto(obj);
                 obj = await service.GetByUniqProps(uniqPropsDto);
                 if (obj is null) { return NotFound(obj); }
@@ -57,9 +57,9 @@ namespace GTRC_Database_API.Controllers
             }
         }
 
-        [HttpPut("Update")] public async Task<ActionResult<Season?>> Update(SeasonUpdateDto objDto)
+        [HttpPut("Update")] public async Task<ActionResult<PointssystemPosition?>> Update(PointssystemPositionUpdateDto objDto)
         {
-            Season? obj = await service.GetById(objDto.Id);
+            PointssystemPosition? obj = await service.GetById(objDto.Id);
             if (obj is null) { return NotFound(obj); }
             else
             {
@@ -72,7 +72,7 @@ namespace GTRC_Database_API.Controllers
                 else
                 {
                     await service.Update(obj);
-                    await fullService.UpdateChildObjects(typeof(Season), obj);
+                    await fullService.UpdateChildObjects(typeof(PointssystemPosition), obj);
                     return Ok(obj);
                 }
             }

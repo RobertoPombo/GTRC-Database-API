@@ -1,14 +1,14 @@
-﻿using GTRC_Basics.Models;
+﻿using GTRC_Basics;
+using GTRC_Basics.Models;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class UserRoleService(IUserRoleContext iUserRoleContext,
+    public class UserDatetimeService(IUserDatetimeContext iUserDatetimeContext,
         IBaseContext<User> iUserContext,
-        IBaseContext<Role> iRoleContext,
-        IBaseContext<UserRole> iBaseContext) : BaseService<UserRole>(iBaseContext)
+        IBaseContext<UserDatetime> iBaseContext) : BaseService<UserDatetime>(iBaseContext)
     {
-        public bool Validate(UserRole? obj)
+        public bool Validate(UserDatetime? obj)
         {
             bool isValid = true;
             if (obj is null) { return false; }
@@ -22,45 +22,26 @@ namespace GTRC_Database_API.Services
                 else { obj.User = list[0]; obj.UserId = list[0].Id; isValid = false; }
             }
             else { obj.User = user; }
-            Role? role = null;
-            if (obj.Role is not null) { role = iRoleContext.GetById(obj.RoleId).Result; };
-            if (role is null)
-            {
-                List<Role> list = iRoleContext.GetAll().Result;
-                if (list.Count == 0) { obj = null; return false; }
-                else { obj.Role = list[0]; obj.RoleId = list[0].Id; isValid = false; }
-            }
-            else { obj.Role = role; }
+            if (obj.Date > GlobalValues.DateTimeMaxValue) { obj.Date = GlobalValues.DateTimeMaxValue; isValid = false; }
+            else if (obj.Date < GlobalValues.DateTimeMinValue) { obj.Date = GlobalValues.DateTimeMinValue; isValid = false; }
+            if (obj.EloRating > User.MaxEloRating) { obj.EloRating = User.MaxEloRating; isValid = false; }
+            else if (obj.EloRating < User.MinEloRating) { obj.EloRating = User.MinEloRating; isValid = false; }
+            if (obj.SafetyRating > User.MaxSafetyRating) { obj.SafetyRating = User.MaxSafetyRating; isValid = false; }
 
             return isValid;
         }
 
-        public async Task<bool> SetNextAvailable(UserRole? obj)
+        public async Task<bool> SetNextAvailable(UserDatetime? obj)
         {
             bool isAvailable = true;
             if (obj is null) { return false; }
 
-            int startIndexRole = 0;
-            List<int> idListRole = [];
-            List<Role> listRole = iRoleContext.GetAll().Result;
-            for (int index = 0; index < listRole.Count; index++)
-            {
-                idListRole.Add(listRole[index].Id);
-                if (listRole[index].Id == obj.RoleId) { startIndexRole = index; }
-            }
-            int indexRole = startIndexRole;
-
+            DateTime startDate = obj.Date;
             while (!await IsUnique(obj))
             {
                 isAvailable = false;
-                if (indexRole < idListRole.Count - 1)
-                {
-                    indexRole++;
-                    obj.Role = listRole[indexRole];
-                    obj.RoleId = listRole[indexRole].Id;
-                }
-                else { indexRole = 0; }
-                if (indexRole == startIndexRole)
+                if (obj.Date < GlobalValues.DateTimeMaxValue.AddDays(-1)) { obj.Date = obj.Date.AddDays(1); } else { obj.Date = GlobalValues.DateTimeMinValue; }
+                if (obj.Date == startDate)
                 {
                     int startIndexUser = 0;
                     List<int> idListUser = [];
@@ -86,6 +67,6 @@ namespace GTRC_Database_API.Services
             return isAvailable;
         }
 
-        public async Task<UserRole?> GetTemp() { UserRole obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
+        public async Task<UserDatetime?> GetTemp() { UserDatetime obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
     }
 }

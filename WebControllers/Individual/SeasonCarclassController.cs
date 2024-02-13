@@ -3,6 +3,7 @@
 using GTRC_Basics.Models;
 using GTRC_Database_API.Services;
 using GTRC_Basics.Models.DTOs;
+using GTRC_Basics;
 
 namespace GTRC_Database_API.Controllers
 {
@@ -39,11 +40,12 @@ namespace GTRC_Database_API.Controllers
 
         [HttpPost("Add")] public async Task<ActionResult<SeasonCarclass?>> Add(SeasonCarclassAddDto objDto)
         {
-            SeasonCarclass? objValidated = service.Validate(objDto.Dto2Model());
-            SeasonCarclass? obj = await service.SetNextAvailable(objDto.Dto2Model());
-            if (obj is null || objValidated is null) { return BadRequest(obj); }
-            else if (!objDto.IsSimilar(objValidated)) { return StatusCode(406, obj); }
-            else if (!objDto.IsSimilar(obj)) { return StatusCode(208, obj); }
+            SeasonCarclass? obj = objDto.Dto2Model();
+            bool isValid = service.Validate(obj);
+            bool isAvailable = await service.SetNextAvailable(obj);
+            if (obj is null) { return BadRequest(obj); }
+            else if (!isAvailable) { return StatusCode(208, obj); }
+            else if (!isValid) { return StatusCode(406, obj); }
             else
             {
                 await service.Add(obj);
@@ -61,12 +63,18 @@ namespace GTRC_Database_API.Controllers
             if (obj is null) { return NotFound(obj); }
             else
             {
-                SeasonCarclass? objValidated = service.Validate(objDto.Dto2Model(obj));
-                obj = await service.SetNextAvailable(objDto.Dto2Model(obj));
-                if (obj is null || objValidated is null) { return BadRequest(await service.GetById(objDto.Id)); }
-                else if (!objDto.IsSimilar(objValidated)) { return StatusCode(406, obj); }
-                else if (!objDto.IsSimilar(obj)) { return StatusCode(208, obj); }
-                else { await service.Update(obj); return Ok(obj); }
+                obj = objDto.Dto2Model(obj);
+                bool isValid = service.Validate(obj);
+                bool isAvailable = await service.SetNextAvailable(obj);
+                if (obj is null) { return BadRequest(await service.GetById(objDto.Id)); }
+                else if (!isAvailable) { return StatusCode(208, await service.SetNextAvailable(obj)); }
+                else if (!isValid) { return StatusCode(406, obj); }
+                else
+                {
+                    await service.Update(obj);
+                    await fullService.UpdateChildObjects(typeof(SeasonCarclass), obj);
+                    return Ok(obj);
+                }
             }
         }
     }

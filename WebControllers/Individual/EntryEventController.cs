@@ -8,39 +8,39 @@ using GTRC_Basics;
 namespace GTRC_Database_API.Controllers
 {
     [ApiController]
-    [Route(nameof(Season))]
-    public class SeasonController(SeasonService service, BaseService<Season> baseService, FullService<Season> fullService) : BaseController<Season>(baseService, fullService)
+    [Route(nameof(EntryEvent))]
+    public class EntryEventController(EntryEventService service, BaseService<EntryEvent> baseService, FullService<EntryEvent> fullService) : BaseController<EntryEvent>(baseService, fullService)
     {
-        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Season?>> GetByUniqProps(SeasonUniqPropsDto0 objDto)
+        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<EntryEvent?>> GetByUniqProps(EntryEventUniqPropsDto0 objDto)
         {
-            UniqPropsDto<Season> _objDto = new() { Index = 0, Dto = objDto };
-            Season? obj = await service.GetByUniqProps(_objDto);
+            UniqPropsDto<EntryEvent> _objDto = new() { Index = 0, Dto = objDto };
+            EntryEvent? obj = await service.GetByUniqProps(_objDto);
             if (obj is null) { return NotFound(obj); }
             else { return Ok(obj); }
         }
 
-        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<Season>>> GetByProps(SeasonAddDto objDto)
+        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<EntryEvent>>> GetByProps(EntryEventAddDto objDto)
         {
-            AddDto<Season> _objDto = new() { Dto = objDto };
+            AddDto<EntryEvent> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByProps(_objDto));
         }
 
-        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<Season>>> GetByFilter(SeasonFilterDtos objDto)
+        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<EntryEvent>>> GetByFilter(EntryEventFilterDtos objDto)
         {
-            FilterDtos<Season> _objDto = new() { Dto = objDto };
+            FilterDtos<EntryEvent> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByFilter(_objDto.Filter, _objDto.FilterMin, _objDto.FilterMax));
         }
 
-        [HttpGet("Get/Temp")] public async Task<ActionResult<Season?>> GetTemp()
+        [HttpGet("Get/Temp")] public async Task<ActionResult<EntryEvent?>> GetTemp()
         {
-            Season? obj = await service.GetTemp();
+            EntryEvent? obj = await service.GetTemp();
             if (obj is null) { return BadRequest(obj); }
             else { return Ok(obj); }
         }
 
-        [HttpPost("Add")] public async Task<ActionResult<Season?>> Add(SeasonAddDto objDto)
+        [HttpPost("Add")] public async Task<ActionResult<EntryEvent?>> Add(EntryEventAddDto objDto)
         {
-            Season? obj = objDto.Dto2Model();
+            EntryEvent? obj = objDto.Dto2Model();
             bool isValid = service.Validate(obj);
             bool isAvailable = await service.SetNextAvailable(obj);
             if (obj is null) { return BadRequest(obj); }
@@ -49,7 +49,7 @@ namespace GTRC_Database_API.Controllers
             else
             {
                 await service.Add(obj);
-                UniqPropsDto<Season> uniqPropsDto = new();
+                UniqPropsDto<EntryEvent> uniqPropsDto = new();
                 uniqPropsDto.Dto.Model2Dto(obj);
                 obj = await service.GetByUniqProps(uniqPropsDto);
                 if (obj is null) { return NotFound(obj); }
@@ -57,9 +57,9 @@ namespace GTRC_Database_API.Controllers
             }
         }
 
-        [HttpPut("Update")] public async Task<ActionResult<Season?>> Update(SeasonUpdateDto objDto)
+        [HttpPut("Update")] public async Task<ActionResult<EntryEvent?>> Update(EntryEventUpdateDto objDto)
         {
-            Season? obj = await service.GetById(objDto.Id);
+            EntryEvent? obj = await service.GetById(objDto.Id);
             if (obj is null) { return NotFound(obj); }
             else
             {
@@ -72,7 +72,7 @@ namespace GTRC_Database_API.Controllers
                 else
                 {
                     await service.Update(obj);
-                    await fullService.UpdateChildObjects(typeof(Season), obj);
+                    await fullService.UpdateChildObjects(typeof(EntryEvent), obj);
                     return Ok(obj);
                 }
             }

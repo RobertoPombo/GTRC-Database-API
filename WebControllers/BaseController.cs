@@ -24,7 +24,7 @@ namespace GTRC_Database_API.Controllers
             ModelType? obj = await service.GetById(id);
             if (obj is null) { return NotFound(); }
             else if (!force && await fullService.HasChildObjects(obj.Id, true)) { return StatusCode(405); }
-            else { await service.Delete(obj); return Ok(); }
+            else { await fullService.ForceDelete(typeof(ModelType), obj); return Ok(); }
         }
 
         [HttpGet("Get/HasChildObjects/{id}/{ignoreCompositeKeys}")] public async Task<bool> HasChildObjects(int id, bool ignoreCompositeKeys = true)

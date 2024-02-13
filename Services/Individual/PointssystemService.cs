@@ -4,21 +4,23 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
-    public class BopService(IBopContext iBopContext,
-        IBaseContext<Bop> iBaseContext) : BaseService<Bop>(iBaseContext)
+    public class PointssystemService(IPointssystemContext iPointssystemContext,
+        IBaseContext<Pointssystem> iBaseContext) : BaseService<Pointssystem>(iBaseContext)
     {
-        public bool Validate(Bop? obj)
+        public bool Validate(Pointssystem? obj)
         {
             bool isValid = true;
             if (obj is null) { return false; }
 
             obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
-            if (obj.Name == string.Empty) { obj.Name = Bop.DefaultName; isValid = false; }
+            if (obj.Name == string.Empty) { obj.Name = Pointssystem.DefaultName; isValid = false; }
+            if (obj.MinPercentageOfP1 > Pointssystem.MaxMinPercentageOfP1) { obj.MinPercentageOfP1 = Pointssystem.MaxMinPercentageOfP1; isValid = false; }
+            if (obj.MaxPercentageOfP1 < Pointssystem.MinMaxPercentageOfP1) { obj.MaxPercentageOfP1 = Pointssystem.MinMaxPercentageOfP1; isValid = false; }
 
             return isValid;
         }
 
-        public async Task<bool> SetNextAvailable(Bop? obj)
+        public async Task<bool> SetNextAvailable(Pointssystem? obj)
         {
             bool isAvailable = true;
             if (obj is null) { return false; }
@@ -39,6 +41,6 @@ namespace GTRC_Database_API.Services
             return isAvailable;
         }
 
-        public async Task<Bop?> GetTemp() { Bop obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
+        public async Task<Pointssystem?> GetTemp() { Pointssystem obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
     }
 }

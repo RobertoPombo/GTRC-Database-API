@@ -7,33 +7,38 @@ namespace GTRC_Database_API.Services
     public class UserService(IUserContext iUserContext,
         IBaseContext<User> iBaseContext) : BaseService<User>(iBaseContext)
     {
-        public User? Validate(User? obj)
+        public bool Validate(User? obj)
         {
-            if (obj is null) { return null; }
-            if (!Scripts.IsValidSteamId(obj.SteamId)) { obj.SteamId = GlobalValues.NoSteamId; }
-            if (!Scripts.IsValidDiscordId(obj.DiscordId)) { obj.DiscordId = GlobalValues.NoDiscordId; }
+            bool isValid = true;
+            if (obj is null) { return false; }
+
+            if (!Scripts.IsValidSteamId(obj.SteamId) && obj.SteamId != GlobalValues.NoSteamId) { obj.SteamId = GlobalValues.NoSteamId; isValid = false; }
+            if (!Scripts.IsValidDiscordId(obj.DiscordId) && obj.DiscordId != GlobalValues.NoDiscordId) { obj.DiscordId = GlobalValues.NoDiscordId; isValid = false; }
             obj.FirstName = Scripts.RemoveSpaceStartEnd(obj.FirstName);
-            if (obj.FirstName == string.Empty) { obj.FirstName = nameof(obj.FirstName); }
+            if (obj.FirstName == string.Empty) { obj.FirstName = nameof(obj.FirstName); isValid = false; }
             obj.LastName = Scripts.RemoveSpaceStartEnd(obj.LastName);
-            if (obj.LastName == string.Empty) { obj.LastName = nameof(obj.LastName); }
-            if (obj.RegisterDate > DateTime.UtcNow || obj.RegisterDate < GlobalValues.DateTimeMinValue) { obj.RegisterDate = DateTime.UtcNow; }
-            if (obj.BanDate < obj.RegisterDate) { obj.BanDate = obj.RegisterDate; }
+            if (obj.LastName == string.Empty) { obj.LastName = nameof(obj.LastName); isValid = false; }
+            if (obj.RegisterDate > DateTime.UtcNow || obj.RegisterDate < GlobalValues.DateTimeMinValue) { obj.RegisterDate = DateTime.UtcNow; isValid = false; }
+            if (obj.BanDate < obj.RegisterDate) { obj.BanDate = obj.RegisterDate; isValid = false; }
             if (obj.Name3Digits.Length == 3) { obj.Name3Digits = obj.Name3Digits.ToUpper(); } else { obj.Name3Digits = string.Empty; }
-            obj.EloRating = Math.Min(Math.Max(obj.EloRating, User.MinEloRating), User.MaxEloRating);
-            obj.SafetyRating = Math.Min(obj.SafetyRating, User.MaxSafetyRating);
+            if (obj.EloRating > User.MaxEloRating) { obj.EloRating = User.MaxEloRating; isValid = false; }
+            else if (obj.EloRating < User.MinEloRating) { obj.EloRating = User.MinEloRating; isValid = false; }
+            if (obj.SafetyRating > User.MaxSafetyRating) { obj.SafetyRating = User.MaxSafetyRating; isValid = false; }
             obj.NickName = Scripts.RemoveSpaceStartEnd(obj.NickName);
-            if (obj.NickName == string.Empty) { obj.NickName = nameof(obj.NickName); }
-            return obj;
+            if (obj.NickName == string.Empty) { obj.NickName = nameof(obj.NickName); isValid = false; }
+
+            return isValid;
         }
 
-        public async Task<User?> SetNextAvailable(User? obj)
+        public async Task<bool> SetNextAvailable(User? obj)
         {
-            obj = Validate(obj);
-            if (obj is null) { return null; }
+            bool isAvailable = true;
+            if (obj is null) { return false; }
 
             ulong? startValue = obj.SteamId;
             while (!await IsUnique(obj, 0) && obj.SteamId != GlobalValues.NoSteamId)
             {
+                isAvailable = false;
                 if (obj.SteamId < GlobalValues.MaxSteamId) { obj.SteamId++; } else { obj.SteamId = GlobalValues.MinSteamId; }
                 if (obj.SteamId == startValue) { obj.SteamId = GlobalValues.NoSteamId; }
             }
@@ -41,14 +46,15 @@ namespace GTRC_Database_API.Services
             startValue = obj.DiscordId;
             while (!await IsUnique(obj, 1) && obj.DiscordId != GlobalValues.NoDiscordId)
             {
+                isAvailable = false;
                 if (obj.DiscordId < GlobalValues.MaxDiscordId) { obj.DiscordId++; } else { obj.DiscordId = GlobalValues.MinDiscordId; }
                 if (obj.DiscordId == startValue) { obj.DiscordId = GlobalValues.NoDiscordId; }
             }
 
-            return obj;
+            return isAvailable;
         }
 
-        public async Task<User?> GetTemp() { return await SetNextAvailable(new User()); }
+        public async Task<User?> GetTemp() { User obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
 
         public List<string> GetName3DigitsOptions(User obj)
         {

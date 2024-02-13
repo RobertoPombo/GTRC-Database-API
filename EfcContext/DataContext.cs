@@ -15,6 +15,7 @@ namespace GTRC_Database_API.Data
         public DbSet<Car> Cars { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UsersRoles { get; set; }
+        public DbSet<UserDatetime> UsersDatetimes { get; set; }
         public DbSet<Bop> Bops { get; set; }
         public DbSet<BopTrackCar> BopsTracksCars { get; set; }
         public DbSet<Series> Series { get; set; }
@@ -24,13 +25,24 @@ namespace GTRC_Database_API.Data
         public DbSet<OrganizationUser> OrganizationsUsers { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<Entry> Entries { get; set; }
+        public DbSet<EntryDatetime> EntriesDatetimes { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<EventCarclass> EventsCarclasses { get; set; }
         public DbSet<EventCar> EventsCars { get; set; }
+        public DbSet<EntryEvent> EntriesEvents { get; set; }
+        public DbSet<EntryUserEvent> EntriesUsersEvents { get; set; }
+        public DbSet<Pointssystem> Pointssystems { get; set; }
+        public DbSet<PointssystemPosition> PointssystemsPositions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            var cascadeFKs = modelBuilder.Model.GetEntityTypes()
+                .SelectMany(t => t.GetForeignKeys())
+                .Where(fk => !fk.IsOwnership && fk.DeleteBehavior == DeleteBehavior.Cascade);
 
+            foreach (var fk in cascadeFKs) { fk.DeleteBehavior = DeleteBehavior.NoAction; }
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

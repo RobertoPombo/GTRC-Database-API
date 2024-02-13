@@ -8,16 +8,18 @@ namespace GTRC_Database_API.Services
         IBaseContext<Car> iCarContext,
         IBaseContext<EventCar> iBaseContext) : BaseService<EventCar>(iBaseContext)
     {
-        public EventCar? Validate(EventCar? obj)
+        public bool Validate(EventCar? obj)
         {
-            if (obj is null) { return null; }
+            bool isValid = true;
+            if (obj is null) { return false; }
+
             Event? _event = null;
             if (obj.Event is not null) { _event = iEventContext.GetById(obj.EventId).Result; };
             if (_event is null)
             {
                 List<Event> list = iEventContext.GetAll().Result;
-                if (list.Count == 0) { return null; }
-                else { obj.Event = list[0]; obj.EventId = list[0].Id; }
+                if (list.Count == 0) { obj = null; return false; }
+                else { obj.Event = list[0]; obj.EventId = list[0].Id; isValid = false; }
             }
             else { obj.Event = _event; }
             Car? car = null;
@@ -25,17 +27,18 @@ namespace GTRC_Database_API.Services
             if (car is null)
             {
                 List<Car> list = iCarContext.GetAll().Result;
-                if (list.Count == 0) { return null; }
-                else { obj.Car = list[0]; obj.CarId = list[0].Id; }
+                if (list.Count == 0) { obj = null; return false; }
+                else { obj.Car = list[0]; obj.CarId = list[0].Id; isValid = false; }
             }
             else { obj.Car = car; }
-            return obj;
+
+            return isValid;
         }
 
-        public async Task<EventCar?> SetNextAvailable(EventCar? obj)
+        public async Task<bool> SetNextAvailable(EventCar? obj)
         {
-            obj = Validate(obj);
-            if (obj is null) { return null; }
+            bool isAvailable = true;
+            if (obj is null) { return false; }
 
             int startIndexCar = 0;
             List<int> idListCar = [];
@@ -49,6 +52,7 @@ namespace GTRC_Database_API.Services
 
             while (!await IsUnique(obj))
             {
+                isAvailable = false;
                 if (indexCar < idListCar.Count - 1)
                 {
                     indexCar++;
@@ -75,13 +79,13 @@ namespace GTRC_Database_API.Services
                         obj.EventId = listEvent[indexEvent].Id;
                     }
                     else { indexEvent = 0; }
-                    if (indexEvent == startIndexEvent) { return null; }
+                    if (indexEvent == startIndexEvent) { obj = null; return false; }
                 }
             }
 
-            return obj;
+            return isAvailable;
         }
 
-        public async Task<EventCar?> GetTemp() { return await SetNextAvailable(new EventCar()); }
+        public async Task<EventCar?> GetTemp() { EventCar obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
     }
 }

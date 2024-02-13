@@ -8,16 +8,18 @@ namespace GTRC_Database_API.Services
         IBaseContext<Carclass> iCarclassContext,
         IBaseContext<SeasonCarclass> iBaseContext) : BaseService<SeasonCarclass>(iBaseContext)
     {
-        public SeasonCarclass? Validate(SeasonCarclass? obj)
+        public bool Validate(SeasonCarclass? obj)
         {
-            if (obj is null) { return null; }
+            bool isValid = true;
+            if (obj is null) { return false; }
+
             Season? season = null;
             if (obj.Season is not null) { season = iSeasonContext.GetById(obj.SeasonId).Result; };
             if (season is null)
             {
                 List<Season> list = iSeasonContext.GetAll().Result;
-                if (list.Count == 0) { return null; }
-                else { obj.Season = list[0]; obj.SeasonId = list[0].Id; }
+                if (list.Count == 0) { obj = null; return false; }
+                else { obj.Season = list[0]; obj.SeasonId = list[0].Id; isValid = false; }
             }
             else { obj.Season = season; }
             Carclass? carclass = null;
@@ -25,17 +27,18 @@ namespace GTRC_Database_API.Services
             if (carclass is null)
             {
                 List<Carclass> list = iCarclassContext.GetAll().Result;
-                if (list.Count == 0) { return null; }
-                else { obj.Carclass = list[0]; obj.CarclassId = list[0].Id; }
+                if (list.Count == 0) { obj = null; return false; }
+                else { obj.Carclass = list[0]; obj.CarclassId = list[0].Id; isValid = false; }
             }
             else { obj.Carclass = carclass; }
-            return obj;
+
+            return isValid;
         }
 
-        public async Task<SeasonCarclass?> SetNextAvailable(SeasonCarclass? obj)
+        public async Task<bool> SetNextAvailable(SeasonCarclass? obj)
         {
-            obj = Validate(obj);
-            if (obj is null) { return null; }
+            bool isAvailable = true;
+            if (obj is null) { return false; }
 
             int startIndexCarclass = 0;
             List<int> idListCarclass = [];
@@ -49,6 +52,7 @@ namespace GTRC_Database_API.Services
 
             while (!await IsUnique(obj))
             {
+                isAvailable = false;
                 if (indexCarclass < idListCarclass.Count - 1)
                 {
                     indexCarclass++;
@@ -75,13 +79,13 @@ namespace GTRC_Database_API.Services
                         obj.SeasonId = listSeason[indexSeason].Id;
                     }
                     else { indexSeason = 0; }
-                    if (indexSeason == startIndexSeason) { return null; }
+                    if (indexSeason == startIndexSeason) { obj = null; return false; }
                 }
             }
 
-            return obj;
+            return isAvailable;
         }
 
-        public async Task<SeasonCarclass?> GetTemp() { return await SetNextAvailable(new SeasonCarclass()); }
+        public async Task<SeasonCarclass?> GetTemp() { SeasonCarclass obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
     }
 }

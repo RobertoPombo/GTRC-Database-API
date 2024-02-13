@@ -18,6 +18,7 @@ namespace GTRC_Database_API.Services
         CarService CarService,
         RoleService RoleService,
         UserRoleService UserRoleService,
+        UserDatetimeService UserDatetimeService,
         BopService BopService,
         BopTrackCarService BopTrackCarService,
         SeriesService SeriesService,
@@ -27,9 +28,14 @@ namespace GTRC_Database_API.Services
         OrganizationUserService OrganizationUserService,
         TeamService TeamService,
         EntryService EntryService,
+        EntryDatetimeService EntryDatetimeService,
         EventService EventService,
         EventCarclassService EventCarclassService,
-        EventCarService EventCarService)
+        EventCarService EventCarService,
+        EntryEventService EntryEventService,
+        EntryUserEventService EntryUserEventService,
+        PointssystemService PointssystemService,
+        PointssystemPositionService PointssystemPositionService)
         {
             Services[typeof(Color)] = ColorService;
             Services[typeof(Sim)] = SimService;
@@ -40,6 +46,7 @@ namespace GTRC_Database_API.Services
             Services[typeof(Car)] = CarService;
             Services[typeof(Role)] = RoleService;
             Services[typeof(UserRole)] = UserRoleService;
+            Services[typeof(UserDatetime)] = UserDatetimeService;
             Services[typeof(Bop)] = BopService;
             Services[typeof(BopTrackCar)] = BopTrackCarService;
             Services[typeof(Series)] = SeriesService;
@@ -49,9 +56,46 @@ namespace GTRC_Database_API.Services
             Services[typeof(OrganizationUser)] = OrganizationUserService;
             Services[typeof(Team)] = TeamService;
             Services[typeof(Entry)] = EntryService;
+            Services[typeof(EntryDatetime)] = EntryDatetimeService;
             Services[typeof(Event)] = EventService;
             Services[typeof(EventCarclass)] = EventCarclassService;
             Services[typeof(EventCar)] = EventCarService;
+            Services[typeof(EntryEvent)] = EntryEventService;
+            Services[typeof(EntryUserEvent)] = EntryUserEventService;
+            Services[typeof(Pointssystem)] = PointssystemService;
+            Services[typeof(PointssystemPosition)] = PointssystemPositionService;
+        }
+
+        public async Task ForceDelete(Type modelType, dynamic obj)
+        {
+            foreach (Type _modelType in GlobalValues.ModelTypeList)
+            {
+                var list = await Services[_modelType].GetChildObjects(modelType, obj.Id, false);
+                foreach (var item in list) { await ForceDelete(_modelType, item); }
+            }
+            await Services[modelType].Delete(obj);
+        }
+
+        public async Task UpdateChildObjects(Type modelType, dynamic obj)
+        {
+            if (!Scripts.IsCompositeKey(modelType.Name))
+            {
+                foreach (Type _modelType in GlobalValues.ModelTypeList)
+                {
+                    var list = await Services[_modelType].GetChildObjects(modelType, obj.Id, false);
+                    foreach (var item in list)
+                    {
+                        bool isValid = Services[_modelType].Validate(item);
+                        bool isAvailable = await Services[_modelType].SetNextAvailable(item);
+                        if (item is null || !isAvailable) { await ForceDelete(_modelType, item); }
+                        else if (!isValid)
+                        {
+                            await Services[_modelType].Update(item);
+                            await UpdateChildObjects(_modelType, item);
+                        }
+                    }
+                }
+            }
         }
 
         public async Task<bool> HasChildObjects(int id, bool ignoreCompositeKeys)

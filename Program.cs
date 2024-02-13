@@ -50,6 +50,9 @@ builder.Services.AddScoped<IRoleContext, RoleContext>();
 builder.Services.AddScoped<UserRoleService>();
 builder.Services.AddScoped<IUserRoleContext, UserRoleContext>();
 
+builder.Services.AddScoped<UserDatetimeService>();
+builder.Services.AddScoped<IUserDatetimeContext, UserDatetimeContext>();
+
 builder.Services.AddScoped<BopService>();
 builder.Services.AddScoped<IBopContext, BopContext>();
 
@@ -77,6 +80,9 @@ builder.Services.AddScoped<ITeamContext, TeamContext>();
 builder.Services.AddScoped<EntryService>();
 builder.Services.AddScoped<IEntryContext, EntryContext>();
 
+builder.Services.AddScoped<EntryDatetimeService>();
+builder.Services.AddScoped<IEntryDatetimeContext, EntryDatetimeContext>();
+
 builder.Services.AddScoped<EventService>();
 builder.Services.AddScoped<IEventContext, EventContext>();
 
@@ -85,7 +91,21 @@ builder.Services.AddScoped<IEventCarclassContext, EventCarclassContext>();
 
 builder.Services.AddScoped<EventCarService>();
 builder.Services.AddScoped<IEventCarContext, EventCarContext>();
+
+builder.Services.AddScoped<EntryEventService>();
+builder.Services.AddScoped<IEntryEventContext, EntryEventContext>();
+
+builder.Services.AddScoped<EntryUserEventService>();
+builder.Services.AddScoped<IEntryUserEventContext, EntryUserEventContext>();
+
+builder.Services.AddScoped<PointssystemService>();
+builder.Services.AddScoped<IPointssystemContext, PointssystemContext>();
+
+builder.Services.AddScoped<PointssystemPositionService>();
+builder.Services.AddScoped<IPointssystemPositionContext, PointssystemPositionContext>();
+
 /*
+
 builder.Services.AddScoped<Service>();
 builder.Services.AddScoped<IContext, Context>();
 */

@@ -36,7 +36,11 @@ namespace GTRC_Database_API.Services
             else { obj.Event = _event; }
             if (obj.SignInDate > GlobalValues.DateTimeMaxValue) { obj.SignInDate = GlobalValues.DateTimeMaxValue; isValid = false; }
             else if (obj.SignInDate < GlobalValues.DateTimeMinValue) { obj.SignInDate = GlobalValues.DateTimeMinValue; isValid = false; }
-            if (obj.Entry.RegisterDate > obj.Event.Date || obj.Entry.SignOutDate < obj.Event.Date) { obj.SignInDate = GlobalValues.DateTimeMaxValue; isValid = false; }
+            if (obj.SignInDate != GlobalValues.DateTimeMaxValue && (obj.Entry.RegisterDate > obj.Event.Date || obj.Entry.SignOutDate < obj.Event.Date))
+            {
+                obj.SignInDate = GlobalValues.DateTimeMaxValue;
+                isValid = false;
+            }
 
             return isValid;
         }

@@ -75,7 +75,7 @@ namespace GTRC_Database_API.Controllers
                 bool isValid = service.Validate(obj);
                 bool isAvailable = await service.SetNextAvailable(obj);
                 if (obj is null) { return BadRequest(await service.GetById(objDto.Id)); }
-                else if (!isAvailable) { return StatusCode(208, await service.SetNextAvailable(obj)); }
+                else if (!isAvailable) { return StatusCode(208, obj); }
                 else if (!isValid) { return StatusCode(406, obj); }
                 else
                 {

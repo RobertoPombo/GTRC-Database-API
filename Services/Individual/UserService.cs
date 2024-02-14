@@ -12,8 +12,6 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
-            if (!Scripts.IsValidSteamId(obj.SteamId) && obj.SteamId != GlobalValues.NoSteamId) { obj.SteamId = GlobalValues.NoSteamId; isValid = false; }
-            if (!Scripts.IsValidDiscordId(obj.DiscordId) && obj.DiscordId != GlobalValues.NoDiscordId) { obj.DiscordId = GlobalValues.NoDiscordId; isValid = false; }
             obj.FirstName = Scripts.RemoveSpaceStartEnd(obj.FirstName);
             if (obj.FirstName == string.Empty) { obj.FirstName = nameof(obj.FirstName); isValid = false; }
             obj.LastName = Scripts.RemoveSpaceStartEnd(obj.LastName);
@@ -30,15 +28,18 @@ namespace GTRC_Database_API.Services
             return isValid;
         }
 
-        public async Task<bool> SetNextAvailable(User? obj)
+        public async Task<bool> ValidateUniqProps(User? obj)
         {
-            bool isAvailable = true;
+            bool isValidUniqProps = true;
             if (obj is null) { return false; }
+
+            if (!Scripts.IsValidSteamId(obj.SteamId) && obj.SteamId != GlobalValues.NoSteamId) { obj.SteamId = GlobalValues.NoSteamId; isValidUniqProps = false; }
+            if (!Scripts.IsValidDiscordId(obj.DiscordId) && obj.DiscordId != GlobalValues.NoDiscordId) { obj.DiscordId = GlobalValues.NoDiscordId; isValidUniqProps = false; }
 
             ulong? startValue = obj.SteamId;
             while (!await IsUnique(obj, 0) && obj.SteamId != GlobalValues.NoSteamId)
             {
-                isAvailable = false;
+                isValidUniqProps = false;
                 if (obj.SteamId < GlobalValues.MaxSteamId) { obj.SteamId++; } else { obj.SteamId = GlobalValues.MinSteamId; }
                 if (obj.SteamId == startValue) { obj.SteamId = GlobalValues.NoSteamId; }
             }
@@ -46,15 +47,16 @@ namespace GTRC_Database_API.Services
             startValue = obj.DiscordId;
             while (!await IsUnique(obj, 1) && obj.DiscordId != GlobalValues.NoDiscordId)
             {
-                isAvailable = false;
+                isValidUniqProps = false;
                 if (obj.DiscordId < GlobalValues.MaxDiscordId) { obj.DiscordId++; } else { obj.DiscordId = GlobalValues.MinDiscordId; }
                 if (obj.DiscordId == startValue) { obj.DiscordId = GlobalValues.NoDiscordId; }
             }
 
-            return isAvailable;
+            Validate(obj);
+            return isValidUniqProps;
         }
 
-        public async Task<User?> GetTemp() { User obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
+        public async Task<User?> GetTemp() { User obj = new(); await ValidateUniqProps(obj); return obj; }
 
         public List<string> GetName3DigitsOptions(User obj)
         {

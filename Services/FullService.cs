@@ -86,8 +86,8 @@ namespace GTRC_Database_API.Services
                     foreach (var item in list)
                     {
                         bool isValid = Services[_modelType].Validate(item);
-                        bool isAvailable = await Services[_modelType].SetNextAvailable(item);
-                        if (item is null || !isAvailable) { await ForceDelete(_modelType, item); }
+                        bool isValidUniqProps = await Services[_modelType].ValidateUniqProps(item);
+                        if (item is null || !isValidUniqProps) { await ForceDelete(_modelType, item); }
                         else if (!isValid)
                         {
                             await Services[_modelType].Update(item);

@@ -13,13 +13,21 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
+            return isValid;
+        }
+
+        public async Task<bool> ValidateUniqProps(SeasonCarclass? obj)
+        {
+            bool isValidUniqProps = true;
+            if (obj is null) { return false; }
+
             Season? season = null;
             if (obj.Season is not null) { season = iSeasonContext.GetById(obj.SeasonId).Result; };
             if (season is null)
             {
                 List<Season> list = iSeasonContext.GetAll().Result;
                 if (list.Count == 0) { obj = null; return false; }
-                else { obj.Season = list[0]; obj.SeasonId = list[0].Id; isValid = false; }
+                else { obj.Season = list[0]; obj.SeasonId = list[0].Id; isValidUniqProps = false; }
             }
             else { obj.Season = season; }
             Carclass? carclass = null;
@@ -28,17 +36,9 @@ namespace GTRC_Database_API.Services
             {
                 List<Carclass> list = iCarclassContext.GetAll().Result;
                 if (list.Count == 0) { obj = null; return false; }
-                else { obj.Carclass = list[0]; obj.CarclassId = list[0].Id; isValid = false; }
+                else { obj.Carclass = list[0]; obj.CarclassId = list[0].Id; isValidUniqProps = false; }
             }
             else { obj.Carclass = carclass; }
-
-            return isValid;
-        }
-
-        public async Task<bool> SetNextAvailable(SeasonCarclass? obj)
-        {
-            bool isAvailable = true;
-            if (obj is null) { return false; }
 
             int startIndexCarclass = 0;
             List<int> idListCarclass = [];
@@ -52,7 +52,7 @@ namespace GTRC_Database_API.Services
 
             while (!await IsUnique(obj))
             {
-                isAvailable = false;
+                isValidUniqProps = false;
                 if (indexCarclass < idListCarclass.Count - 1)
                 {
                     indexCarclass++;
@@ -83,9 +83,10 @@ namespace GTRC_Database_API.Services
                 }
             }
 
-            return isAvailable;
+            Validate(obj);
+            return isValidUniqProps;
         }
 
-        public async Task<SeasonCarclass?> GetTemp() { SeasonCarclass obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
+        public async Task<SeasonCarclass?> GetTemp() { SeasonCarclass obj = new(); await ValidateUniqProps(obj); return obj; }
     }
 }

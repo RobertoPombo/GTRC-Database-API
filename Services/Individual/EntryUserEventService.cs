@@ -16,13 +16,23 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
+            if (obj.Name3Digits.Length == 3) { obj.Name3Digits = obj.Name3Digits.ToUpper(); } else { obj.Name3Digits = EntryUserEvent.DefaultName3Digits; isValid = false; }
+
+            return isValid;
+        }
+
+        public async Task<bool> ValidateUniqProps(EntryUserEvent? obj)
+        {
+            bool isValidUniqProps = true;
+            if (obj is null) { return false; }
+
             Entry? entry = null;
             if (obj.Entry is not null) { entry = iEntryContext.GetById(obj.EntryId).Result; };
             if (entry is null)
             {
                 List<Entry> list = iEntryContext.GetAll().Result;
                 if (list.Count == 0) { obj = null; return false; }
-                else { obj.Entry = list[0]; obj.EntryId = list[0].Id; isValid = false; }
+                else { obj.Entry = list[0]; obj.EntryId = list[0].Id; isValidUniqProps = false; }
             }
             else { obj.Entry = entry; }
             User? user = null;
@@ -31,7 +41,7 @@ namespace GTRC_Database_API.Services
             {
                 List<User> list = iUserContext.GetAll().Result;
                 if (list.Count == 0) { obj = null; return false; }
-                else { obj.User = list[0]; obj.UserId = list[0].Id; isValid = false; }
+                else { obj.User = list[0]; obj.UserId = list[0].Id; isValidUniqProps = false; }
             }
             else { obj.User = user; }
             Event? _event = null;
@@ -40,18 +50,9 @@ namespace GTRC_Database_API.Services
             {
                 List<Event> list = iEventContext.GetAll().Result;
                 if (list.Count == 0) { obj = null; return false; }
-                else { obj.Event = list[0]; obj.EventId = list[0].Id; isValid = false; }
+                else { obj.Event = list[0]; obj.EventId = list[0].Id; isValidUniqProps = false; }
             }
             else { obj.Event = _event; }
-            if (obj.Name3Digits.Length == 3) { obj.Name3Digits = obj.Name3Digits.ToUpper(); } else { obj.Name3Digits = EntryUserEvent.DefaultName3Digits; isValid = false; }
-
-            return isValid;
-        }
-
-        public async Task<bool> SetNextAvailable(EntryUserEvent? obj)
-        {
-            bool isAvailable = true;
-            if (obj is null) { return false; }
 
             int seasonId = obj.Entry.SeasonId;
             int startIndexEvent = 0;
@@ -64,9 +65,22 @@ namespace GTRC_Database_API.Services
             }
             int indexEvent = startIndexEvent;
 
+            if (obj.Event.SeasonId != seasonId)
+            {
+                if (listEvent.Count == 0) { obj = null; return false; }
+                else
+                {
+                    startIndexEvent = 0;
+                    indexEvent = 0;
+                    obj.Event = listEvent[indexEvent];
+                    obj.EventId = listEvent[indexEvent].Id;
+                    isValidUniqProps = false;
+                }
+            }
+
             while (!await IsUnique(obj))
             {
-                isAvailable = false;
+                isValidUniqProps = false;
                 if (indexEvent < idListEvent.Count - 1)
                 {
                     indexEvent++;
@@ -117,9 +131,10 @@ namespace GTRC_Database_API.Services
                 }
             }
 
-            return isAvailable;
+            Validate(obj);
+            return isValidUniqProps;
         }
 
-        public async Task<EntryUserEvent?> GetTemp() { EntryUserEvent obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
+        public async Task<EntryUserEvent?> GetTemp() { EntryUserEvent obj = new(); await ValidateUniqProps(obj); return obj; }
     }
 }

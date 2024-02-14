@@ -13,13 +13,21 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
+            return isValid;
+        }
+
+        public async Task<bool> ValidateUniqProps(UserRole? obj)
+        {
+            bool isValidUniqProps = true;
+            if (obj is null) { return false; }
+
             User? user = null;
             if (obj.User is not null) { user = iUserContext.GetById(obj.UserId).Result; };
             if (user is null)
             {
                 List<User> list = iUserContext.GetAll().Result;
                 if (list.Count == 0) { obj = null; return false; }
-                else { obj.User = list[0]; obj.UserId = list[0].Id; isValid = false; }
+                else { obj.User = list[0]; obj.UserId = list[0].Id; isValidUniqProps = false; }
             }
             else { obj.User = user; }
             Role? role = null;
@@ -28,17 +36,9 @@ namespace GTRC_Database_API.Services
             {
                 List<Role> list = iRoleContext.GetAll().Result;
                 if (list.Count == 0) { obj = null; return false; }
-                else { obj.Role = list[0]; obj.RoleId = list[0].Id; isValid = false; }
+                else { obj.Role = list[0]; obj.RoleId = list[0].Id; isValidUniqProps = false; }
             }
             else { obj.Role = role; }
-
-            return isValid;
-        }
-
-        public async Task<bool> SetNextAvailable(UserRole? obj)
-        {
-            bool isAvailable = true;
-            if (obj is null) { return false; }
 
             int startIndexRole = 0;
             List<int> idListRole = [];
@@ -52,7 +52,7 @@ namespace GTRC_Database_API.Services
 
             while (!await IsUnique(obj))
             {
-                isAvailable = false;
+                isValidUniqProps = false;
                 if (indexRole < idListRole.Count - 1)
                 {
                     indexRole++;
@@ -83,9 +83,10 @@ namespace GTRC_Database_API.Services
                 }
             }
 
-            return isAvailable;
+            Validate(obj);
+            return isValidUniqProps;
         }
 
-        public async Task<UserRole?> GetTemp() { UserRole obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
+        public async Task<UserRole?> GetTemp() { UserRole obj = new(); await ValidateUniqProps(obj); return obj; }
     }
 }

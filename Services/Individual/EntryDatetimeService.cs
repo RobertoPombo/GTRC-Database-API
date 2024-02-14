@@ -14,17 +14,6 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
-            Entry? entry = null;
-            if (obj.Entry is not null) { entry = iEntryContext.GetById(obj.EntryId).Result; };
-            if (entry is null)
-            {
-                List<Entry> list = iEntryContext.GetAll().Result;
-                if (list.Count == 0) { obj = null; return false; }
-                else { obj.Entry = list[0]; obj.EntryId = list[0].Id; isValid = false; }
-            }
-            else { obj.Entry = entry; }
-            if (obj.Date > GlobalValues.DateTimeMaxValue) { obj.Date = GlobalValues.DateTimeMaxValue; isValid = false; }
-            else if (obj.Date < GlobalValues.DateTimeMinValue) { obj.Date = GlobalValues.DateTimeMinValue; isValid = false; }
             Car? car = null;
             if (obj.Car is not null) { car = iCarContext.GetById(obj.CarId).Result; };
             if (car is null)
@@ -38,15 +27,27 @@ namespace GTRC_Database_API.Services
             return isValid;
         }
 
-        public async Task<bool> SetNextAvailable(EntryDatetime? obj)
+        public async Task<bool> ValidateUniqProps(EntryDatetime? obj)
         {
-            bool isAvailable = true;
+            bool isValidUniqProps = true;
             if (obj is null) { return false; }
+
+            Entry? entry = null;
+            if (obj.Entry is not null) { entry = iEntryContext.GetById(obj.EntryId).Result; };
+            if (entry is null)
+            {
+                List<Entry> list = iEntryContext.GetAll().Result;
+                if (list.Count == 0) { obj = null; return false; }
+                else { obj.Entry = list[0]; obj.EntryId = list[0].Id; isValidUniqProps = false; }
+            }
+            else { obj.Entry = entry; }
+            if (obj.Date > GlobalValues.DateTimeMaxValue) { obj.Date = GlobalValues.DateTimeMaxValue; isValidUniqProps = false; }
+            else if (obj.Date < GlobalValues.DateTimeMinValue) { obj.Date = GlobalValues.DateTimeMinValue; isValidUniqProps = false; }
 
             DateTime startDate = obj.Date;
             while (!await IsUnique(obj))
             {
-                isAvailable = false;
+                isValidUniqProps = false;
                 if (obj.Date < GlobalValues.DateTimeMaxValue.AddDays(-1)) { obj.Date = obj.Date.AddDays(1); } else { obj.Date = GlobalValues.DateTimeMinValue; }
                 if (obj.Date == startDate)
                 {
@@ -71,9 +72,10 @@ namespace GTRC_Database_API.Services
                 }
             }
 
-            return isAvailable;
+            Validate(obj);
+            return isValidUniqProps;
         }
 
-        public async Task<EntryDatetime?> GetTemp() { EntryDatetime obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
+        public async Task<EntryDatetime?> GetTemp() { EntryDatetime obj = new(); await ValidateUniqProps(obj); return obj; }
     }
 }

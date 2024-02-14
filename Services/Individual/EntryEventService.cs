@@ -16,27 +16,9 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
-            Entry? entry = null;
-            if (obj.Entry is not null) { entry = iEntryContext.GetById(obj.EntryId).Result; };
-            if (entry is null)
-            {
-                List<Entry> list = iEntryContext.GetAll().Result;
-                if (list.Count == 0) { obj = null; return false; }
-                else { obj.Entry = list[0]; obj.EntryId = list[0].Id; isValid = false; }
-            }
-            else { obj.Entry = entry; }
-            Event? _event = null;
-            if (obj.Event is not null) { _event = iEventContext.GetById(obj.EventId).Result; };
-            if (_event is null)
-            {
-                List<Event> list = iEventContext.GetAll().Result;
-                if (list.Count == 0) { obj = null; return false; }
-                else { obj.Event = list[0]; obj.EventId = list[0].Id; isValid = false; }
-            }
-            else { obj.Event = _event; }
             if (obj.SignInDate > GlobalValues.DateTimeMaxValue) { obj.SignInDate = GlobalValues.DateTimeMaxValue; isValid = false; }
             else if (obj.SignInDate < GlobalValues.DateTimeMinValue) { obj.SignInDate = GlobalValues.DateTimeMinValue; isValid = false; }
-            if (obj.SignInDate != GlobalValues.DateTimeMaxValue && (obj.Entry.RegisterDate > obj.Event.Date || obj.Entry.SignOutDate < obj.Event.Date))
+            if (obj.SignInDate < GlobalValues.DateTimeMaxValue && (obj.Entry.RegisterDate > obj.Event.Date || obj.Entry.SignOutDate < obj.Event.Date))
             {
                 obj.SignInDate = GlobalValues.DateTimeMaxValue;
                 isValid = false;
@@ -45,10 +27,29 @@ namespace GTRC_Database_API.Services
             return isValid;
         }
 
-        public async Task<bool> SetNextAvailable(EntryEvent? obj)
+        public async Task<bool> ValidateUniqProps(EntryEvent? obj)
         {
-            bool isAvailable = true;
+            bool isValidUniqProps = true;
             if (obj is null) { return false; }
+
+            Entry? entry = null;
+            if (obj.Entry is not null) { entry = iEntryContext.GetById(obj.EntryId).Result; };
+            if (entry is null)
+            {
+                List<Entry> list = iEntryContext.GetAll().Result;
+                if (list.Count == 0) { obj = null; return false; }
+                else { obj.Entry = list[0]; obj.EntryId = list[0].Id; isValidUniqProps = false; }
+            }
+            else { obj.Entry = entry; }
+            Event? _event = null;
+            if (obj.Event is not null) { _event = iEventContext.GetById(obj.EventId).Result; };
+            if (_event is null)
+            {
+                List<Event> list = iEventContext.GetAll().Result;
+                if (list.Count == 0) { obj = null; return false; }
+                else { obj.Event = list[0]; obj.EventId = list[0].Id; isValidUniqProps = false; }
+            }
+            else { obj.Event = _event; }
 
             int seasonId = obj.Entry.SeasonId;
             int startIndexEvent = 0;
@@ -61,9 +62,22 @@ namespace GTRC_Database_API.Services
             }
             int indexEvent = startIndexEvent;
 
+            if (obj.Event.SeasonId != seasonId)
+            {
+                if (listEvent.Count == 0) { obj = null; return false; }
+                else
+                {
+                    startIndexEvent = 0;
+                    indexEvent = 0;
+                    obj.Event = listEvent[indexEvent];
+                    obj.EventId = listEvent[indexEvent].Id;
+                    isValidUniqProps = false;
+                }
+            }
+
             while (!await IsUnique(obj))
             {
-                isAvailable = false;
+                isValidUniqProps = false;
                 if (indexEvent < idListEvent.Count - 1)
                 {
                     indexEvent++;
@@ -94,9 +108,10 @@ namespace GTRC_Database_API.Services
                 }
             }
 
-            return isAvailable;
+            Validate(obj);
+            return isValidUniqProps;
         }
 
-        public async Task<EntryEvent?> GetTemp() { EntryEvent obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
+        public async Task<EntryEvent?> GetTemp() { EntryEvent obj = new(); await ValidateUniqProps(obj); return obj; }
     }
 }

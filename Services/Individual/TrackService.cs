@@ -12,8 +12,6 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
-            obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
-            if (obj.Name == string.Empty) { obj.Name = Track.DefaultName; isValid = false; }
             obj.AccTrackId = Scripts.RemoveSpaceStartEnd(obj.AccTrackId).Replace(" ", "_");
             if (obj.AccTrackId == string.Empty) { obj.AccTrackId = Track.DefaultAccTrackId; isValid = false; }
             obj.NameGoogleSheets = Scripts.RemoveSpaceStartEnd(obj.NameGoogleSheets);
@@ -21,10 +19,13 @@ namespace GTRC_Database_API.Services
             return isValid;
         }
 
-        public async Task<bool> SetNextAvailable(Track? obj)
+        public async Task<bool> ValidateUniqProps(Track? obj)
         {
-            bool isAvailable = true;
+            bool isValidUniqProps = true;
             if (obj is null) { return false; }
+
+            obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
+            if (obj.Name == string.Empty) { obj.Name = Track.DefaultName; isValidUniqProps = false; }
 
             int nr = 1;
             string delimiter = " #";
@@ -33,7 +34,7 @@ namespace GTRC_Database_API.Services
             if (defNameList.Length > 1 && int.TryParse(defNameList[^1], out _)) { defName = defName[..^(defNameList[^1].Length + delimiter.Length)]; }
             while (!await IsUnique(obj, 0))
             {
-                isAvailable = false;
+                isValidUniqProps = false;
                 obj.Name = defName + delimiter + nr.ToString();
                 nr++;
                 if (nr == int.MaxValue) { obj = null; return false; }
@@ -46,15 +47,16 @@ namespace GTRC_Database_API.Services
             if (defNameList.Length > 1 && int.TryParse(defNameList[^1], out _)) { defName = defName[..^(defNameList[^1].Length + delimiter.Length)]; }
             while (!await IsUnique(obj, 1))
             {
-                isAvailable = false;
+                isValidUniqProps = false;
                 obj.AccTrackId = defName + delimiter + nr.ToString();
                 nr++;
                 if (nr == int.MaxValue) { obj = null; return false; }
             }
 
-            return isAvailable;
+            Validate(obj);
+            return isValidUniqProps;
         }
 
-        public async Task<Track?> GetTemp() { Track obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
+        public async Task<Track?> GetTemp() { Track obj = new(); await ValidateUniqProps(obj); return obj; }
     }
 }

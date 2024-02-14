@@ -42,9 +42,9 @@ namespace GTRC_Database_API.Controllers
         {
             BopTrackCar? obj = objDto.Dto2Model();
             bool isValid = service.Validate(obj);
-            bool isAvailable = await service.SetNextAvailable(obj);
+            bool isValidUniqProps = await service.ValidateUniqProps(obj);
             if (obj is null) { return BadRequest(obj); }
-            else if (!isAvailable) { return StatusCode(208, obj); }
+            else if (!isValidUniqProps) { return StatusCode(208, obj); }
             else if (!isValid) { return StatusCode(406, obj); }
             else
             {
@@ -65,9 +65,9 @@ namespace GTRC_Database_API.Controllers
             {
                 obj = objDto.Dto2Model(obj);
                 bool isValid = service.Validate(obj);
-                bool isAvailable = await service.SetNextAvailable(obj);
+                bool isValidUniqProps = await service.ValidateUniqProps(obj);
                 if (obj is null) { return BadRequest(await service.GetById(objDto.Id)); }
-                else if (!isAvailable) { return StatusCode(208, obj); }
+                else if (!isValidUniqProps) { return StatusCode(208, obj); }
                 else if (!isValid) { return StatusCode(406, obj); }
                 else
                 {

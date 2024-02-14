@@ -13,13 +13,21 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
+            return isValid;
+        }
+
+        public async Task<bool> ValidateUniqProps(EventCarclass? obj)
+        {
+            bool isValidUniqProps = true;
+            if (obj is null) { return false; }
+
             Event? _event = null;
             if (obj.Event is not null) { _event = iEventContext.GetById(obj.EventId).Result; };
             if (_event is null)
             {
                 List<Event> list = iEventContext.GetAll().Result;
                 if (list.Count == 0) { obj = null; return false; }
-                else { obj.Event = list[0]; obj.EventId = list[0].Id; isValid = false; }
+                else { obj.Event = list[0]; obj.EventId = list[0].Id; isValidUniqProps = false; }
             }
             else { obj.Event = _event; }
             Carclass? carclass = null;
@@ -28,17 +36,9 @@ namespace GTRC_Database_API.Services
             {
                 List<Carclass> list = iCarclassContext.GetAll().Result;
                 if (list.Count == 0) { obj = null; return false; }
-                else { obj.Carclass = list[0]; obj.CarclassId = list[0].Id; isValid = false; }
+                else { obj.Carclass = list[0]; obj.CarclassId = list[0].Id; isValidUniqProps = false; }
             }
             else { obj.Carclass = carclass; }
-
-            return isValid;
-        }
-
-        public async Task<bool> SetNextAvailable(EventCarclass? obj)
-        {
-            bool isAvailable = true;
-            if (obj is null) { return false; }
 
             int startIndexCarclass = 0;
             List<int> idListCarclass = [];
@@ -52,7 +52,7 @@ namespace GTRC_Database_API.Services
 
             while (!await IsUnique(obj))
             {
-                isAvailable = false;
+                isValidUniqProps = false;
                 if (indexCarclass < idListCarclass.Count - 1)
                 {
                     indexCarclass++;
@@ -83,9 +83,10 @@ namespace GTRC_Database_API.Services
                 }
             }
 
-            return isAvailable;
+            Validate(obj);
+            return isValidUniqProps;
         }
 
-        public async Task<EventCarclass?> GetTemp() { EventCarclass obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
+        public async Task<EventCarclass?> GetTemp() { EventCarclass obj = new(); await ValidateUniqProps(obj); return obj; }
     }
 }

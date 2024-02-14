@@ -12,29 +12,29 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
+            return isValid;
+        }
+
+        public async Task<bool> ValidateUniqProps(PointssystemPosition? obj)
+        {
+            bool isValidUniqProps = true;
+            if (obj is null) { return false; }
+
             Pointssystem? pointssystem = null;
             if (obj.Pointssystem is not null) { pointssystem = iPointssystemContext.GetById(obj.PointssystemId).Result; };
             if (pointssystem is null)
             {
                 List<Pointssystem> list = iPointssystemContext.GetAll().Result;
                 if (list.Count == 0) { obj = null; return false; }
-                else { obj.Pointssystem = list[0]; obj.PointssystemId = list[0].Id; isValid = false; }
+                else { obj.Pointssystem = list[0]; obj.PointssystemId = list[0].Id; isValidUniqProps = false; }
             }
             else { obj.Pointssystem = pointssystem; }
-            if (obj.Position < PointssystemPosition.MinPosition) { obj.Position = PointssystemPosition.MinPosition; isValid = false; }
-
-            return isValid;
-        }
-
-        public async Task<bool> SetNextAvailable(PointssystemPosition? obj)
-        {
-            bool isAvailable = true;
-            if (obj is null) { return false; }
+            if (obj.Position < PointssystemPosition.MinPosition) { obj.Position = PointssystemPosition.MinPosition; isValidUniqProps = false; }
 
             byte startPosition = obj.Position;
             while (!await IsUnique(obj))
             {
-                isAvailable = false;
+                isValidUniqProps = false;
                 if (obj.Position < byte.MaxValue) { obj.Position += 1; } else { obj.Position = PointssystemPosition.MinPosition; }
                 if (obj.Position == startPosition)
                 {
@@ -59,9 +59,10 @@ namespace GTRC_Database_API.Services
                 }
             }
 
-            return isAvailable;
+            Validate(obj);
+            return isValidUniqProps;
         }
 
-        public async Task<PointssystemPosition?> GetTemp() { PointssystemPosition obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
+        public async Task<PointssystemPosition?> GetTemp() { PointssystemPosition obj = new(); await ValidateUniqProps(obj); return obj; }
     }
 }

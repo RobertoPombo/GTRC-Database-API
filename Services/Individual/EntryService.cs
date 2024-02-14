@@ -15,17 +15,6 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
-            Season? season = null;
-            if (obj.Season is not null) { season = iSeasonContext.GetById(obj.SeasonId).Result; };
-            if (season is null)
-            {
-                List<Season> list = iSeasonContext.GetAll().Result;
-                if (list.Count == 0) { obj = null; return false; }
-                else { obj.Season = list[0]; obj.SeasonId = list[0].Id; isValid = false; }
-            }
-            else { obj.Season = season; }
-            if (obj.RaceNumber > Entry.MaxRaceNumber) { obj.RaceNumber = Entry.MaxRaceNumber; isValid = false; }
-            else if (obj.RaceNumber < Entry.MinRaceNumber) { obj.RaceNumber = Entry.MinRaceNumber; isValid = false; }
             Team? team = null;
             if (obj.Team is not null) { team = iTeamContext.GetById(obj.TeamId).Result; };
             if (team is null)
@@ -50,15 +39,27 @@ namespace GTRC_Database_API.Services
             return isValid;
         }
 
-        public async Task<bool> SetNextAvailable(Entry? obj)
+        public async Task<bool> ValidateUniqProps(Entry? obj)
         {
-            bool isAvailable = true;
+            bool isValidUniqProps = true;
             if (obj is null) { return false; }
+
+            Season? season = null;
+            if (obj.Season is not null) { season = iSeasonContext.GetById(obj.SeasonId).Result; };
+            if (season is null)
+            {
+                List<Season> list = iSeasonContext.GetAll().Result;
+                if (list.Count == 0) { obj = null; return false; }
+                else { obj.Season = list[0]; obj.SeasonId = list[0].Id; isValidUniqProps = false; }
+            }
+            else { obj.Season = season; }
+            if (obj.RaceNumber > Entry.MaxRaceNumber) { obj.RaceNumber = Entry.MaxRaceNumber; isValidUniqProps = false; }
+            else if (obj.RaceNumber < Entry.MinRaceNumber) { obj.RaceNumber = Entry.MinRaceNumber; isValidUniqProps = false; }
 
             int startRaceNumber = obj.RaceNumber;
             while (!await IsUnique(obj))
             {
-                isAvailable = false;
+                isValidUniqProps = false;
                 if (obj.RaceNumber < Entry.MaxRaceNumber) { obj.RaceNumber += 1; } else { obj.RaceNumber = Entry.DefaultRaceNumber; }
                 if (obj.RaceNumber == startRaceNumber)
                 {
@@ -83,9 +84,10 @@ namespace GTRC_Database_API.Services
                 }
             }
 
-            return isAvailable;
+            Validate(obj);
+            return isValidUniqProps;
         }
 
-        public async Task<Entry?> GetTemp() { Entry obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
+        public async Task<Entry?> GetTemp() { Entry obj = new(); await ValidateUniqProps(obj); return obj; }
     }
 }

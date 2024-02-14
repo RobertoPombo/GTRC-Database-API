@@ -14,13 +14,21 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
+            return isValid;
+        }
+
+        public async Task<bool> ValidateUniqProps(BopTrackCar? obj)
+        {
+            bool isValidUniqProps = true;
+            if (obj is null) { return false; }
+
             Bop? bop = null;
             if (obj.Bop is not null) { bop = iBopContext.GetById(obj.BopId).Result; };
             if (bop is null)
             {
                 List<Bop> list = iBopContext.GetAll().Result;
                 if (list.Count == 0) { obj = null; return false; }
-                else { obj.Bop = list[0]; obj.BopId = list[0].Id; isValid = false; }
+                else { obj.Bop = list[0]; obj.BopId = list[0].Id; isValidUniqProps = false; }
             }
             else { obj.Bop = bop; }
             Track? track = null;
@@ -29,7 +37,7 @@ namespace GTRC_Database_API.Services
             {
                 List<Track> list = iTrackContext.GetAll().Result;
                 if (list.Count == 0) { obj = null; return false; }
-                else { obj.Track = list[0]; obj.TrackId = list[0].Id; isValid = false; }
+                else { obj.Track = list[0]; obj.TrackId = list[0].Id; isValidUniqProps = false; }
             }
             else { obj.Track = track; }
             Car? car = null;
@@ -38,17 +46,9 @@ namespace GTRC_Database_API.Services
             {
                 List<Car> list = iCarContext.GetAll().Result;
                 if (list.Count == 0) { obj = null; return false; }
-                else { obj.Car = list[0]; obj.CarId = list[0].Id; isValid = false; }
+                else { obj.Car = list[0]; obj.CarId = list[0].Id; isValidUniqProps = false; }
             }
             else { obj.Car = car; }
-
-            return isValid;
-        }
-
-        public async Task<bool> SetNextAvailable(BopTrackCar? obj)
-        {
-            bool isAvailable = true;
-            if (obj is null) { return false; }
 
             int startIndexCar = 0;
             List<int> idListCar = [];
@@ -62,7 +62,7 @@ namespace GTRC_Database_API.Services
 
             while (!await IsUnique(obj))
             {
-                isAvailable = false;
+                isValidUniqProps = false;
                 if (indexCar < idListCar.Count - 1)
                 {
                     indexCar++;
@@ -113,9 +113,10 @@ namespace GTRC_Database_API.Services
                 }
             }
 
-            return isAvailable;
+            Validate(obj);
+            return isValidUniqProps;
         }
 
-        public async Task<BopTrackCar?> GetTemp() { BopTrackCar obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
+        public async Task<BopTrackCar?> GetTemp() { BopTrackCar obj = new(); await ValidateUniqProps(obj); return obj; }
     }
 }

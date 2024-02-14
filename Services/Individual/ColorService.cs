@@ -14,9 +14,9 @@ namespace GTRC_Database_API.Services
             return isValid;
         }
 
-        public async Task<bool> SetNextAvailable(Color? obj)
+        public async Task<bool> ValidateUniqProps(Color? obj)
         {
-            bool isAvailable = true;
+            bool isValidUniqProps = true;
             if (obj is null) { return false; }
 
             if (obj.Alpha == byte.MinValue) { obj.Alpha = byte.MaxValue; } else { obj.Alpha--; }
@@ -35,7 +35,7 @@ namespace GTRC_Database_API.Services
                         for (byte blue = byte.MinValue; blue <= byte.MaxValue; blue++)
                         {
                             if (obj.Blue == byte.MaxValue) { obj.Blue = byte.MinValue; } else { obj.Blue++; }
-                            if (await IsUnique(obj)) { return isAvailable; } else { isAvailable = false; }
+                            if (await IsUnique(obj)) { Validate(obj); return isValidUniqProps; } else { isValidUniqProps = false; }
                         }
                     }
                 }
@@ -45,6 +45,6 @@ namespace GTRC_Database_API.Services
             return false;
         }
 
-        public async Task<Color?> GetTemp() { Color obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
+        public async Task<Color?> GetTemp() { Color obj = new(); await ValidateUniqProps(obj); return obj; }
     }
 }

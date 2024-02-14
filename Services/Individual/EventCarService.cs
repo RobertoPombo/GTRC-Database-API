@@ -13,13 +13,21 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
+            return isValid;
+        }
+
+        public async Task<bool> ValidateUniqProps(EventCar? obj)
+        {
+            bool isValidUniqProps = true;
+            if (obj is null) { return false; }
+
             Event? _event = null;
             if (obj.Event is not null) { _event = iEventContext.GetById(obj.EventId).Result; };
             if (_event is null)
             {
                 List<Event> list = iEventContext.GetAll().Result;
                 if (list.Count == 0) { obj = null; return false; }
-                else { obj.Event = list[0]; obj.EventId = list[0].Id; isValid = false; }
+                else { obj.Event = list[0]; obj.EventId = list[0].Id; isValidUniqProps = false; }
             }
             else { obj.Event = _event; }
             Car? car = null;
@@ -28,17 +36,9 @@ namespace GTRC_Database_API.Services
             {
                 List<Car> list = iCarContext.GetAll().Result;
                 if (list.Count == 0) { obj = null; return false; }
-                else { obj.Car = list[0]; obj.CarId = list[0].Id; isValid = false; }
+                else { obj.Car = list[0]; obj.CarId = list[0].Id; isValidUniqProps = false; }
             }
             else { obj.Car = car; }
-
-            return isValid;
-        }
-
-        public async Task<bool> SetNextAvailable(EventCar? obj)
-        {
-            bool isAvailable = true;
-            if (obj is null) { return false; }
 
             int startIndexCar = 0;
             List<int> idListCar = [];
@@ -52,7 +52,7 @@ namespace GTRC_Database_API.Services
 
             while (!await IsUnique(obj))
             {
-                isAvailable = false;
+                isValidUniqProps = false;
                 if (indexCar < idListCar.Count - 1)
                 {
                     indexCar++;
@@ -83,9 +83,10 @@ namespace GTRC_Database_API.Services
                 }
             }
 
-            return isAvailable;
+            Validate(obj);
+            return isValidUniqProps;
         }
 
-        public async Task<EventCar?> GetTemp() { EventCar obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
+        public async Task<EventCar?> GetTemp() { EventCar obj = new(); await ValidateUniqProps(obj); return obj; }
     }
 }

@@ -15,17 +15,6 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
-            Season? season = null;
-            if (obj.Season is not null) { season = iSeasonContext.GetById(obj.SeasonId).Result; };
-            if (season is null)
-            {
-                List<Season> list = iSeasonContext.GetAll().Result;
-                if (list.Count == 0) { obj = null; return false; }
-                else { obj.Season = list[0]; obj.SeasonId = list[0].Id; isValid = false; }
-            }
-            else { obj.Season = season; }
-            obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
-            if (obj.Name == string.Empty) { obj.Name = Event.DefaultName; isValid = false; }
             if (obj.Date > GlobalValues.DateTimeMaxValue) { obj.Date = GlobalValues.DateTimeMaxValue; isValid = false; }
             else if (obj.Date < GlobalValues.DateTimeMinValue) { obj.Date = GlobalValues.DateTimeMinValue; isValid = false; }
             Track? track = null;
@@ -44,10 +33,22 @@ namespace GTRC_Database_API.Services
             return isValid;
         }
 
-        public async Task<bool> SetNextAvailable(Event? obj)
+        public async Task<bool> ValidateUniqProps(Event? obj)
         {
-            bool isAvailable = true;
+            bool isValidUniqProps = true;
             if (obj is null) { return false; }
+
+            Season? season = null;
+            if (obj.Season is not null) { season = iSeasonContext.GetById(obj.SeasonId).Result; };
+            if (season is null)
+            {
+                List<Season> list = iSeasonContext.GetAll().Result;
+                if (list.Count == 0) { obj = null; return false; }
+                else { obj.Season = list[0]; obj.SeasonId = list[0].Id; isValidUniqProps = false; }
+            }
+            else { obj.Season = season; }
+            obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
+            if (obj.Name == string.Empty) { obj.Name = Event.DefaultName; isValidUniqProps = false; }
 
             int nr = 1;
             string delimiter = " #";
@@ -56,7 +57,7 @@ namespace GTRC_Database_API.Services
             if (defNameList.Length > 1 && int.TryParse(defNameList[^1], out _)) { defName = defName[..^(defNameList[^1].Length + delimiter.Length)]; }
             while (!await IsUnique(obj, 0))
             {
-                isAvailable = false;
+                isValidUniqProps = false;
                 obj.Name = defName + delimiter + nr.ToString();
                 nr++;
                 if (nr == int.MaxValue)
@@ -85,7 +86,7 @@ namespace GTRC_Database_API.Services
             DateTime startDate = obj.Date;
             while (!await IsUnique(obj, 1))
             {
-                isAvailable = false;
+                isValidUniqProps = false;
                 if (obj.Date < GlobalValues.DateTimeMaxValue.AddDays(-1)) { obj.Date = obj.Date.AddDays(1); } else { obj.Date = GlobalValues.DateTimeMinValue; }
                 if (obj.Date == startDate)
                 {
@@ -110,10 +111,11 @@ namespace GTRC_Database_API.Services
                 }
             }
 
-            return isAvailable;
+            Validate(obj);
+            return isValidUniqProps;
         }
 
-        public async Task<Event?> GetTemp() { Event obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
+        public async Task<Event?> GetTemp() { Event obj = new(); await ValidateUniqProps(obj); return obj; }
 
         public async Task<int?> GetNr(int id)
         {

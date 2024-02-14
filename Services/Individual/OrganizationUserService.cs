@@ -13,25 +13,7 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
-            Organization? organization = null;
-            if (obj.Organization is not null) { organization = iOrganizationContext.GetById(obj.OrganizationId).Result; };
-            if (organization is null)
-            {
-                List<Organization> list = iOrganizationContext.GetAll().Result;
-                if (list.Count == 0) { obj = null; return false; }
-                else { obj.Organization = list[0]; obj.OrganizationId = list[0].Id; isValid = false; }
-            }
-            else { obj.Organization = organization; }
-            User? user = null;
-            if (obj.User is not null) { user = iUserContext.GetById(obj.UserId).Result; };
-            if (user is null)
-            {
-                List<User> list = iUserContext.GetAll().Result;
-                if (list.Count == 0) { obj = null; return false; }
-                else { obj.User = list[0]; obj.UserId = list[0].Id; isValid = false; }
-            }
-            else { obj.User = user; }
-            if (obj.IsInvited) { obj.IsAdmin = false; }
+            if (obj.IsInvited) { obj.IsAdmin = false; isValid = false; }
             List<OrganizationUser> listOrganizationUsers = GetAdmins(obj.Organization.Id);
             if (listOrganizationUsers.Count == 0 || (listOrganizationUsers.Count == 1 && listOrganizationUsers[0].UserId == obj.UserId))
             {
@@ -41,10 +23,29 @@ namespace GTRC_Database_API.Services
             return isValid;
         }
 
-        public async Task<bool> SetNextAvailable(OrganizationUser? obj)
+        public async Task<bool> ValidateUniqProps(OrganizationUser? obj)
         {
-            bool isAvailable = true;
+            bool isValidUniqProps = true;
             if (obj is null) { return false; }
+
+            Organization? organization = null;
+            if (obj.Organization is not null) { organization = iOrganizationContext.GetById(obj.OrganizationId).Result; };
+            if (organization is null)
+            {
+                List<Organization> list = iOrganizationContext.GetAll().Result;
+                if (list.Count == 0) { obj = null; return false; }
+                else { obj.Organization = list[0]; obj.OrganizationId = list[0].Id; isValidUniqProps = false; }
+            }
+            else { obj.Organization = organization; }
+            User? user = null;
+            if (obj.User is not null) { user = iUserContext.GetById(obj.UserId).Result; };
+            if (user is null)
+            {
+                List<User> list = iUserContext.GetAll().Result;
+                if (list.Count == 0) { obj = null; return false; }
+                else { obj.User = list[0]; obj.UserId = list[0].Id; isValidUniqProps = false; }
+            }
+            else { obj.User = user; }
 
             int startIndexUser = 0;
             List<int> idListUser = [];
@@ -58,7 +59,7 @@ namespace GTRC_Database_API.Services
 
             while (!await IsUnique(obj))
             {
-                isAvailable = false;
+                isValidUniqProps = false;
                 if (indexUser < idListUser.Count - 1)
                 {
                     indexUser++;
@@ -89,10 +90,11 @@ namespace GTRC_Database_API.Services
                 }
             }
 
-            return isAvailable;
+            Validate(obj);
+            return isValidUniqProps;
         }
 
-        public async Task<OrganizationUser?> GetTemp() { OrganizationUser obj = new(); Validate(obj); await SetNextAvailable(obj); return obj; }
+        public async Task<OrganizationUser?> GetTemp() { OrganizationUser obj = new(); await ValidateUniqProps(obj); return obj; }
 
         public List<OrganizationUser> GetAdmins(int organizationId) { return iOrganizationUserContext.GetAdmins(organizationId); }
 

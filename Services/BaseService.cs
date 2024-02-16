@@ -168,7 +168,7 @@ namespace GTRC_Database_API.Services
 
         public async Task Update(ModelType obj) { await iBaseContext.Update(obj); }
 
-        public async Task<List<ModelType>> GetChildObjects(Type modelType, int id, bool ignoreCompositeKeys)
+        public async Task<List<ModelType>> GetChildObjects(Type modelType, int id, bool ignoreCompositeKeys = false)
         {
             PropertyInfo? property = GlobalValues.DictDtoModels[typeof(ModelType)][DtoType.Add].GetProperty(modelType.Name + GlobalValues.Id);
             if (property is not null && (!ignoreCompositeKeys || !typeof(ModelType).Name.Contains(modelType.Name)))

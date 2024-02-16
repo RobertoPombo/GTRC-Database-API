@@ -92,5 +92,21 @@ namespace GTRC_Database_API.Controllers
             if (obj is null) { return NotFound(new List<string>()); }
             else { return Ok(service.GetName3DigitsOptions(obj)); }
         }
+
+        [HttpGet("Get/ByEntry/{entryId}")] public async Task<ActionResult<List<User>>> GetByEntry(int entryId)
+        {
+            Entry? entry = await fullService.Services[typeof(Entry)].GetById(entryId);
+            if (entry is null) { return NotFound(new List<User>()); }
+            else { return Ok(await service.GetByEntry(entry)); }
+        }
+
+        [HttpGet("Get/ByEntryEvent/{entryId}/{eventId}")] public async Task<ActionResult<List<User>>> GetByEntryEvent(int entryId, int eventId)
+        {
+            Entry? entry = await fullService.Services[typeof(Entry)].GetById(entryId);
+            if (entry is null) { return NotFound(new List<User>()); }
+            Event? _event = await fullService.Services[typeof(Event)].GetById(eventId);
+            if (_event is null) { return NotFound(new List<User>()); }
+            else { return Ok(await service.GetByEntryEvent(entry, _event)); }
+        }
     }
 }

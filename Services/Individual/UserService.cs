@@ -1,10 +1,13 @@
 ﻿using GTRC_Basics;
 using GTRC_Basics.Models;
+using GTRC_Basics.Models.DTOs;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
     public class UserService(IUserContext iUserContext,
+        BaseService<Event> eventService,
+        BaseService<EntryUserEvent> entryUserEventService,
         IBaseContext<User> iBaseContext) : BaseService<User>(iBaseContext)
     {
         public bool Validate(User? obj)
@@ -172,6 +175,33 @@ namespace GTRC_Database_API.Services
             List<string> nameList = [];
             foreach (string _name in name.Split(' ')) { if (_name.Length > 0) { nameList.Add(_name); } }
             return nameList;
+        }
+
+        public async Task<List<User>> GetByEntry(Entry entry)
+        {
+            List<User> listUsers = [];
+            List<Event> listEvents = await eventService.GetChildObjects(typeof(Season), entry.SeasonId);
+            foreach (Event _event in listEvents)
+            {
+                List<User> listUsersTemp = await GetByEntryEvent(entry, _event);
+                foreach (User user in listUsersTemp) { if (!listUsers.Contains(user)) listUsers.Add(user); }
+            }
+            return listUsers;
+        }
+
+        public async Task<List<User>> GetByEntryEvent(Entry entry, Event _event)
+        {
+            List<User> listUsers = [];
+            AddDto<EntryUserEvent> addDto = new();
+            addDto.Dto.EntryId = entry.Id;
+            addDto.Dto.EventId = _event.Id;
+            List<EntryUserEvent> list = await entryUserEventService.GetByProps(addDto);
+            foreach (EntryUserEvent obj in list)
+            {
+                User? user = await GetById(obj.UserId);
+                if (user is not null) { listUsers.Add(user); }
+            }
+            return listUsers;
         }
     }
 }

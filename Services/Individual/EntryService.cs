@@ -40,8 +40,8 @@ namespace GTRC_Database_API.Services
             else { obj.Car = car; }
             if (obj.RegisterDate > DateTime.UtcNow || obj.RegisterDate < GlobalValues.DateTimeMinValue) { obj.RegisterDate = DateTime.UtcNow; isValid = false; }
             if (obj.SignOutDate > GlobalValues.DateTimeMaxValue || obj.SignOutDate < obj.RegisterDate) { obj.SignOutDate = GlobalValues.DateTimeMaxValue; isValid = false; }
-            if (obj.PreferedRaceNumber > Entry.MaxRaceNumber) { obj.PreferedRaceNumber = Entry.MaxRaceNumber; isValid = false; }
-            else if (obj.PreferedRaceNumber < Entry.MinRaceNumber) { obj.PreferedRaceNumber = Entry.MinRaceNumber; isValid = false; }
+            if (obj.RaceNumberPreference > Entry.MaxRaceNumber) { obj.RaceNumberPreference = Entry.MaxRaceNumber; isValid = false; }
+            else if (obj.RaceNumberPreference < Entry.MinRaceNumber) { obj.RaceNumberPreference = Entry.MinRaceNumber; isValid = false; }
 
             return isValid;
         }
@@ -103,7 +103,7 @@ namespace GTRC_Database_API.Services
             List<Entry> listEntries = await GetChildObjects(typeof(Season), seasonId);
             foreach (Entry entry in listEntries)
             {
-                if (entry.RaceNumber != entry.PreferedRaceNumber) { list.Add(entry); }
+                if (entry.RaceNumber != entry.RaceNumberPreference) { list.Add(entry); }
             }
             return list;
         }
@@ -128,11 +128,11 @@ namespace GTRC_Database_API.Services
             {
                 UniqPropsDto<Entry> uniqPropsDto = new();
                 uniqPropsDto.Dto.SeasonId = seasonId;
-                uniqPropsDto.Dto.RaceNumber = entry.PreferedRaceNumber;
+                uniqPropsDto.Dto.RaceNumber = entry.RaceNumberPreference;
                 Entry? entryRival = await GetByUniqProps(uniqPropsDto);
                 if (entryRival is null)
                 {
-                    entry.RaceNumber = entry.PreferedRaceNumber;
+                    entry.RaceNumber = entry.RaceNumberPreference;
                     await Update(entry);
                     for (int index = 0; index < updatedEntries.Count; index++) { if (updatedEntries[index].Id == entry.Id) { updatedEntries.RemoveAt(index); break; } }
                     updatedEntries.Add(entry);
@@ -146,7 +146,7 @@ namespace GTRC_Database_API.Services
                     foreach (Season previousSeason in seasons)
                     {
                         uniqPropsDto.Dto.SeasonId = previousSeason.Id;
-                        uniqPropsDto.Dto.RaceNumber = entry.PreferedRaceNumber;
+                        uniqPropsDto.Dto.RaceNumber = entry.RaceNumberPreference;
                         Entry? previousEntry = await GetByUniqProps(uniqPropsDto);
                         if (previousEntry is not null)
                         {
@@ -186,7 +186,7 @@ namespace GTRC_Database_API.Services
                     }
                     if (grantRaceNumber[0])
                     {
-                        entry.RaceNumber = entry.PreferedRaceNumber;
+                        entry.RaceNumber = entry.RaceNumberPreference;
                         await Update(entry);
                         for (int index =  0; index < updatedEntries.Count; index++) { if (updatedEntries[index].Id == entry.Id) { updatedEntries.RemoveAt(index); break; } }
                         updatedEntries.Add(entry);

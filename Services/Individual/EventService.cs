@@ -131,13 +131,10 @@ namespace GTRC_Database_API.Services
             }
         }
 
-        public async Task<Event?> GetNext(int seasonId, DateTime? date = null)
+        public async Task<Event?> GetNext(int seasonId, DateTime date)
         {
-            date ??= DateTime.UtcNow;
             Event? next = null;
-            AddDto<Event> objDto = new();
-            objDto.Dto.SeasonId = seasonId;
-            List<Event> list = Scripts.SortByDate(await GetByProps(objDto));
+            List<Event> list = Scripts.SortByDate(await GetChildObjects(typeof(Season), seasonId));
             foreach (Event obj in list) { next = obj; if (obj.Date > date) { return next; } }
             return next;
         }

@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 
-using GTRC_Basics;
 using GTRC_Database_API.Data;
 using GTRC_Database_API.Services;
 using GTRC_Database_API.Services.Interfaces;
 using GTRC_Database_API.EfcContext;
+using GTRC_Basics.Configs;
 
 
 

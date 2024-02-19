@@ -77,5 +77,24 @@ namespace GTRC_Database_API.Controllers
                 }
             }
         }
+
+        [HttpPut("Get/ByUniqProps/0/Any")] public async Task<ActionResult<EntryDatetime?>> GetAnyByUniqProps(EntryDatetimeUniqPropsDto0 objDto)
+        {
+            EntryDatetimeAddDto _objDtoDto = Scripts.Map(objDto, new EntryDatetimeAddDto());
+            _objDtoDto.Date = null;
+            AddDto<EntryDatetime> _objDto = new() { Dto = _objDtoDto };
+            List<EntryDatetime> list = Scripts.SortByDate(await service.GetByProps(_objDto));
+            if (list.Count == 0)
+            {
+                Entry entry = await fullService.Services[typeof(Entry)].GetById(objDto.EntryId);
+                if (entry is null) { return NotFound(entry); }
+                else { return Ok(new EntryDatetime() { EntryId = entry.Id, Date = entry.RegisterDate, CarId = entry.CarId }); }
+            }
+            else
+            {
+                for (int index = 0; index < list.Count - 1; index++) { if (list[index + 1].Date > objDto.Date) { return Ok(list[index]); } }
+                return Ok(list[^1]);
+            }
+        }
     }
 }

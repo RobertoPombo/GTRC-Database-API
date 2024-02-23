@@ -14,6 +14,7 @@ namespace GTRC_Database_API.Services
 
             obj.AccTrackId = Scripts.RemoveSpaceStartEnd(obj.AccTrackId).Replace(" ", "_");
             if (obj.AccTrackId == string.Empty) { obj.AccTrackId = Track.DefaultAccTrackId; isValid = false; }
+            obj.NameLfm = Scripts.RemoveSpaceStartEnd(obj.NameLfm);
             obj.NameGoogleSheets = Scripts.RemoveSpaceStartEnd(obj.NameGoogleSheets);
 
             return isValid;

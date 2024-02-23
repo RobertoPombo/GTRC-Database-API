@@ -35,6 +35,7 @@ namespace GTRC_Database_API.Services
             else { obj.Carclass = carclass; }
             if (obj.WidthMm < Car.MinWidthMm) { obj.WidthMm = Car.MinWidthMm; isValid = false; }
             if (obj.LengthMm < Car.MinLengthMm) { obj.LengthMm = Car.MinLengthMm; isValid = false; }
+            obj.NameLfm = Scripts.RemoveSpaceStartEnd(obj.NameLfm);
             obj.NameGoogleSheets = Scripts.RemoveSpaceStartEnd(obj.NameGoogleSheets);
 
             return isValid;

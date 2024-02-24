@@ -35,8 +35,6 @@ namespace GTRC_Database_API.Services
             else { obj.Carclass = carclass; }
             if (obj.WidthMm < Car.MinWidthMm) { obj.WidthMm = Car.MinWidthMm; isValid = false; }
             if (obj.LengthMm < Car.MinLengthMm) { obj.LengthMm = Car.MinLengthMm; isValid = false; }
-            obj.NameLfm = Scripts.RemoveSpaceStartEnd(obj.NameLfm);
-            obj.NameGoogleSheets = Scripts.RemoveSpaceStartEnd(obj.NameGoogleSheets);
 
             return isValid;
         }
@@ -48,6 +46,8 @@ namespace GTRC_Database_API.Services
 
             obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
             if (obj.Name == string.Empty) { obj.Name = Car.DefaultName; isValidUniqProps = false; }
+            obj.NameLfm = Scripts.RemoveSpaceStartEnd(obj.NameLfm);
+            obj.NameGoogleSheets = Scripts.RemoveSpaceStartEnd(obj.NameGoogleSheets);
 
             int nr = 1;
             string delimiter = " #";
@@ -68,6 +68,32 @@ namespace GTRC_Database_API.Services
                 isValidUniqProps = false;
                 if (obj.AccCarId < uint.MaxValue) { obj.AccCarId += 1; } else { obj.AccCarId = uint.MinValue; }
                 if (obj.AccCarId == startValue) { obj = null; return false; }
+            }
+
+            nr = 1;
+            delimiter = " #";
+            defName = obj.NameLfm;
+            defNameList = defName.Split(delimiter);
+            if (defNameList.Length > 1 && int.TryParse(defNameList[^1], out _)) { defName = defName[..^(defNameList[^1].Length + delimiter.Length)]; }
+            while (!await IsUnique(obj, 2) && obj.NameLfm != string.Empty)
+            {
+                isValidUniqProps = false;
+                obj.NameLfm = defName + delimiter + nr.ToString();
+                nr++;
+                if (nr == int.MaxValue) { obj.NameLfm = string.Empty; }
+            }
+
+            nr = 1;
+            delimiter = " #";
+            defName = obj.NameGoogleSheets;
+            defNameList = defName.Split(delimiter);
+            if (defNameList.Length > 1 && int.TryParse(defNameList[^1], out _)) { defName = defName[..^(defNameList[^1].Length + delimiter.Length)]; }
+            while (!await IsUnique(obj, 3) && obj.NameGoogleSheets != string.Empty)
+            {
+                isValidUniqProps = false;
+                obj.NameGoogleSheets = defName + delimiter + nr.ToString();
+                nr++;
+                if (nr == int.MaxValue) { obj.NameGoogleSheets = string.Empty; }
             }
 
             Validate(obj);

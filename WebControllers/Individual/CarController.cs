@@ -3,7 +3,6 @@
 using GTRC_Basics.Models;
 using GTRC_Database_API.Services;
 using GTRC_Basics.Models.DTOs;
-using GTRC_Basics;
 
 namespace GTRC_Database_API.Controllers
 {
@@ -22,6 +21,22 @@ namespace GTRC_Database_API.Controllers
         [HttpPut("Get/ByUniqProps/1")] public async Task<ActionResult<Car?>> GetByUniqProps(CarUniqPropsDto1 objDto)
         {
             UniqPropsDto<Car> _objDto = new() { Index = 1, Dto = objDto };
+            Car? obj = await service.GetByUniqProps(_objDto);
+            if (obj is null) { return NotFound(obj); }
+            else { return Ok(obj); }
+        }
+
+        [HttpPut("Get/ByUniqProps/2")] public async Task<ActionResult<Car?>> GetByUniqProps(CarUniqPropsDto2 objDto)
+        {
+            UniqPropsDto<Car> _objDto = new() { Index = 2, Dto = objDto };
+            Car? obj = await service.GetByUniqProps(_objDto);
+            if (obj is null) { return NotFound(obj); }
+            else { return Ok(obj); }
+        }
+
+        [HttpPut("Get/ByUniqProps/3")] public async Task<ActionResult<Car?>> GetByUniqProps(CarUniqPropsDto3 objDto)
+        {
+            UniqPropsDto<Car> _objDto = new() { Index = 3, Dto = objDto };
             Car? obj = await service.GetByUniqProps(_objDto);
             if (obj is null) { return NotFound(obj); }
             else { return Ok(obj); }

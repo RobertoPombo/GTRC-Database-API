@@ -84,11 +84,17 @@ namespace GTRC_Database_API.Controllers
             _objDtoDto.Date = null;
             AddDto<EntryDatetime> _objDto = new() { Dto = _objDtoDto };
             List<EntryDatetime> list = Scripts.SortByDate(await service.GetByProps(_objDto));
-            if (list.Count == 0)
+            if (list.Count == 0 || list[0].Date > objDto.Date)
             {
                 Entry entry = await fullService.Services[typeof(Entry)].GetById(objDto.EntryId);
-                if (entry is null) { return NotFound(entry); }
-                else { return Ok(new EntryDatetime() { EntryId = entry.Id, Date = entry.RegisterDate, CarId = entry.CarId }); }
+                if (entry is null) { return NotFound(null); }
+                else
+                {
+                    EntryDatetime newObj = new() { EntryId = entry.Id, Date = entry.RegisterDate, CarId = entry.CarId };
+                    await service.ValidateUniqProps(newObj);
+                    if (newObj is not null) { return Ok(newObj); }
+                    else { return StatusCode(406, newObj); }
+                }
             }
             else
             {

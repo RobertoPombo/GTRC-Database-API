@@ -77,5 +77,12 @@ namespace GTRC_Database_API.Controllers
                 }
             }
         }
+
+        [HttpGet("Get/ByUser/{userId}")] public async Task<ActionResult<List<Role>>> GetByUser(int userId)
+        {
+            User? user = await fullService.Services[typeof(User)].GetById(userId);
+            if (user is null) { return NotFound(new List<Role>()); }
+            else { return Ok(await service.GetByUser(user)); }
+        }
     }
 }

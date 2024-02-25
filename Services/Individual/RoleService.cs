@@ -5,6 +5,7 @@ using GTRC_Database_API.Services.Interfaces;
 namespace GTRC_Database_API.Services
 {
     public class RoleService(IRoleContext iRoleContext,
+        BaseService<UserRole> userRoleService,
         IBaseContext<Role> iBaseContext) : BaseService<Role>(iBaseContext)
     {
         public bool Validate(Role? obj)
@@ -43,5 +44,13 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<Role?> GetTemp() { Role obj = new(); await ValidateUniqProps(obj); return obj; }
+
+        public async Task<List<Role>> GetByUser(User user)
+        {
+            List<Role> roles = [];
+            List<UserRole> userRoles = await userRoleService.GetChildObjects(typeof(User), user.Id);
+            foreach (UserRole userRole in userRoles) { roles.Add(userRole.Role); }
+            return roles;
+        }
     }
 }

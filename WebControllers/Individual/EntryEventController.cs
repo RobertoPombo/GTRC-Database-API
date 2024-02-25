@@ -77,5 +77,33 @@ namespace GTRC_Database_API.Controllers
                 }
             }
         }
+
+        [HttpPut("Get/ByUniqProps/0/Any")] public async Task<ActionResult<EntryEvent?>> GetAnyByUniqProps(EntryEventUniqPropsDto0 objDto)
+        {
+            UniqPropsDto<EntryEvent> uniqDto = new() { Dto = objDto };
+            EntryEvent? obj = await service.GetByUniqProps(uniqDto);
+            if (obj is not null) { return Ok(obj); }
+            else 
+            {
+                Entry entry = await fullService.Services[typeof(Entry)].GetById(objDto.EntryId);
+                Event _event = await fullService.Services[typeof(Event)].GetById(objDto.EventId);
+                if (entry is null || _event is null) { return NotFound(null); }
+                else
+                {
+                    DateTime signInDate = GlobalValues.DateTimeMaxValue;
+                    if (EntryFullDto.GetRegisterState(entry) && entry.IsPermanent) { signInDate = GlobalValues.DateTimeMinValue; }
+                    EntryEvent newObj = new()
+                    {
+                        EntryId = entry.Id,
+                        EventId = _event.Id,
+                        SignInDate = signInDate,
+                        IsPointScorer = entry.IsPointScorer
+                    };
+                    await service.ValidateUniqProps(newObj);
+                    if (newObj is not null) { return Ok(newObj); }
+                    else { return StatusCode(406, newObj); }
+                }
+            }
+        }
     }
 }

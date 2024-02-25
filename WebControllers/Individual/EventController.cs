@@ -3,7 +3,6 @@
 using GTRC_Basics.Models;
 using GTRC_Database_API.Services;
 using GTRC_Basics.Models.DTOs;
-using GTRC_Basics;
 
 namespace GTRC_Database_API.Controllers
 {
@@ -98,6 +97,20 @@ namespace GTRC_Database_API.Controllers
             Event? obj = await service.GetNext(seasonId, date);
             if (obj is null) { return NotFound(obj); }
             else { return Ok(obj); }
+        }
+
+        [HttpGet("Get/First/{seasonId}")] public async Task<ActionResult<Event?>> GetFirst(int seasonId)
+        {
+            Event? _event = await service.GetFirst(seasonId, false);
+            if (_event is null) { return NotFound(null); }
+            else { return Ok(_event); }
+        }
+
+        [HttpGet("Get/Final/{seasonId}")] public async Task<ActionResult<Event?>> GetFinal(int seasonId)
+        {
+            Event? _event = await service.GetFirst(seasonId, true);
+            if (_event is null) { return NotFound(null); }
+            else { return Ok(_event); }
         }
     }
 }

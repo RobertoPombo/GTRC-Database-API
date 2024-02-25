@@ -138,5 +138,16 @@ namespace GTRC_Database_API.Services
             foreach (Event obj in list) { next = obj; if (obj.Date > date) { return next; } }
             return next;
         }
+
+        public async Task<Event?> GetFirst(int seasonId, bool isGetFinal = false)
+        {
+            Event? _event = null;
+            List<Event> events = await GetChildObjects(typeof(Season), seasonId);
+            foreach (Event _eventCandidate in events)
+            {
+                if (_event is null || (!isGetFinal && _event.Date > _eventCandidate.Date) || (isGetFinal && _event.Date < _eventCandidate.Date)) { _event = _eventCandidate; }
+            }
+            return _event;
+        }
     }
 }

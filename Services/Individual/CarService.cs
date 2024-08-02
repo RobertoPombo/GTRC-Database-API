@@ -1,5 +1,6 @@
 ﻿using GTRC_Basics;
 using GTRC_Basics.Models;
+
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
@@ -44,6 +45,15 @@ namespace GTRC_Database_API.Services
             bool isValidUniqProps = true;
             if (obj is null) { return false; }
 
+            Carclass? carclass = null;
+            if (obj.Carclass is not null) { carclass = iCarclassContext.GetById(obj.CarclassId).Result; };
+            if (carclass is null)
+            {
+                List<Carclass> list = iCarclassContext.GetAll().Result;
+                if (list.Count == 0) { obj = null; return false; }
+                else { obj.Carclass = list[0]; obj.CarclassId = list[0].Id; isValidUniqProps = false; }
+            }
+            else { obj.Carclass = carclass; }
             obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
             if (obj.Name == string.Empty) { obj.Name = Car.DefaultName; isValidUniqProps = false; }
             obj.NameLfm = Scripts.RemoveSpaceStartEnd(obj.NameLfm);
@@ -80,7 +90,27 @@ namespace GTRC_Database_API.Services
                 isValidUniqProps = false;
                 obj.NameLfm = defName + delimiter + nr.ToString();
                 nr++;
-                if (nr == int.MaxValue) { obj.NameLfm = string.Empty; }
+                if (nr == int.MaxValue)
+                {
+                    int startIndexCarclass = 0;
+                    List<int> idListCarclass = [];
+                    List<Carclass> listCarclass = iCarclassContext.GetAll().Result;
+                    for (int index = 0; index < listCarclass.Count; index++)
+                    {
+                        idListCarclass.Add(listCarclass[index].Id);
+                        if (listCarclass[index].Id == obj.CarclassId) { startIndexCarclass = index; }
+                    }
+                    int indexSeason = startIndexCarclass;
+
+                    if (indexSeason < idListCarclass.Count - 1)
+                    {
+                        indexSeason++;
+                        obj.Carclass = listCarclass[indexSeason];
+                        obj.CarclassId = listCarclass[indexSeason].Id;
+                    }
+                    else { indexSeason = 0; }
+                    if (indexSeason == startIndexCarclass) { obj.NameLfm = string.Empty; }
+                }
             }
 
             nr = 1;

@@ -5,7 +5,7 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.EfcContext
 {
-    public class ResultsFileContext(DataContext db) : IResultsFileContext
+    public class ResultsfileContext(DataContext db) : IResultsfileContext
     {
 
     }

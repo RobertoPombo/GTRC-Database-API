@@ -20,7 +20,7 @@ namespace GTRC_Database_API.Services
             if (obj.MaxEntriesPerTeam < obj.MinEntriesPerTeam) { obj.MaxEntriesPerTeam = obj.MinEntriesPerTeam; isValid = false; }
             if (obj.DateStartRegistration < GlobalValues.DateTimeMinValue) { obj.DateStartRegistration = GlobalValues.DateTimeMinValue; isValid = false; }
             if (obj.DateEndRegistration < obj.DateStartRegistration) { obj.DateEndRegistration = obj.DateStartRegistration; isValid = false; }
-            if (obj.DateStartCarRegristrationLimit < GlobalValues.DateTimeMinValue) { obj.DateStartCarRegristrationLimit = GlobalValues.DateTimeMinValue; isValid = false; }
+            if (obj.DateStartCarRegistrationLimit < GlobalValues.DateTimeMinValue) { obj.DateStartCarRegistrationLimit = GlobalValues.DateTimeMinValue; isValid = false; }
             if (obj.DateStartCarChangeLimit < GlobalValues.DateTimeMinValue) { obj.DateStartCarChangeLimit = GlobalValues.DateTimeMinValue; isValid = false; }
             Bop? bop = null;
             if (obj.Bop is not null) { bop = iBopContext.GetById(obj.BopId).Result; };

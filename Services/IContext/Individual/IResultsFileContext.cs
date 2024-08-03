@@ -1,6 +1,6 @@
 ﻿namespace GTRC_Database_API.Services.Interfaces
 {
-    public interface IResultsFileContext
+    public interface IResultsfileContext
     {
 
     }

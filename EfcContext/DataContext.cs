@@ -33,6 +33,13 @@ namespace GTRC_Database_API.Data
         public DbSet<EntryUserEvent> EntriesUsersEvents { get; set; }
         public DbSet<Pointssystem> Pointssystems { get; set; }
         public DbSet<PointssystemPosition> PointssystemsPositions { get; set; }
+        public DbSet<Server> Servers { get; set; }
+        public DbSet<Session> Session { get; set; }
+        public DbSet<Resultsfile> Resultsfile { get; set; }
+        public DbSet<Lap> Lap { get; set; }
+        public DbSet<Leaderboardline> Leaderboardline { get; set; }
+        public DbSet<Incident> Incident { get; set; }
+        public DbSet<IncidentEntry> IncidentEntry { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

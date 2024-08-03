@@ -35,7 +35,14 @@ namespace GTRC_Database_API.Services
         EntryEventService EntryEventService,
         EntryUserEventService EntryUserEventService,
         PointssystemService PointssystemService,
-        PointssystemPositionService PointssystemPositionService)
+        PointssystemPositionService PointssystemPositionService,
+        ServerService ServerService,
+        SessionService SessionService,
+        ResultsfileService ResultsfileService,
+        LapService LapService,
+        LeaderboardlineService LeaderboardlineService,
+        IncidentService IncidentService,
+        IncidentEntryService IncidentEntryService)
         {
             Services[typeof(Color)] = ColorService;
             Services[typeof(Sim)] = SimService;
@@ -64,6 +71,13 @@ namespace GTRC_Database_API.Services
             Services[typeof(EntryUserEvent)] = EntryUserEventService;
             Services[typeof(Pointssystem)] = PointssystemService;
             Services[typeof(PointssystemPosition)] = PointssystemPositionService;
+            Services[typeof(Server)] = ServerService;
+            Services[typeof(Session)] = SessionService;
+            Services[typeof(Resultsfile)] = ResultsfileService;
+            Services[typeof(Lap)] = LapService;
+            Services[typeof(Leaderboardline)] = LeaderboardlineService;
+            Services[typeof(Incident)] = IncidentService;
+            Services[typeof(IncidentEntry)] = IncidentEntryService;
         }
 
         public async Task ForceDelete(Type modelType, dynamic obj)

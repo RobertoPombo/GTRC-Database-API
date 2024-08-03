@@ -104,6 +104,27 @@ builder.Services.AddScoped<IPointssystemContext, PointssystemContext>();
 builder.Services.AddScoped<PointssystemPositionService>();
 builder.Services.AddScoped<IPointssystemPositionContext, PointssystemPositionContext>();
 
+builder.Services.AddScoped<ServerService>();
+builder.Services.AddScoped<IServerContext, ServerContext>();
+
+builder.Services.AddScoped<SessionService>();
+builder.Services.AddScoped<ISessionContext, SessionContext>();
+
+builder.Services.AddScoped<ResultsfileService>();
+builder.Services.AddScoped<IResultsfileContext, ResultsfileContext>();
+
+builder.Services.AddScoped<LapService>();
+builder.Services.AddScoped<ILapContext, LapContext>();
+
+builder.Services.AddScoped<LeaderboardlineService>();
+builder.Services.AddScoped<ILeaderboardlineContext, LeaderboardlineContext>();
+
+builder.Services.AddScoped<IncidentService>();
+builder.Services.AddScoped<IIncidentContext, IncidentContext>();
+
+builder.Services.AddScoped<IncidentEntryService>();
+builder.Services.AddScoped<IIncidentEntryContext, IncidentEntryContext>();
+
 /*
 
 builder.Services.AddScoped<Service>();

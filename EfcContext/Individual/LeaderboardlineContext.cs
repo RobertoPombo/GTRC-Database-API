@@ -5,7 +5,7 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.EfcContext
 {
-    public class LeaderboardLinePracticeContext(DataContext db) : ILeaderboardLinePracticeContext
+    public class LeaderboardlineContext(DataContext db) : ILeaderboardlineContext
     {
 
     }

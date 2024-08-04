@@ -5,7 +5,6 @@ using GTRC_Database_API.Services.Interfaces;
 namespace GTRC_Database_API.Services
 {
     public class StintAnalysisMethodService(IStintAnalysisMethodContext iStintAnalysisMethodContext,
-        IBaseContext<Resultsfile> iResultsfileContext,
         IBaseContext<StintAnalysisMethod> iBaseContext) : BaseService<StintAnalysisMethod>(iBaseContext)
     {
         public bool Validate(StintAnalysisMethod? obj)
@@ -13,6 +12,7 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
+            if (obj.MaxTimeDeltaPercent < StintAnalysisMethod.MinMaxTimeDeltaPercent) { obj.MaxTimeDeltaPercent = StintAnalysisMethod.MinMaxTimeDeltaPercent; isValid = false; }
             if (obj.MinLapsCount > obj.LapRange) { obj.MinLapsCount = obj.LapRange; isValid = false; }
             if (obj.MinLapsCount > obj.MaxLapsCount) { obj.MinLapsCount = obj.MaxLapsCount; isValid = false; }
 

@@ -55,6 +55,27 @@ namespace GTRC_Database_API.Services
             else { obj.Event = _event; }
 
             int seasonId = obj.Entry.SeasonId;
+
+            int startIndexEntry = 0;
+            List<int> idListEntry = [];
+            List<Entry> listEntry = IEntryContext.GetBySeason(seasonId);
+            for (int index = 0; index < listEntry.Count; index++)
+            {
+                idListEntry.Add(listEntry[index].Id);
+                if (listEntry[index].Id == obj.EntryId) { startIndexEntry = index; }
+            }
+            int indexEntry = startIndexEntry;
+
+            int startIndexUser = 0;
+            List<int> idListUser = [];
+            List<User> listUser = iUserContext.GetAll().Result;
+            for (int index = 0; index < listUser.Count; index++)
+            {
+                idListUser.Add(listUser[index].Id);
+                if (listUser[index].Id == obj.UserId) { startIndexUser = index; }
+            }
+            int indexUser = startIndexUser;
+
             int startIndexEvent = 0;
             List<int> idListEvent = [];
             List<Event> listEvent = IEventContext.GetBySeason(seasonId);
@@ -81,51 +102,22 @@ namespace GTRC_Database_API.Services
             while (!await IsUnique(obj))
             {
                 isValidUniqProps = false;
-                if (indexEvent < idListEvent.Count - 1)
-                {
-                    indexEvent++;
-                    obj.Event = listEvent[indexEvent];
-                    obj.EventId = listEvent[indexEvent].Id;
-                }
+                if (indexEvent < idListEvent.Count - 1) { indexEvent++; }
                 else { indexEvent = 0; }
+                obj.Event = listEvent[indexEvent];
+                obj.EventId = listEvent[indexEvent].Id;
                 if (indexEvent == startIndexEvent)
                 {
-                    int startIndexUser = 0;
-                    List<int> idListUser = [];
-                    List<User> listUser = iUserContext.GetAll().Result;
-                    for (int index = 0; index < listUser.Count; index++)
-                    {
-                        idListUser.Add(listUser[index].Id);
-                        if (listUser[index].Id == obj.UserId) { startIndexUser = index; }
-                    }
-                    int indexUser = startIndexUser;
-
-                    if (indexUser < idListUser.Count - 1)
-                    {
-                        indexUser++;
-                        obj.User = listUser[indexUser];
-                        obj.UserId = listUser[indexUser].Id;
-                    }
+                    if (indexUser < idListUser.Count - 1) { indexUser++; }
                     else { indexUser = 0; }
+                    obj.User = listUser[indexUser];
+                    obj.UserId = listUser[indexUser].Id;
                     if (indexUser == startIndexUser)
-                        {
-                        int startIndexEntry = 0;
-                        List<int> idListEntry = [];
-                        List<Entry> listEntry = IEntryContext.GetBySeason(seasonId);
-                        for (int index = 0; index < listEntry.Count; index++)
-                        {
-                            idListEntry.Add(listEntry[index].Id);
-                            if (listEntry[index].Id == obj.EntryId) { startIndexEntry = index; }
-                        }
-                        int indexEntry = startIndexEntry;
-
-                        if (indexEntry < idListEntry.Count - 1)
-                        {
-                            indexEntry++;
-                            obj.Entry = listEntry[indexEntry];
-                            obj.EntryId = listEntry[indexEntry].Id;
-                        }
+                    {
+                        if (indexEntry < idListEntry.Count - 1) { indexEntry++; }
                         else { indexEntry = 0; }
+                        obj.Entry = listEntry[indexEntry];
+                        obj.EntryId = listEntry[indexEntry].Id;
                         if (indexEntry == startIndexEntry) { obj = null; return false; }
                     }
                 }

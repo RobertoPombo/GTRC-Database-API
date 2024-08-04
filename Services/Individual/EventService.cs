@@ -15,8 +15,6 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
-            if (obj.Date > GlobalValues.DateTimeMaxValue) { obj.Date = GlobalValues.DateTimeMaxValue; isValid = false; }
-            else if (obj.Date < GlobalValues.DateTimeMinValue) { obj.Date = GlobalValues.DateTimeMinValue; isValid = false; }
             Track? track = null;
             if (obj.Track is not null) { track = iTrackContext.GetById(obj.TrackId).Result; };
             if (track is null)
@@ -49,6 +47,18 @@ namespace GTRC_Database_API.Services
             else { obj.Season = season; }
             obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
             if (obj.Name == string.Empty) { obj.Name = Event.DefaultName; isValidUniqProps = false; }
+            if (obj.Date > GlobalValues.DateTimeMaxValue) { obj.Date = GlobalValues.DateTimeMaxValue; isValidUniqProps = false; }
+            else if (obj.Date < GlobalValues.DateTimeMinValue) { obj.Date = GlobalValues.DateTimeMinValue; isValidUniqProps = false; }
+
+            int startIndexSeason = 0;
+            List<int> idListSeason = [];
+            List<Season> listSeason = iSeasonContext.GetAll().Result;
+            for (int index = 0; index < listSeason.Count; index++)
+            {
+                idListSeason.Add(listSeason[index].Id);
+                if (listSeason[index].Id == obj.SeasonId) { startIndexSeason = index; }
+            }
+            int indexSeason = startIndexSeason;
 
             int nr = 1;
             string delimiter = " #";
@@ -62,23 +72,10 @@ namespace GTRC_Database_API.Services
                 nr++;
                 if (nr == int.MaxValue)
                 {
-                    int startIndexSeason = 0;
-                    List<int> idListSeason = [];
-                    List<Season> listSeason = iSeasonContext.GetAll().Result;
-                    for (int index = 0; index < listSeason.Count; index++)
-                    {
-                        idListSeason.Add(listSeason[index].Id);
-                        if (listSeason[index].Id == obj.SeasonId) { startIndexSeason = index; }
-                    }
-                    int indexSeason = startIndexSeason;
-
-                    if (indexSeason < idListSeason.Count - 1)
-                    {
-                        indexSeason++;
-                        obj.Season = listSeason[indexSeason];
-                        obj.SeasonId = listSeason[indexSeason].Id;
-                    }
+                    if (indexSeason < idListSeason.Count - 1) { indexSeason++; }
                     else { indexSeason = 0; }
+                    obj.Season = listSeason[indexSeason];
+                    obj.SeasonId = listSeason[indexSeason].Id;
                     if (indexSeason == startIndexSeason) { obj = null; return false; }
                 }
             }
@@ -90,16 +87,6 @@ namespace GTRC_Database_API.Services
                 if (obj.Date < GlobalValues.DateTimeMaxValue.AddDays(-1)) { obj.Date = obj.Date.AddDays(1); } else { obj.Date = GlobalValues.DateTimeMinValue; }
                 if (obj.Date == startDate)
                 {
-                    int startIndexSeason = 0;
-                    List<int> idListSeason = [];
-                    List<Season> listSeason = iSeasonContext.GetAll().Result;
-                    for (int index = 0; index < listSeason.Count; index++)
-                    {
-                        idListSeason.Add(listSeason[index].Id);
-                        if (listSeason[index].Id == obj.SeasonId) { startIndexSeason = index; }
-                    }
-                    int indexSeason = startIndexSeason;
-
                     if (indexSeason < idListSeason.Count - 1)
                     {
                         indexSeason++;

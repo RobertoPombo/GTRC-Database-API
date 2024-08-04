@@ -10,6 +10,14 @@ namespace GTRC_Database_API.Controllers
     [Route(nameof(Session))]
     public class SessionController(SessionService service, BaseService<Session> baseService, FullService<Session> fullService) : BaseController<Session>(baseService, fullService)
     {
+        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Session?>> GetByUniqProps(SessionUniqPropsDto0 objDto)
+        {
+            UniqPropsDto<Session> _objDto = new() { Index = 0, Dto = objDto };
+            Session? obj = await service.GetByUniqProps(_objDto);
+            if (obj is null) { return NotFound(obj); }
+            else { return Ok(obj); }
+        }
+
         [HttpPut("Get/ByProps")] public async Task<ActionResult<List<Session>>> GetByProps(SessionAddDto objDto)
         {
             AddDto<Session> _objDto = new() { Dto = objDto };

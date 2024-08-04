@@ -12,8 +12,6 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
-            if (obj.PortUdp > Server.MaxPort) { obj.PortUdp = Server.MaxPort; isValid = false; }
-            if (obj.PortTcp > Server.MaxPort) { obj.PortTcp = Server.MaxPort; isValid = false; }
             Sim? sim = null;
             if (obj.Sim is not null) { sim = iSimContext.GetById(obj.SimId).Result; };
             if (sim is null)
@@ -31,6 +29,9 @@ namespace GTRC_Database_API.Services
         {
             bool isValidUniqProps = true;
             if (obj is null) { return false; }
+
+            if (obj.PortUdp > Server.MaxPort) { obj.PortUdp = Server.MaxPort; isValidUniqProps = false; }
+            if (obj.PortTcp > Server.MaxPort) { obj.PortTcp = Server.MaxPort; isValidUniqProps = false; }
 
             ushort startValuePortUdp = obj.PortUdp;
             while (!await IsUnique(obj, 0))

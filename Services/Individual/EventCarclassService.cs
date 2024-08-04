@@ -40,6 +40,16 @@ namespace GTRC_Database_API.Services
             }
             else { obj.Carclass = carclass; }
 
+            int startIndexEvent = 0;
+            List<int> idListEvent = [];
+            List<Event> listEvent = iEventContext.GetAll().Result;
+            for (int index = 0; index < listEvent.Count; index++)
+            {
+                idListEvent.Add(listEvent[index].Id);
+                if (listEvent[index].Id == obj.EventId) { startIndexEvent = index; }
+            }
+            int indexEvent = startIndexEvent;
+
             int startIndexCarclass = 0;
             List<int> idListCarclass = [];
             List<Carclass> listCarclass = iCarclassContext.GetAll().Result;
@@ -53,32 +63,16 @@ namespace GTRC_Database_API.Services
             while (!await IsUnique(obj))
             {
                 isValidUniqProps = false;
-                if (indexCarclass < idListCarclass.Count - 1)
-                {
-                    indexCarclass++;
-                    obj.Carclass = listCarclass[indexCarclass];
-                    obj.CarclassId = listCarclass[indexCarclass].Id;
-                }
+                if (indexCarclass < idListCarclass.Count - 1) { indexCarclass++; }
                 else { indexCarclass = 0; }
+                obj.Carclass = listCarclass[indexCarclass];
+                obj.CarclassId = listCarclass[indexCarclass].Id;
                 if (indexCarclass == startIndexCarclass)
                 {
-                    int startIndexEvent = 0;
-                    List<int> idListEvent = [];
-                    List<Event> listEvent = iEventContext.GetAll().Result;
-                    for (int index = 0; index < listEvent.Count; index++)
-                    {
-                        idListEvent.Add(listEvent[index].Id);
-                        if (listEvent[index].Id == obj.EventId) { startIndexEvent = index; }
-                    }
-                    int indexEvent = startIndexEvent;
-
-                    if (indexEvent < idListEvent.Count - 1)
-                    {
-                        indexEvent++;
-                        obj.Event = listEvent[indexEvent];
-                        obj.EventId = listEvent[indexEvent].Id;
-                    }
+                    if (indexEvent < idListEvent.Count - 1) { indexEvent++; }
                     else { indexEvent = 0; }
+                    obj.Event = listEvent[indexEvent];
+                    obj.EventId = listEvent[indexEvent].Id;
                     if (indexEvent == startIndexEvent) { obj = null; return false; }
                 }
             }

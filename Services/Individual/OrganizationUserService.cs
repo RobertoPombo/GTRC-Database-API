@@ -47,6 +47,16 @@ namespace GTRC_Database_API.Services
             }
             else { obj.User = user; }
 
+            int startIndexOrganization = 0;
+            List<int> idListOrganization = [];
+            List<Organization> listOrganization = iOrganizationContext.GetAll().Result;
+            for (int index = 0; index < listOrganization.Count; index++)
+            {
+                idListOrganization.Add(listOrganization[index].Id);
+                if (listOrganization[index].Id == obj.OrganizationId) { startIndexOrganization = index; }
+            }
+            int indexOrganization = startIndexOrganization;
+
             int startIndexUser = 0;
             List<int> idListUser = [];
             List<User> listUser = iUserContext.GetAll().Result;
@@ -60,32 +70,16 @@ namespace GTRC_Database_API.Services
             while (!await IsUnique(obj))
             {
                 isValidUniqProps = false;
-                if (indexUser < idListUser.Count - 1)
-                {
-                    indexUser++;
-                    obj.User = listUser[indexUser];
-                    obj.UserId = listUser[indexUser].Id;
-                }
+                if (indexUser < idListUser.Count - 1) { indexUser++; }
                 else { indexUser = 0; }
+                obj.User = listUser[indexUser];
+                obj.UserId = listUser[indexUser].Id;
                 if (indexUser == startIndexUser)
                 {
-                    int startIndexOrganization = 0;
-                    List<int> idListOrganization = [];
-                    List<Organization> listOrganization = iOrganizationContext.GetAll().Result;
-                    for (int index = 0; index < listOrganization.Count; index++)
-                    {
-                        idListOrganization.Add(listOrganization[index].Id);
-                        if (listOrganization[index].Id == obj.OrganizationId) { startIndexOrganization = index; }
-                    }
-                    int indexOrganization = startIndexOrganization;
-
-                    if (indexOrganization < idListOrganization.Count - 1)
-                    {
-                        indexOrganization++;
-                        obj.Organization = listOrganization[indexOrganization];
-                        obj.OrganizationId = listOrganization[indexOrganization].Id;
-                    }
+                    if (indexOrganization < idListOrganization.Count - 1) { indexOrganization++; }
                     else { indexOrganization = 0; }
+                    obj.Organization = listOrganization[indexOrganization];
+                    obj.OrganizationId = listOrganization[indexOrganization].Id;
                     if (indexOrganization == startIndexOrganization) { obj = null; return false; }
                 }
             }

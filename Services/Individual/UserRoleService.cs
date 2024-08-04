@@ -40,6 +40,16 @@ namespace GTRC_Database_API.Services
             }
             else { obj.Role = role; }
 
+            int startIndexUser = 0;
+            List<int> idListUser = [];
+            List<User> listUser = iUserContext.GetAll().Result;
+            for (int index = 0; index < listUser.Count; index++)
+            {
+                idListUser.Add(listUser[index].Id);
+                if (listUser[index].Id == obj.UserId) { startIndexUser = index; }
+            }
+            int indexUser = startIndexUser;
+
             int startIndexRole = 0;
             List<int> idListRole = [];
             List<Role> listRole = iRoleContext.GetAll().Result;
@@ -53,32 +63,16 @@ namespace GTRC_Database_API.Services
             while (!await IsUnique(obj))
             {
                 isValidUniqProps = false;
-                if (indexRole < idListRole.Count - 1)
-                {
-                    indexRole++;
-                    obj.Role = listRole[indexRole];
-                    obj.RoleId = listRole[indexRole].Id;
-                }
+                if (indexRole < idListRole.Count - 1) { indexRole++; }
                 else { indexRole = 0; }
+                obj.Role = listRole[indexRole];
+                obj.RoleId = listRole[indexRole].Id;
                 if (indexRole == startIndexRole)
                 {
-                    int startIndexUser = 0;
-                    List<int> idListUser = [];
-                    List<User> listUser = iUserContext.GetAll().Result;
-                    for (int index = 0; index < listUser.Count; index++)
-                    {
-                        idListUser.Add(listUser[index].Id);
-                        if (listUser[index].Id == obj.UserId) { startIndexUser = index; }
-                    }
-                    int indexUser = startIndexUser;
-
-                    if (indexUser < idListUser.Count - 1)
-                    {
-                        indexUser++;
-                        obj.User = listUser[indexUser];
-                        obj.UserId = listUser[indexUser].Id;
-                    }
+                    if (indexUser < idListUser.Count - 1) { indexUser++; }
                     else { indexUser = 0; }
+                    obj.User = listUser[indexUser];
+                    obj.UserId = listUser[indexUser].Id;
                     if (indexUser == startIndexUser) { obj = null; return false; }
                 }
             }

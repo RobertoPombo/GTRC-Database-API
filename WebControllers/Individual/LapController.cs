@@ -10,6 +10,14 @@ namespace GTRC_Database_API.Controllers
     [Route(nameof(Lap))]
     public class LapController(LapService service, BaseService<Lap> baseService, FullService<Lap> fullService) : BaseController<Lap>(baseService, fullService)
     {
+        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Lap?>> GetByUniqProps(LapUniqPropsDto0 objDto)
+        {
+            UniqPropsDto<Lap> _objDto = new() { Index = 0, Dto = objDto };
+            Lap? obj = await service.GetByUniqProps(_objDto);
+            if (obj is null) { return NotFound(obj); }
+            else { return Ok(obj); }
+        }
+
         [HttpPut("Get/ByProps")] public async Task<ActionResult<List<Lap>>> GetByProps(LapAddDto objDto)
         {
             AddDto<Lap> _objDto = new() { Dto = objDto };

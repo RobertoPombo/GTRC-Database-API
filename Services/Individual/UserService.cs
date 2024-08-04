@@ -183,18 +183,18 @@ namespace GTRC_Database_API.Services
             List<Event> listEvents = await eventService.GetChildObjects(typeof(Season), entry.SeasonId);
             foreach (Event _event in listEvents)
             {
-                List<User> listUsersTemp = await GetByEntryEvent(entry, _event);
+                List<User> listUsersTemp = await GetByEntryEvent(entry.Id, _event.Id);
                 foreach (User user in listUsersTemp) { if (!listUsers.Contains(user)) listUsers.Add(user); }
             }
             return listUsers;
         }
 
-        public async Task<List<User>> GetByEntryEvent(Entry entry, Event _event)
+        public async Task<List<User>> GetByEntryEvent(int entryId, int eventId)
         {
             List<User> listUsers = [];
             AddDto<EntryUserEvent> addDto = new();
-            addDto.Dto.EntryId = entry.Id;
-            addDto.Dto.EventId = _event.Id;
+            addDto.Dto.EntryId = entryId;
+            addDto.Dto.EventId = eventId;
             List<EntryUserEvent> list = await entryUserEventService.GetByProps(addDto);
             foreach (EntryUserEvent obj in list)
             {

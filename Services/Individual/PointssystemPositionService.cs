@@ -31,6 +31,16 @@ namespace GTRC_Database_API.Services
             else { obj.Pointssystem = pointssystem; }
             if (obj.Position < PointssystemPosition.MinPosition) { obj.Position = PointssystemPosition.MinPosition; isValidUniqProps = false; }
 
+            int startIndexPointssystem = 0;
+            List<int> idListPointssystem = [];
+            List<Pointssystem> listPointssystem = iPointssystemContext.GetAll().Result;
+            for (int index = 0; index < listPointssystem.Count; index++)
+            {
+                idListPointssystem.Add(listPointssystem[index].Id);
+                if (listPointssystem[index].Id == obj.PointssystemId) { startIndexPointssystem = index; }
+            }
+            int indexPointssystem = startIndexPointssystem;
+
             byte startPosition = obj.Position;
             while (!await IsUnique(obj))
             {
@@ -38,23 +48,10 @@ namespace GTRC_Database_API.Services
                 if (obj.Position < byte.MaxValue) { obj.Position += 1; } else { obj.Position = PointssystemPosition.MinPosition; }
                 if (obj.Position == startPosition)
                 {
-                    int startIndexPointssystem = 0;
-                    List<int> idListPointssystem = [];
-                    List<Pointssystem> listPointssystem = iPointssystemContext.GetAll().Result;
-                    for (int index = 0; index < listPointssystem.Count; index++)
-                    {
-                        idListPointssystem.Add(listPointssystem[index].Id);
-                        if (listPointssystem[index].Id == obj.PointssystemId) { startIndexPointssystem = index; }
-                    }
-                    int indexPointssystem = startIndexPointssystem;
-
-                    if (indexPointssystem < idListPointssystem.Count - 1)
-                    {
-                        indexPointssystem++;
-                        obj.Pointssystem = listPointssystem[indexPointssystem];
-                        obj.PointssystemId = listPointssystem[indexPointssystem].Id;
-                    }
+                    if (indexPointssystem < idListPointssystem.Count - 1) { indexPointssystem++; }
                     else { indexPointssystem = 0; }
+                    obj.Pointssystem = listPointssystem[indexPointssystem];
+                    obj.PointssystemId = listPointssystem[indexPointssystem].Id;
                     if (indexPointssystem == startIndexPointssystem) { obj = null; return false; }
                 }
             }

@@ -25,15 +25,6 @@ namespace GTRC_Database_API.Services
             }
             else { obj.Manufacturer = manufacturer; }
             obj.Model = Scripts.RemoveSpaceStartEnd(obj.Model);
-            Carclass? carclass = null;
-            if (obj.Carclass is not null) { carclass = iCarclassContext.GetById(obj.CarclassId).Result; };
-            if (carclass is null)
-            {
-                List<Carclass> list = iCarclassContext.GetAll().Result;
-                if (list.Count == 0) { obj = null; return false; }
-                else { obj.Carclass = list[0]; obj.CarclassId = list[0].Id; isValid = false; }
-            }
-            else { obj.Carclass = carclass; }
             if (obj.WidthMm < Car.MinWidthMm) { obj.WidthMm = Car.MinWidthMm; isValid = false; }
             if (obj.LengthMm < Car.MinLengthMm) { obj.LengthMm = Car.MinLengthMm; isValid = false; }
 
@@ -80,6 +71,16 @@ namespace GTRC_Database_API.Services
                 if (obj.AccCarId == startValue) { obj = null; return false; }
             }
 
+            int startIndexCarclass = 0;
+            List<int> idListCarclass = [];
+            List<Carclass> listCarclass = iCarclassContext.GetAll().Result;
+            for (int index = 0; index < listCarclass.Count; index++)
+            {
+                idListCarclass.Add(listCarclass[index].Id);
+                if (listCarclass[index].Id == obj.CarclassId) { startIndexCarclass = index; }
+            }
+            int indexSeason = startIndexCarclass;
+
             nr = 1;
             delimiter = " #";
             defName = obj.NameLfm;
@@ -92,23 +93,10 @@ namespace GTRC_Database_API.Services
                 nr++;
                 if (nr == int.MaxValue)
                 {
-                    int startIndexCarclass = 0;
-                    List<int> idListCarclass = [];
-                    List<Carclass> listCarclass = iCarclassContext.GetAll().Result;
-                    for (int index = 0; index < listCarclass.Count; index++)
-                    {
-                        idListCarclass.Add(listCarclass[index].Id);
-                        if (listCarclass[index].Id == obj.CarclassId) { startIndexCarclass = index; }
-                    }
-                    int indexSeason = startIndexCarclass;
-
-                    if (indexSeason < idListCarclass.Count - 1)
-                    {
-                        indexSeason++;
-                        obj.Carclass = listCarclass[indexSeason];
-                        obj.CarclassId = listCarclass[indexSeason].Id;
-                    }
+                    if (indexSeason < idListCarclass.Count - 1) { indexSeason++; }
                     else { indexSeason = 0; }
+                    obj.Carclass = listCarclass[indexSeason];
+                    obj.CarclassId = listCarclass[indexSeason].Id;
                     if (indexSeason == startIndexCarclass) { obj.NameLfm = string.Empty; }
                 }
             }

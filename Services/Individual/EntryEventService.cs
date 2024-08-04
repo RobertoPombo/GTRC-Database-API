@@ -75,35 +75,29 @@ namespace GTRC_Database_API.Services
                 }
             }
 
+            int startIndexEntry = 0;
+            List<int> idListEntry = [];
+            List<Entry> listEntry = IEntryContext.GetBySeason(seasonId);
+            for (int index = 0; index < listEntry.Count; index++)
+            {
+                idListEntry.Add(listEntry[index].Id);
+                if (listEntry[index].Id == obj.EntryId) { startIndexEntry = index; }
+            }
+            int indexEntry = startIndexEntry;
+
             while (!await IsUnique(obj))
             {
                 isValidUniqProps = false;
-                if (indexEvent < idListEvent.Count - 1)
-                {
-                    indexEvent++;
-                    obj.Event = listEvent[indexEvent];
-                    obj.EventId = listEvent[indexEvent].Id;
-                }
+                if (indexEvent < idListEvent.Count - 1) { indexEvent++; }
                 else { indexEvent = 0; }
+                obj.Event = listEvent[indexEvent];
+                obj.EventId = listEvent[indexEvent].Id;
                 if (indexEvent == startIndexEvent)
                 {
-                    int startIndexEntry = 0;
-                    List<int> idListEntry = [];
-                    List<Entry> listEntry = IEntryContext.GetBySeason(seasonId);
-                    for (int index = 0; index < listEntry.Count; index++)
-                    {
-                        idListEntry.Add(listEntry[index].Id);
-                        if (listEntry[index].Id == obj.EntryId) { startIndexEntry = index; }
-                    }
-                    int indexEntry = startIndexEntry;
-
-                    if (indexEntry < idListEntry.Count - 1)
-                    {
-                        indexEntry++;
-                        obj.Entry = listEntry[indexEntry];
-                        obj.EntryId = listEntry[indexEntry].Id;
-                    }
+                    if (indexEntry < idListEntry.Count - 1) { indexEntry++; }
                     else { indexEntry = 0; }
+                    obj.Entry = listEntry[indexEntry];
+                    obj.EntryId = listEntry[indexEntry].Id;
                     if (indexEntry == startIndexEntry) { obj = null; return false; }
                 }
             }

@@ -62,6 +62,16 @@ namespace GTRC_Database_API.Services
             if (obj.RaceNumber > Entry.MaxRaceNumber) { obj.RaceNumber = Entry.MaxRaceNumber; isValidUniqProps = false; }
             else if (obj.RaceNumber < Entry.MinRaceNumber) { obj.RaceNumber = Entry.MinRaceNumber; isValidUniqProps = false; }
 
+            int startIndexSeason = 0;
+            List<int> idListSeason = [];
+            List<Season> listSeason = iSeasonContext.GetAll().Result;
+            for (int index = 0; index < listSeason.Count; index++)
+            {
+                idListSeason.Add(listSeason[index].Id);
+                if (listSeason[index].Id == obj.SeasonId) { startIndexSeason = index; }
+            }
+            int indexSeason = startIndexSeason;
+
             int startRaceNumber = obj.RaceNumber;
             while (!await IsUnique(obj))
             {
@@ -69,23 +79,10 @@ namespace GTRC_Database_API.Services
                 if (obj.RaceNumber < Entry.MaxRaceNumber) { obj.RaceNumber += 1; } else { obj.RaceNumber = Entry.DefaultRaceNumber; }
                 if (obj.RaceNumber == startRaceNumber)
                 {
-                    int startIndexSeason = 0;
-                    List<int> idListSeason = [];
-                    List<Season> listSeason = iSeasonContext.GetAll().Result;
-                    for (int index = 0; index < listSeason.Count; index++)
-                    {
-                        idListSeason.Add(listSeason[index].Id);
-                        if (listSeason[index].Id == obj.SeasonId) { startIndexSeason = index; }
-                    }
-                    int indexSeason = startIndexSeason;
-
-                    if (indexSeason < idListSeason.Count - 1)
-                    {
-                        indexSeason++;
-                        obj.Season = listSeason[indexSeason];
-                        obj.SeasonId = listSeason[indexSeason].Id;
-                    }
+                    if (indexSeason < idListSeason.Count - 1) { indexSeason++; }
                     else { indexSeason = 0; }
+                    obj.Season = listSeason[indexSeason];
+                    obj.SeasonId = listSeason[indexSeason].Id;
                     if (indexSeason == startIndexSeason) { obj = null; return false; }
                 }
             }

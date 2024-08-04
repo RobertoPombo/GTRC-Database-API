@@ -3,7 +3,6 @@
 using GTRC_Basics.Models;
 using GTRC_Database_API.Services;
 using GTRC_Basics.Models.DTOs;
-using GTRC_Basics;
 
 namespace GTRC_Database_API.Controllers
 {
@@ -106,7 +105,7 @@ namespace GTRC_Database_API.Controllers
             if (entry is null) { return NotFound(new List<User>()); }
             Event? _event = await fullService.Services[typeof(Event)].GetById(eventId);
             if (_event is null) { return NotFound(new List<User>()); }
-            else { return Ok(await service.GetByEntryEvent(entry, _event)); }
+            else { return Ok(await service.GetByEntryEvent(entry.Id, _event.Id)); }
         }
     }
 }

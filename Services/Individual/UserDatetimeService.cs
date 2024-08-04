@@ -37,6 +37,16 @@ namespace GTRC_Database_API.Services
             if (obj.Date > GlobalValues.DateTimeMaxValue) { obj.Date = GlobalValues.DateTimeMaxValue; isValidUniqProps = false; }
             else if (obj.Date < GlobalValues.DateTimeMinValue) { obj.Date = GlobalValues.DateTimeMinValue; isValidUniqProps = false; }
 
+            int startIndexUser = 0;
+            List<int> idListUser = [];
+            List<User> listUser = iUserContext.GetAll().Result;
+            for (int index = 0; index < listUser.Count; index++)
+            {
+                idListUser.Add(listUser[index].Id);
+                if (listUser[index].Id == obj.UserId) { startIndexUser = index; }
+            }
+            int indexUser = startIndexUser;
+
             DateTime startDate = obj.Date;
             while (!await IsUnique(obj))
             {
@@ -44,23 +54,10 @@ namespace GTRC_Database_API.Services
                 if (obj.Date < GlobalValues.DateTimeMaxValue.AddDays(-1)) { obj.Date = obj.Date.AddDays(1); } else { obj.Date = GlobalValues.DateTimeMinValue; }
                 if (obj.Date == startDate)
                 {
-                    int startIndexUser = 0;
-                    List<int> idListUser = [];
-                    List<User> listUser = iUserContext.GetAll().Result;
-                    for (int index = 0; index < listUser.Count; index++)
-                    {
-                        idListUser.Add(listUser[index].Id);
-                        if (listUser[index].Id == obj.UserId) { startIndexUser = index; }
-                    }
-                    int indexUser = startIndexUser;
-
-                    if (indexUser < idListUser.Count - 1)
-                    {
-                        indexUser++;
-                        obj.User = listUser[indexUser];
-                        obj.UserId = listUser[indexUser].Id;
-                    }
+                    if (indexUser < idListUser.Count - 1) { indexUser++; }
                     else { indexUser = 0; }
+                    obj.User = listUser[indexUser];
+                    obj.UserId = listUser[indexUser].Id;
                     if (indexUser == startIndexUser) { obj = null; return false; }
                 }
             }

@@ -104,6 +104,9 @@ builder.Services.AddScoped<IPointssystemContext, PointssystemContext>();
 builder.Services.AddScoped<PointssystemPositionService>();
 builder.Services.AddScoped<IPointssystemPositionContext, PointssystemPositionContext>();
 
+builder.Services.AddScoped<StintAnalysisMethodService>();
+builder.Services.AddScoped<IStintAnalysisMethodContext, StintAnalysisMethodContext>();
+
 builder.Services.AddScoped<ServerService>();
 builder.Services.AddScoped<IServerContext, ServerContext>();
 

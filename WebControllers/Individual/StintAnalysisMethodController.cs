@@ -7,39 +7,39 @@ using GTRC_Basics.Models.DTOs;
 namespace GTRC_Database_API.Controllers
 {
     [ApiController]
-    [Route(nameof(Incident))]
-    public class IncidentController(IncidentService service, BaseService<Incident> baseService, FullService<Incident> fullService) : BaseController<Incident>(baseService, fullService)
+    [Route(nameof(StintAnalysisMethod))]
+    public class StintAnalysisMethodController(StintAnalysisMethodService service, BaseService<StintAnalysisMethod> baseService, FullService<StintAnalysisMethod> fullService) : BaseController<StintAnalysisMethod>(baseService, fullService)
     {
-        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Incident?>> GetByUniqProps(IncidentUniqPropsDto0 objDto)
+        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<StintAnalysisMethod?>> GetByUniqProps(StintAnalysisMethodUniqPropsDto0 objDto)
         {
-            UniqPropsDto<Incident> _objDto = new() { Index = 0, Dto = objDto };
-            Incident? obj = await service.GetByUniqProps(_objDto);
+            UniqPropsDto<StintAnalysisMethod> _objDto = new() { Index = 0, Dto = objDto };
+            StintAnalysisMethod? obj = await service.GetByUniqProps(_objDto);
             if (obj is null) { return NotFound(obj); }
             else { return Ok(obj); }
         }
 
-        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<Incident>>> GetByProps(IncidentAddDto objDto)
+        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<StintAnalysisMethod>>> GetByProps(StintAnalysisMethodAddDto objDto)
         {
-            AddDto<Incident> _objDto = new() { Dto = objDto };
+            AddDto<StintAnalysisMethod> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByProps(_objDto));
         }
 
-        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<Incident>>> GetByFilter(IncidentFilterDtos objDto)
+        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<StintAnalysisMethod>>> GetByFilter(StintAnalysisMethodFilterDtos objDto)
         {
-            FilterDtos<Incident> _objDto = new() { Dto = objDto };
+            FilterDtos<StintAnalysisMethod> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByFilter(_objDto.Filter, _objDto.FilterMin, _objDto.FilterMax));
         }
 
-        [HttpGet("Get/Temp")] public async Task<ActionResult<Incident?>> GetTemp()
+        [HttpGet("Get/Temp")] public async Task<ActionResult<StintAnalysisMethod?>> GetTemp()
         {
-            Incident? obj = await service.GetTemp();
+            StintAnalysisMethod? obj = await service.GetTemp();
             if (obj is null) { return BadRequest(obj); }
             else { return Ok(obj); }
         }
 
-        [HttpPost("Add")] public async Task<ActionResult<Incident?>> Add(IncidentAddDto objDto)
+        [HttpPost("Add")] public async Task<ActionResult<StintAnalysisMethod?>> Add(StintAnalysisMethodAddDto objDto)
         {
-            Incident? obj = objDto.Dto2Model();
+            StintAnalysisMethod? obj = objDto.Dto2Model();
             bool isValid = service.Validate(obj);
             bool isValidUniqProps = await service.ValidateUniqProps(obj);
             if (obj is null) { return BadRequest(obj); }
@@ -48,7 +48,7 @@ namespace GTRC_Database_API.Controllers
             else
             {
                 await service.Add(obj);
-                UniqPropsDto<Incident> uniqPropsDto = new();
+                UniqPropsDto<StintAnalysisMethod> uniqPropsDto = new();
                 uniqPropsDto.Dto.Model2Dto(obj);
                 obj = await service.GetByUniqProps(uniqPropsDto);
                 if (obj is null) { return NotFound(obj); }
@@ -56,9 +56,9 @@ namespace GTRC_Database_API.Controllers
             }
         }
 
-        [HttpPut("Update")] public async Task<ActionResult<Incident?>> Update(IncidentUpdateDto objDto)
+        [HttpPut("Update")] public async Task<ActionResult<StintAnalysisMethod?>> Update(StintAnalysisMethodUpdateDto objDto)
         {
-            Incident? obj = await service.GetById(objDto.Id);
+            StintAnalysisMethod? obj = await service.GetById(objDto.Id);
             if (obj is null) { return NotFound(obj); }
             else
             {
@@ -71,7 +71,7 @@ namespace GTRC_Database_API.Controllers
                 else
                 {
                     await service.Update(obj);
-                    await fullService.UpdateChildObjects(typeof(Incident), obj);
+                    await fullService.UpdateChildObjects(typeof(StintAnalysisMethod), obj);
                     return Ok(obj);
                 }
             }

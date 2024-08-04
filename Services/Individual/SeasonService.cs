@@ -65,6 +65,16 @@ namespace GTRC_Database_API.Services
             obj.Name = Scripts.RemoveSpaceStartEnd(obj.Name);
             if (obj.Name == string.Empty) { obj.Name = Season.DefaultName; isValidUniqProps = false; }
 
+            int startIndexSeries = 0;
+            List<int> idListSeries = [];
+            List<Series> listSeries = iSeriesContext.GetAll().Result;
+            for (int index = 0; index < listSeries.Count; index++)
+            {
+                idListSeries.Add(listSeries[index].Id);
+                if (listSeries[index].Id == obj.SeriesId) { startIndexSeries = index; }
+            }
+            int indexSeries = startIndexSeries;
+
             int nr = 1;
             string delimiter = " #";
             string defName = obj.Name;
@@ -77,23 +87,10 @@ namespace GTRC_Database_API.Services
                 nr++;
                 if (nr == int.MaxValue)
                 {
-                    int startIndexSeries = 0;
-                    List<int> idListSeries = [];
-                    List<Series> listSeries = iSeriesContext.GetAll().Result;
-                    for (int index = 0; index < listSeries.Count; index++)
-                    {
-                        idListSeries.Add(listSeries[index].Id);
-                        if (listSeries[index].Id == obj.SeriesId) { startIndexSeries = index; }
-                    }
-                    int indexSeries = startIndexSeries;
-
-                    if (indexSeries < idListSeries.Count - 1)
-                    {
-                        indexSeries++;
-                        obj.Series = listSeries[indexSeries];
-                        obj.SeriesId = listSeries[indexSeries].Id;
-                    }
+                    if (indexSeries < idListSeries.Count - 1) { indexSeries++; }
                     else { indexSeries = 0; }
+                    obj.Series = listSeries[indexSeries];
+                    obj.SeriesId = listSeries[indexSeries].Id;
                     if (indexSeries == startIndexSeries) { obj = null; return false; }
                 }
             }

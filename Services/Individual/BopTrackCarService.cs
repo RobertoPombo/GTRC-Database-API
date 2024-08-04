@@ -50,6 +50,26 @@ namespace GTRC_Database_API.Services
             }
             else { obj.Car = car; }
 
+            int startIndexBop = 0;
+            List<int> idListBop = [];
+            List<Bop> listBop = iBopContext.GetAll().Result;
+            for (int index = 0; index < listBop.Count; index++)
+            {
+                idListBop.Add(listBop[index].Id);
+                if (listBop[index].Id == obj.BopId) { startIndexBop = index; }
+            }
+            int indexBop = startIndexBop;
+
+            int startIndexTrack = 0;
+            List<int> idListTrack = [];
+            List<Track> listTrack = iTrackContext.GetAll().Result;
+            for (int index = 0; index < listTrack.Count; index++)
+            {
+                idListTrack.Add(listTrack[index].Id);
+                if (listTrack[index].Id == obj.TrackId) { startIndexTrack = index; }
+            }
+            int indexTrack = startIndexTrack;
+
             int startIndexCar = 0;
             List<int> idListCar = [];
             List<Car> listCar = iCarContext.GetAll().Result;
@@ -63,51 +83,22 @@ namespace GTRC_Database_API.Services
             while (!await IsUnique(obj))
             {
                 isValidUniqProps = false;
-                if (indexCar < idListCar.Count - 1)
-                {
-                    indexCar++;
-                    obj.Car = listCar[indexCar];
-                    obj.CarId = listCar[indexCar].Id;
-                }
+                if (indexCar < idListCar.Count - 1) { indexCar++; }
                 else { indexCar = 0; }
+                obj.Car = listCar[indexCar];
+                obj.CarId = listCar[indexCar].Id;
                 if (indexCar == startIndexCar)
                 {
-                    int startIndexTrack = 0;
-                    List<int> idListTrack = [];
-                    List<Track> listTrack = iTrackContext.GetAll().Result;
-                    for (int index = 0; index < listTrack.Count; index++)
-                    {
-                        idListTrack.Add(listTrack[index].Id);
-                        if (listTrack[index].Id == obj.TrackId) { startIndexTrack = index; }
-                    }
-                    int indexTrack = startIndexTrack;
-
-                    if (indexTrack < idListTrack.Count - 1)
-                    {
-                        indexTrack++;
-                        obj.Track = listTrack[indexTrack];
-                        obj.TrackId = listTrack[indexTrack].Id;
-                    }
+                    if (indexTrack < idListTrack.Count - 1) { indexTrack++; }
                     else { indexTrack = 0; }
+                    obj.Track = listTrack[indexTrack];
+                    obj.TrackId = listTrack[indexTrack].Id;
                     if (indexTrack == startIndexTrack)
                     {
-                        int startIndexBop = 0;
-                        List<int> idListBop = [];
-                        List<Bop> listBop = iBopContext.GetAll().Result;
-                        for (int index = 0; index < listBop.Count; index++)
-                        {
-                            idListBop.Add(listBop[index].Id);
-                            if (listBop[index].Id == obj.BopId) { startIndexBop = index; }
-                        }
-                        int indexBop = startIndexBop;
-
-                        if (indexBop < idListBop.Count - 1)
-                        {
-                            indexBop++;
-                            obj.Bop = listBop[indexBop];
-                            obj.BopId = listBop[indexBop].Id;
-                        }
+                        if (indexBop < idListBop.Count - 1) { indexBop++; }
                         else { indexBop = 0; }
+                        obj.Bop = listBop[indexBop];
+                        obj.BopId = listBop[indexBop].Id;
                         if (indexBop == startIndexBop) { obj = null; return false; }
                     }
                 }

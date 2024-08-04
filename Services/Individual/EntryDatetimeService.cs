@@ -44,6 +44,16 @@ namespace GTRC_Database_API.Services
             if (obj.Date > GlobalValues.DateTimeMaxValue) { obj.Date = GlobalValues.DateTimeMaxValue; isValidUniqProps = false; }
             else if (obj.Date < GlobalValues.DateTimeMinValue) { obj.Date = GlobalValues.DateTimeMinValue; isValidUniqProps = false; }
 
+            int startIndexEntry = 0;
+            List<int> idListEntry = [];
+            List<Entry> listEntry = iEntryContext.GetAll().Result;
+            for (int index = 0; index < listEntry.Count; index++)
+            {
+                idListEntry.Add(listEntry[index].Id);
+                if (listEntry[index].Id == obj.EntryId) { startIndexEntry = index; }
+            }
+            int indexEntry = startIndexEntry;
+
             DateTime startDate = obj.Date;
             while (!await IsUnique(obj))
             {
@@ -51,23 +61,10 @@ namespace GTRC_Database_API.Services
                 if (obj.Date < GlobalValues.DateTimeMaxValue.AddDays(-1)) { obj.Date = obj.Date.AddDays(1); } else { obj.Date = GlobalValues.DateTimeMinValue; }
                 if (obj.Date == startDate)
                 {
-                    int startIndexEntry = 0;
-                    List<int> idListEntry = [];
-                    List<Entry> listEntry = iEntryContext.GetAll().Result;
-                    for (int index = 0; index < listEntry.Count; index++)
-                    {
-                        idListEntry.Add(listEntry[index].Id);
-                        if (listEntry[index].Id == obj.EntryId) { startIndexEntry = index; }
-                    }
-                    int indexEntry = startIndexEntry;
-
-                    if (indexEntry < idListEntry.Count - 1)
-                    {
-                        indexEntry++;
-                        obj.Entry = listEntry[indexEntry];
-                        obj.EntryId = listEntry[indexEntry].Id;
-                    }
+                    if (indexEntry < idListEntry.Count - 1) { indexEntry++; }
                     else { indexEntry = 0; }
+                    obj.Entry = listEntry[indexEntry];
+                    obj.EntryId = listEntry[indexEntry].Id;
                     if (indexEntry == startIndexEntry) { obj = null; return false; }
                 }
             }

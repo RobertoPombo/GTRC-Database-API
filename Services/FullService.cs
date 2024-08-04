@@ -36,6 +36,7 @@ namespace GTRC_Database_API.Services
         EntryUserEventService EntryUserEventService,
         PointssystemService PointssystemService,
         PointssystemPositionService PointssystemPositionService,
+        StintAnalysisMethodService StintAnalysisMethodService,
         ServerService ServerService,
         SessionService SessionService,
         ResultsfileService ResultsfileService,
@@ -71,6 +72,7 @@ namespace GTRC_Database_API.Services
             Services[typeof(EntryUserEvent)] = EntryUserEventService;
             Services[typeof(Pointssystem)] = PointssystemService;
             Services[typeof(PointssystemPosition)] = PointssystemPositionService;
+            Services[typeof(StintAnalysisMethod)] = StintAnalysisMethodService;
             Services[typeof(Server)] = ServerService;
             Services[typeof(Session)] = SessionService;
             Services[typeof(Resultsfile)] = ResultsfileService;

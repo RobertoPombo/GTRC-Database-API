@@ -96,7 +96,12 @@ namespace GTRC_Database_API.Services
             else { obj.Event = _event; }
             if (GlobalValues.DateTimeMaxValue - TimeSpan.FromMinutes(obj.StartTimeOffsetMin + Session.MinSessionsCount) < obj.Event.Date)
             {
-                obj.StartTimeOffsetMin = (ushort)Math.Min(Math.Abs((GlobalValues.DateTimeMaxValue - obj.Event.Date).TotalMinutes - Session.MinSessionsCount), ushort.MaxValue);
+                obj.StartTimeOffsetMin = Math.Min((int)Math.Round((GlobalValues.DateTimeMaxValue - obj.Event.Date).TotalMinutes, 0) - Session.MinSessionsCount, int.MaxValue);
+                isValidUniqProps = false;
+            }
+            if (obj.StartTimeOffsetMin < 0 && GlobalValues.DateTimeMinValue + TimeSpan.FromMinutes(Math.Abs(obj.StartTimeOffsetMin)) > obj.Event.Date)
+            {
+                obj.StartTimeOffsetMin = Math.Max((int)Math.Round((obj.Event.Date - GlobalValues.DateTimeMinValue).TotalMinutes, 0), int.MinValue);
                 isValidUniqProps = false;
             }
 
@@ -115,7 +120,7 @@ namespace GTRC_Database_API.Services
             {
                 isValidUniqProps = false;
                 if (GlobalValues.DateTimeMaxValue - TimeSpan.FromMinutes(obj.StartTimeOffsetMin + Session.MinSessionsCount + 1) < obj.Event.Date) { obj.StartTimeOffsetMin += 1; }
-                else { obj.StartTimeOffsetMin = ushort.MinValue; }
+                else { obj.StartTimeOffsetMin = Math.Max((int)Math.Round((obj.Event.Date - GlobalValues.DateTimeMinValue).TotalMinutes, 0), int.MinValue); }
                 if (obj.StartTimeOffsetMin == startStartTimeOffsetMin)
                 {
                     if (indexEvent < idListEvent.Count - 1) { indexEvent++; }

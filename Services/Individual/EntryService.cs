@@ -37,7 +37,7 @@ namespace GTRC_Database_API.Services
                 else { obj.Car = list[0]; obj.CarId = list[0].Id; isValid = false; }
             }
             else { obj.Car = car; }
-            if (obj.RegisterDate > DateTime.UtcNow || obj.RegisterDate < GlobalValues.DateTimeMinValue) { obj.RegisterDate = DateTime.UtcNow; isValid = false; }
+            if (obj.RegisterDate > DateTime.Now || obj.RegisterDate < GlobalValues.DateTimeMinValue) { obj.RegisterDate = DateTime.Now; isValid = false; }
             if (obj.SignOutDate > GlobalValues.DateTimeMaxValue || obj.SignOutDate < obj.RegisterDate) { obj.SignOutDate = GlobalValues.DateTimeMaxValue; isValid = false; }
             if (obj.RaceNumberPreference > Entry.MaxRaceNumber) { obj.RaceNumberPreference = Entry.MaxRaceNumber; isValid = false; }
             else if (obj.RaceNumberPreference < Entry.MinRaceNumber) { obj.RaceNumberPreference = Entry.MinRaceNumber; isValid = false; }

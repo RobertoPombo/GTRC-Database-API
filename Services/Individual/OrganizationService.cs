@@ -12,7 +12,7 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
-            if (obj.RegisterDate > DateTime.UtcNow || obj.RegisterDate < GlobalValues.DateTimeMinValue) { obj.RegisterDate = DateTime.UtcNow; isValid = false; }
+            if (obj.RegisterDate > DateTime.Now || obj.RegisterDate < GlobalValues.DateTimeMinValue) { obj.RegisterDate = DateTime.Now; isValid = false; }
 
             return isValid;
         }

@@ -19,7 +19,7 @@ namespace GTRC_Database_API.Services
             if (obj.FirstName == string.Empty) { obj.FirstName = nameof(obj.FirstName); isValid = false; }
             obj.LastName = Scripts.RemoveSpaceStartEnd(obj.LastName);
             if (obj.LastName == string.Empty) { obj.LastName = nameof(obj.LastName); isValid = false; }
-            if (obj.RegisterDate > DateTime.UtcNow || obj.RegisterDate < GlobalValues.DateTimeMinValue) { obj.RegisterDate = DateTime.UtcNow; isValid = false; }
+            if (obj.RegisterDate > DateTime.Now || obj.RegisterDate < GlobalValues.DateTimeMinValue) { obj.RegisterDate = DateTime.Now; isValid = false; }
             if (obj.BanDate < obj.RegisterDate) { obj.BanDate = obj.RegisterDate; isValid = false; }
             if (obj.Name3Digits.Length == 3) { obj.Name3Digits = obj.Name3Digits.ToUpper(); } else { obj.Name3Digits = string.Empty; }
             if (obj.EloRating > User.MaxEloRating) { obj.EloRating = User.MaxEloRating; isValid = false; }

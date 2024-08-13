@@ -32,18 +32,6 @@ namespace GTRC_Database_API.Services
             }
             else { obj.Bop = bop; }
             if (obj.DateBoPFreeze < GlobalValues.DateTimeMinValue) { obj.DateBoPFreeze = GlobalValues.DateTimeMinValue; isValid = false; }
-            if (!Scripts.IsValidDiscordId(obj.DiscordDriverRoleId) && obj.DiscordDriverRoleId != GlobalValues.NoDiscordId)
-            {
-                obj.DiscordDriverRoleId = GlobalValues.NoDiscordId; isValid = false;
-            }
-            if (!Scripts.IsValidDiscordId(obj.DiscordRegistrationChannelId) && obj.DiscordRegistrationChannelId != GlobalValues.NoDiscordId)
-            {
-                obj.DiscordRegistrationChannelId = GlobalValues.NoDiscordId; isValid = false;
-            }
-            if (!Scripts.IsValidDiscordId(obj.DiscordTrackReportChannelId) && obj.DiscordTrackReportChannelId != GlobalValues.NoDiscordId)
-            {
-                obj.DiscordTrackReportChannelId = GlobalValues.NoDiscordId; isValid = false;
-            }
 
             return isValid;
         }

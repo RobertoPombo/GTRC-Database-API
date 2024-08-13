@@ -3,7 +3,6 @@
 using GTRC_Basics.Models;
 using GTRC_Database_API.Services;
 using GTRC_Basics.Models.DTOs;
-using GTRC_Basics;
 
 namespace GTRC_Database_API.Controllers
 {
@@ -14,6 +13,38 @@ namespace GTRC_Database_API.Controllers
         [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Series?>> GetByUniqProps(SeriesUniqPropsDto0 objDto)
         {
             UniqPropsDto<Series> _objDto = new() { Index = 0, Dto = objDto };
+            Series? obj = await service.GetByUniqProps(_objDto);
+            if (obj is null) { return NotFound(obj); }
+            else { return Ok(obj); }
+        }
+        
+        [HttpPut("Get/ByUniqProps/1")] public async Task<ActionResult<Series?>> GetByUniqProps(SeriesUniqPropsDto1 objDto)
+        {
+            UniqPropsDto<Series> _objDto = new() { Index = 1, Dto = objDto };
+            Series? obj = await service.GetByUniqProps(_objDto);
+            if (obj is null) { return NotFound(obj); }
+            else { return Ok(obj); }
+        }
+        
+        [HttpPut("Get/ByUniqProps/2")] public async Task<ActionResult<Series?>> GetByUniqProps(SeriesUniqPropsDto2 objDto)
+        {
+            UniqPropsDto<Series> _objDto = new() { Index = 2, Dto = objDto };
+            Series? obj = await service.GetByUniqProps(_objDto);
+            if (obj is null) { return NotFound(obj); }
+            else { return Ok(obj); }
+        }
+        
+        [HttpPut("Get/ByUniqProps/3")] public async Task<ActionResult<Series?>> GetByUniqProps(SeriesUniqPropsDto3 objDto)
+        {
+            UniqPropsDto<Series> _objDto = new() { Index = 3, Dto = objDto };
+            Series? obj = await service.GetByUniqProps(_objDto);
+            if (obj is null) { return NotFound(obj); }
+            else { return Ok(obj); }
+        }
+        
+        [HttpPut("Get/ByUniqProps/4")] public async Task<ActionResult<Series?>> GetByUniqProps(SeriesUniqPropsDto4 objDto)
+        {
+            UniqPropsDto<Series> _objDto = new() { Index = 4, Dto = objDto };
             Series? obj = await service.GetByUniqProps(_objDto);
             if (obj is null) { return NotFound(obj); }
             else { return Ok(obj); }

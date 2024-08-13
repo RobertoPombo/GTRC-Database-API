@@ -100,5 +100,12 @@ namespace GTRC_Database_API.Controllers
                 }
             }
         }
+
+        [HttpGet("Get/IsLatestModel/{carId}")] public async Task<ActionResult<bool>> GetIsLatestModel(int carId)
+        {
+            Car? obj = await service.GetById(carId);
+            if (obj is null) { return NotFound(false); }
+            else { return Ok(await service.GetIsLatestModel(obj)); }
+        }
     }
 }

@@ -76,5 +76,12 @@ namespace GTRC_Database_API.Controllers
                 }
             }
         }
+
+        [HttpGet("Get/Current/{seriesId}")] public async Task<ActionResult<Season?>> GetCurrent(int seriesId, DateTime date)
+        {
+            Season? obj = await service.GetCurrent(seriesId, date);
+            if (obj is null) { return NotFound(obj); }
+            else { return Ok(obj); }
+        }
     }
 }

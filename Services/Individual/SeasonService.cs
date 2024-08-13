@@ -88,5 +88,13 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<Season?> GetTemp() { Season obj = new(); await ValidateUniqProps(obj); return obj; }
+
+        public async Task<Season?> GetCurrent(int seriesId, DateTime date)
+        {
+            Season? next = null;
+            List<Season> list = Scripts.SortByDate(await GetChildObjects(typeof(Series), seriesId));
+            foreach (Season obj in list) { if (obj.DateStartRegistration > date) { return next; } next = obj; }
+            return next;
+        }
     }
 }

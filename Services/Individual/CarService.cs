@@ -119,5 +119,12 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<Car?> GetTemp() { Car obj = new(); await ValidateUniqProps(obj); return obj; }
+
+        public async Task<bool> GetIsLatestModel(Car obj)
+        {
+            List<Car> list = await GetAll();
+            foreach (Car car in list) { if (car.Manufacturer.Id == obj.Manufacturer.Id && car.Carclass.Id == obj.Carclass.Id && car.Year > obj.Year) { return false; } }
+            return true;
+        }
     }
 }

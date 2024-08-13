@@ -110,10 +110,16 @@ namespace GTRC_Database_API.Services
             if (obj is null) { return null; }
             else
             {
+                int eventNr = 0;
+                if (obj.IsPreQualifying) { return eventNr; }
                 AddDto<Event> objDto = new();
                 objDto.Dto.SeasonId = obj.SeasonId;
                 List<Event> list = Scripts.SortByDate(await GetByProps(objDto));
-                for (int index = 0; index < list.Count; index++) { if (list[index].Id == obj.Id) { return index + 1; } }
+                foreach (Event _obj in list)
+                {
+                    if (!_obj.IsPreQualifying) { eventNr++; }
+                    if (_obj.Id == obj.Id) { return eventNr; }
+                }
                 return null;
             }
         }

@@ -5,6 +5,7 @@ using GTRC_Database_API.Services;
 using GTRC_Database_API.Services.Interfaces;
 using GTRC_Database_API.EfcContext;
 using GTRC_Basics.Configs;
+using GTRC_Basics.Models;
 
 
 
@@ -127,6 +128,9 @@ builder.Services.AddScoped<IIncidentContext, IncidentContext>();
 
 builder.Services.AddScoped<IncidentEntryService>();
 builder.Services.AddScoped<IIncidentEntryContext, IncidentEntryContext>();
+
+builder.Services.AddScoped<SeriesDiscordchanneltypeService>();
+builder.Services.AddScoped<ISeriesDiscordchanneltypeContext, SeriesDiscordchanneltypeContext>();
 
 /*
 

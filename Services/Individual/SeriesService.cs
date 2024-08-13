@@ -36,18 +36,6 @@ namespace GTRC_Database_API.Services
             {
                 obj.DiscordDriverRoleId = GlobalValues.NoDiscordId; isValidUniqProps = false;
             }
-            if (!Scripts.IsValidDiscordId(obj.DiscordLogChannelId) && obj.DiscordLogChannelId != GlobalValues.NoDiscordId)
-            {
-                obj.DiscordLogChannelId = GlobalValues.NoDiscordId; isValidUniqProps = false;
-            }
-            if (!Scripts.IsValidDiscordId(obj.DiscordRegistrationChannelId) && obj.DiscordRegistrationChannelId != GlobalValues.NoDiscordId)
-            {
-                obj.DiscordRegistrationChannelId = GlobalValues.NoDiscordId; isValidUniqProps = false;
-            }
-            if (!Scripts.IsValidDiscordId(obj.DiscordTrackReportChannelId) && obj.DiscordTrackReportChannelId != GlobalValues.NoDiscordId)
-            {
-                obj.DiscordTrackReportChannelId = GlobalValues.NoDiscordId; isValidUniqProps = false;
-            }
 
             int startIndexSim = 0;
             List<int> idListSim = [];
@@ -85,30 +73,6 @@ namespace GTRC_Database_API.Services
                 isValidUniqProps = false;
                 if (obj.DiscordDriverRoleId < GlobalValues.MaxDiscordId) { obj.DiscordDriverRoleId++; } else { obj.DiscordDriverRoleId = GlobalValues.MinDiscordId; }
                 if (obj.DiscordDriverRoleId == startValue) { obj.DiscordDriverRoleId = GlobalValues.NoDiscordId; }
-            }
-
-            startValue = obj.DiscordLogChannelId;
-            while (!await IsUnique(obj, 2))
-            {
-                isValidUniqProps = false;
-                if (obj.DiscordLogChannelId < GlobalValues.MaxDiscordId) { obj.DiscordLogChannelId++; } else { obj.DiscordLogChannelId = GlobalValues.MinDiscordId; }
-                if (obj.DiscordLogChannelId == startValue) { obj.DiscordLogChannelId = GlobalValues.NoDiscordId; }
-            }
-
-            startValue = obj.DiscordRegistrationChannelId;
-            while (!await IsUnique(obj, 3))
-            {
-                isValidUniqProps = false;
-                if (obj.DiscordRegistrationChannelId < GlobalValues.MaxDiscordId) { obj.DiscordRegistrationChannelId++; } else { obj.DiscordRegistrationChannelId = GlobalValues.MinDiscordId; }
-                if (obj.DiscordRegistrationChannelId == startValue) { obj.DiscordRegistrationChannelId = GlobalValues.NoDiscordId; }
-            }
-
-            startValue = obj.DiscordTrackReportChannelId;
-            while (!await IsUnique(obj, 4))
-            {
-                isValidUniqProps = false;
-                if (obj.DiscordTrackReportChannelId < GlobalValues.MaxDiscordId) { obj.DiscordTrackReportChannelId++; } else { obj.DiscordTrackReportChannelId = GlobalValues.MinDiscordId; }
-                if (obj.DiscordTrackReportChannelId == startValue) { obj.DiscordTrackReportChannelId = GlobalValues.NoDiscordId; }
             }
 
             Validate(obj);

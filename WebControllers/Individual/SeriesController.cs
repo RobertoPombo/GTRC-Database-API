@@ -25,30 +25,6 @@ namespace GTRC_Database_API.Controllers
             if (obj is null) { return NotFound(obj); }
             else { return Ok(obj); }
         }
-        
-        [HttpPut("Get/ByUniqProps/2")] public async Task<ActionResult<Series?>> GetByUniqProps(SeriesUniqPropsDto2 objDto)
-        {
-            UniqPropsDto<Series> _objDto = new() { Index = 2, Dto = objDto };
-            Series? obj = await service.GetByUniqProps(_objDto);
-            if (obj is null) { return NotFound(obj); }
-            else { return Ok(obj); }
-        }
-        
-        [HttpPut("Get/ByUniqProps/3")] public async Task<ActionResult<Series?>> GetByUniqProps(SeriesUniqPropsDto3 objDto)
-        {
-            UniqPropsDto<Series> _objDto = new() { Index = 3, Dto = objDto };
-            Series? obj = await service.GetByUniqProps(_objDto);
-            if (obj is null) { return NotFound(obj); }
-            else { return Ok(obj); }
-        }
-        
-        [HttpPut("Get/ByUniqProps/4")] public async Task<ActionResult<Series?>> GetByUniqProps(SeriesUniqPropsDto4 objDto)
-        {
-            UniqPropsDto<Series> _objDto = new() { Index = 4, Dto = objDto };
-            Series? obj = await service.GetByUniqProps(_objDto);
-            if (obj is null) { return NotFound(obj); }
-            else { return Ok(obj); }
-        }
 
         [HttpPut("Get/ByProps")] public async Task<ActionResult<List<Series>>> GetByProps(SeriesAddDto objDto)
         {

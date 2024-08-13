@@ -41,6 +41,7 @@ namespace GTRC_Database_API.Data
         public DbSet<Leaderboardline> Leaderboardlines { get; set; }
         public DbSet<Incident> Incidents { get; set; }
         public DbSet<IncidentEntry> IncidentsEntries { get; set; }
+        public DbSet<SeriesDiscordchanneltype> SeriesDiscordchanneltypes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -43,7 +43,8 @@ namespace GTRC_Database_API.Services
         LapService LapService,
         LeaderboardlineService LeaderboardlineService,
         IncidentService IncidentService,
-        IncidentEntryService IncidentEntryService)
+        IncidentEntryService IncidentEntryService,
+        SeriesDiscordchanneltypeService SeriesDiscordchanneltypeService)
         {
             Services[typeof(Color)] = ColorService;
             Services[typeof(Sim)] = SimService;
@@ -80,6 +81,7 @@ namespace GTRC_Database_API.Services
             Services[typeof(Leaderboardline)] = LeaderboardlineService;
             Services[typeof(Incident)] = IncidentService;
             Services[typeof(IncidentEntry)] = IncidentEntryService;
+            Services[typeof(SeriesDiscordchanneltype)] = SeriesDiscordchanneltypeService;
         }
 
         public async Task ForceDelete(Type modelType, dynamic obj)

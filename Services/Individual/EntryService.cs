@@ -1,4 +1,5 @@
-﻿using GTRC_Basics;
+﻿using Castle.Components.DictionaryAdapter.Xml;
+using GTRC_Basics;
 using GTRC_Basics.Models;
 using GTRC_Basics.Models.DTOs;
 using GTRC_Database_API.Services.Interfaces;
@@ -12,6 +13,8 @@ namespace GTRC_Database_API.Services
         UserService userService,
         SeasonService seasonService,
         EventService eventService,
+        EntryDatetimeService entryDatetimeService,
+        BaseService<EntryUserEvent> entryUserEventService,
         IBaseContext<Entry> iBaseContext) : BaseService<Entry>(iBaseContext)
     {
         public bool Validate(Entry? obj)
@@ -190,6 +193,60 @@ namespace GTRC_Database_API.Services
                 }
             }
             return updatedEntries;
+        }
+
+        public async Task<List<Entry>> GetByUserSeason(User user, Season season)
+        {
+            List<Entry> listEntries = [];
+            List<Event> listEvents = await eventService.GetChildObjects(typeof(Season), season.Id);
+            foreach (Event _event in listEvents)
+            {
+                List<Entry> listEntriesTemp = await GetByUserEvent(user, _event);
+                foreach (Entry entry in listEntriesTemp) { if (!listEntries.Contains(entry)) listEntries.Add(entry); }
+            }
+            return listEntries;
+        }
+
+        public async Task<List<Entry>> GetByUserEvent(User user, Event _event)
+        {
+            List<Entry> listEntries = [];
+            AddDto<EntryUserEvent> addDto = new() { Dto = new EntryUserEventAddDto() { UserId = user.Id, EventId = _event.Id } };
+            List<EntryUserEvent> list = await entryUserEventService.GetByProps(addDto);
+            foreach (EntryUserEvent obj in list) { if (!listEntries.Contains(obj.Entry)) listEntries.Add(obj.Entry); }
+            return listEntries;
+        }
+
+        public async Task<byte> GetCarChangeCount(Entry entry, Event nextEvent)
+        {
+            Season season = entry.Season;
+            byte carChangeCount = 0;
+            List<EntryDatetime> listCarChanges = Scripts.SortByDate(await entryDatetimeService.GetChildObjects(typeof(Entry), entry.Id));
+            List<Event> listEvents = Scripts.SortByDate(await eventService.GetChildObjects(typeof(Season), season.Id));
+            Car car0 = entry.Car;
+            DateTime startDate = season.DateStartCarChangeLimit;
+            for (int eventNr = 0; eventNr < listEvents.Count; eventNr++)
+            {
+                bool countNextCarChange = true;
+                if (listEvents[eventNr].Id == nextEvent.Id) { return carChangeCount; }
+                if (eventNr > 0 && startDate < listEvents[eventNr - 1].Date) { startDate = listEvents[eventNr - 1].Date; }
+                for (int carChangeIndex = listCarChanges.Count - 1; carChangeIndex >= 0; carChangeIndex--)
+                {
+                    if (listCarChanges[carChangeIndex].Date > startDate && listCarChanges[carChangeIndex].Date <= listEvents[eventNr].Date)
+                    {
+                        Car car1 = listCarChanges[carChangeIndex].Car;
+                        if (countNextCarChange && car0.Id != car1.Id)
+                        {
+                            bool changedManufacturerCarclass = car1.ManufacturerId != car0.ManufacturerId || car1.CarclassId != car0.CarclassId;
+                            bool countsAsCarChange = changedManufacturerCarclass || (!season.GroupCarRegistrationLimits && TimeSpan.FromDays(season.DaysIgnoreCarRegistrationLimit) <
+                                (listCarChanges[carChangeIndex].Date - car1.ReleaseDate.ToDateTime(TimeOnly.MinValue)));
+                            if (countsAsCarChange) { carChangeCount++; }
+                        }
+                        countNextCarChange = false;
+                        car0 = car1;
+                    }
+                }
+            }
+            return carChangeCount;
         }
     }
 }

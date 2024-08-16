@@ -92,6 +92,13 @@ namespace GTRC_Database_API.Controllers
             else { return Ok(nr); }
         }
 
+        [HttpGet("Get/ByNr/{nr}")] public async Task<ActionResult<Event?>> GetByNr(int seasonId, int nr)
+        {
+            Event? obj = await service.GetByNr(seasonId, nr);
+            if (obj is null) { return NotFound(obj); }
+            else { return Ok(obj); }
+        }
+
         [HttpGet("Get/Next/{seasonId}")] public async Task<ActionResult<Event?>> GetNext(int seasonId, DateTime date)
         {
             Event? obj = await service.GetNext(seasonId, date);

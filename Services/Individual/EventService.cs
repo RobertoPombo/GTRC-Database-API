@@ -2,7 +2,6 @@
 using GTRC_Basics.Models;
 using GTRC_Basics.Models.DTOs;
 using GTRC_Database_API.Services.Interfaces;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace GTRC_Database_API.Services
 {
@@ -128,8 +127,9 @@ namespace GTRC_Database_API.Services
         public async Task<Event?> GetByNr(int seasonId, int nr)
         {
             List<Event> list = Scripts.SortByDate(await GetChildObjects(typeof(Season), seasonId));
-            if (nr < 1 || nr > list.Count) { return null; }
-            return list[nr - 1];
+            int eventNr = 0;
+            foreach (Event _event in list) { if (!_event.IsPreQualifying) { eventNr++; if (eventNr == nr) { return _event; } } }
+            return null;
         }
 
         public async Task<Event?> GetNext(int seasonId, DateTime date)

@@ -107,5 +107,33 @@ namespace GTRC_Database_API.Controllers
             if (_event is null) { return NotFound(new List<User>()); }
             else { return Ok(await service.GetByEntryEvent(entry.Id, _event.Id)); }
         }
+
+        [HttpGet("Get/Violations/DiscordId/{seasonId}")] public async Task<ActionResult<List<User>>> GetViolationsDiscordId(int seasonId)
+        {
+            Season? season = await fullService.Services[typeof(Season)].GetById(seasonId);
+            if (season is null) { return NotFound(new List<User>()); }
+            return Ok(await service.GetViolationsDiscordId(season));
+        }
+
+        [HttpGet("Get/Violations/AllowEntriesShareDriverSameEvent/{seasonId}")] public async Task<ActionResult<List<User>>> GetViolationsAllowEntriesShareDriverSameEvent(int seasonId)
+        {
+            Season? season = await fullService.Services[typeof(Season)].GetById(seasonId);
+            if (season is null) { return NotFound(new List<User>()); }
+            return Ok(await service.GetViolationsAllowEntriesShareDriver(season, true));
+        }
+
+        [HttpGet("Get/Violations/AllowEntriesShareDriver/{seasonId}")] public async Task<ActionResult<List<User>>> GetViolationsAllowEntriesShareDriver(int seasonId)
+        {
+            Season? season = await fullService.Services[typeof(Season)].GetById(seasonId);
+            if (season is null) { return NotFound(new List<User>()); }
+            return Ok(await service.GetViolationsAllowEntriesShareDriver(season));
+        }
+
+        [HttpGet("Get/Violations/ForceDriverFromOrganization/{seasonId}")] public async Task<ActionResult<List<User>>> GetViolationsForceDriverFromOrganization(int seasonId)
+        {
+            Season? season = await fullService.Services[typeof(Season)].GetById(seasonId);
+            if (season is null) { return NotFound(new List<User>()); }
+            return Ok(await service.GetViolationsForceDriverFromOrganization(season));
+        }
     }
 }

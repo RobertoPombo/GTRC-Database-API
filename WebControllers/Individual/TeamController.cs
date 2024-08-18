@@ -3,7 +3,6 @@
 using GTRC_Basics.Models;
 using GTRC_Database_API.Services;
 using GTRC_Basics.Models.DTOs;
-using GTRC_Basics;
 
 namespace GTRC_Database_API.Controllers
 {
@@ -76,6 +75,27 @@ namespace GTRC_Database_API.Controllers
                     return Ok(obj);
                 }
             }
+        }
+
+        [HttpGet("Get/BySeason/{seasonId}")] public async Task<ActionResult<List<Team>>> GetBySeason(int seasonId)
+        {
+            Season? season = await fullService.Services[typeof(Season)].GetById(seasonId);
+            if (season is null) { return NotFound(new List<Team>()); }
+            return Ok(await service.GetBySeason(season));
+        }
+
+        [HttpGet("Get/Violations/MinEntriesPerTeam/{seasonId}")] public async Task<ActionResult<List<Team>>> GetViolationsMinEntriesPerTeam(int seasonId)
+        {
+            Season? season = await fullService.Services[typeof(Season)].GetById(seasonId);
+            if (season is null) { return NotFound(new List<Team>()); }
+            return Ok(await service.GetViolationsMinEntriesPerTeam(season));
+        }
+
+        [HttpGet("Get/Violations/MaxEntriesPerTeam/{seasonId}")] public async Task<ActionResult<List<Team>>> GetViolationsMaxEntriesPerTeam(int seasonId)
+        {
+            Season? season = await fullService.Services[typeof(Season)].GetById(seasonId);
+            if (season is null) { return NotFound(new List<Team>()); }
+            return Ok(await service.GetViolationsMinEntriesPerTeam(season, true));
         }
     }
 }

@@ -3,7 +3,6 @@
 using GTRC_Basics.Models;
 using GTRC_Database_API.Services;
 using GTRC_Basics.Models.DTOs;
-using GTRC_Basics;
 
 namespace GTRC_Database_API.Controllers
 {
@@ -118,6 +117,41 @@ namespace GTRC_Database_API.Controllers
             if (_event is null) { return NotFound(byte.MinValue); }
             if (entry.SeasonId != _event.SeasonId) { return StatusCode(406, byte.MinValue); }
             return Ok(await service.GetCarChangeCount(entry, _event));
+        }
+
+        [HttpGet("Get/Violations/MinDriversPerEntryEvent/{seasonId}")] public async Task<ActionResult<List<Entry>>> GetViolationsMinDriversPerEntryEvent(int seasonId)
+        {
+            Season? season = await fullService.Services[typeof(Season)].GetById(seasonId);
+            if (season is null) { return NotFound(new List<Entry>()); }
+            return Ok(await service.GetViolationsMinDriversPerEntryEvent(season));
+        }
+
+        [HttpGet("Get/Violations/MaxDriversPerEntryEvent/{seasonId}")] public async Task<ActionResult<List<Entry>>> GetViolationsMaxDriversPerEntryEvent(int seasonId)
+        {
+            Season? season = await fullService.Services[typeof(Season)].GetById(seasonId);
+            if (season is null) { return NotFound(new List<Entry>()); }
+            return Ok(await service.GetViolationsMinDriversPerEntryEvent(season, true));
+        }
+
+        [HttpGet("Get/Violations/AllowDriverLineupPerEvent/{seasonId}")] public async Task<ActionResult<List<Entry>>> GetViolationsAllowDriverLineupPerEvent(int seasonId)
+        {
+            Season? season = await fullService.Services[typeof(Season)].GetById(seasonId);
+            if (season is null) { return NotFound(new List<Entry>()); }
+            return Ok(await service.GetViolationsAllowDriverLineupPerEvent(season));
+        }
+
+        [HttpGet("Get/Violations/DateStartRegistration/{seasonId}")] public async Task<ActionResult<List<Entry>>> GetViolationsDateStartRegistration(int seasonId)
+        {
+            Season? season = await fullService.Services[typeof(Season)].GetById(seasonId);
+            if (season is null) { return NotFound(new List<Entry>()); }
+            return Ok(await service.GetViolationsDateStartRegistration(season));
+        }
+
+        [HttpGet("Get/Violations/DateEndRegistration/{seasonId}")] public async Task<ActionResult<List<Entry>>> GetViolationsDateEndRegistration(int seasonId)
+        {
+            Season? season = await fullService.Services[typeof(Season)].GetById(seasonId);
+            if (season is null) { return NotFound(new List<Entry>()); }
+            return Ok(await service.GetViolationsDateStartRegistration(season, true));
         }
     }
 }

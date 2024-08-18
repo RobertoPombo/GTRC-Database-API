@@ -6,8 +6,10 @@ using GTRC_Database_API.Services.Interfaces;
 namespace GTRC_Database_API.Services
 {
     public class UserService(IUserContext iUserContext,
+        BaseService<Entry> entryService,
         BaseService<Event> eventService,
         BaseService<EntryUserEvent> entryUserEventService,
+        BaseService<OrganizationUser> organizationUserService,
         IBaseContext<User> iBaseContext) : BaseService<User>(iBaseContext)
     {
         public bool Validate(User? obj)
@@ -202,6 +204,62 @@ namespace GTRC_Database_API.Services
                 if (user is not null) { listUsers.Add(user); }
             }
             return listUsers;
+        }
+
+        public async Task<List<User>> GetViolationsDiscordId(Season season)
+        {
+            List<User> list = [];
+            List<Entry> listEntries = await entryService.GetChildObjects(typeof(Season), season.Id);
+            foreach (Entry entry in listEntries)
+            {
+                List<User> userListFull = await GetByEntry(entry);
+                foreach (User user in userListFull) { if (!Scripts.IsValidDiscordId(user.DiscordId) && !list.Contains(user)) { list.Add(user); } }
+            }
+            return list;
+        }
+
+        public async Task<List<User>> GetViolationsAllowEntriesShareDriver(Season season, bool onlyIfSameEvent = false)
+        {
+            List<User> list = [];
+            if (!onlyIfSameEvent && season.AllowEntriesShareDriver) { return list; }
+            else if (onlyIfSameEvent && season.AllowEntriesShareDriverSameEvent) { return list; }
+            List<Event> listEvents = await eventService.GetChildObjects(typeof(Season), season.Id);
+            List<EntryUserEvent> allEue = [];
+            foreach (Event _event in listEvents)
+            {
+                List<EntryUserEvent> listEntryUserEvents = await entryUserEventService.GetChildObjects(typeof(Event), _event.Id);
+                foreach (EntryUserEvent eue in listEntryUserEvents) { allEue.Add(eue); }
+            }
+            for (int id1 = 0; id1 < allEue.Count - 1; id1++)
+            {
+                for (int id2 = id1 + 1; id2 < allEue.Count; id2++)
+                {
+                    if (allEue[id1].EntryId != allEue[id2].EntryId && allEue[id1].UserId == allEue[id2].UserId)
+                    {
+                        if ((!onlyIfSameEvent || allEue[id1].EventId == allEue[id2].EventId) && !Scripts.ListContainsId(list, allEue[id1].User)) { list.Add(allEue[id1].User); }
+                    }
+                }
+            }
+            return list;
+        }
+
+        public async Task<List<User>> GetViolationsForceDriverFromOrganization(Season season)
+        {
+            List<User> list = [];
+            if (!season.ForceDriverFromOrganization) { return list; }
+            List<Entry> listEntries = await entryService.GetChildObjects(typeof(Season), season.Id);
+            foreach (Entry entry in listEntries)
+            {
+                List<User> userListFull = await GetByEntry(entry);
+                List<OrganizationUser> userListOrganization = await organizationUserService.GetChildObjects(typeof(Organization), entry.Team.OrganizationId);
+                foreach (User user in userListFull)
+                {
+                    bool isInOrganization = false;
+                    foreach (OrganizationUser organizationUser in userListOrganization) { if (organizationUser.User.Id == user.Id) { isInOrganization = true; break; } }
+                    if (!isInOrganization && !list.Contains(user) && !Scripts.ListContainsId(list, user)) { list.Add(user); }
+                }
+            }
+            return list;
         }
     }
 }

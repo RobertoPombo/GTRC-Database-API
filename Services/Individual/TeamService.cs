@@ -1,10 +1,12 @@
 ﻿using GTRC_Basics;
 using GTRC_Basics.Models;
+using GTRC_Basics.Models.DTOs;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
     public class TeamService(ITeamContext iTeamContext,
+        BaseService<Entry> entryService,
         IBaseContext<Organization> iOrganizationContext,
         IBaseContext<Team> iBaseContext) : BaseService<Team>(iBaseContext)
     {
@@ -52,5 +54,30 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<Team?> GetTemp() { Team obj = new(); await ValidateUniqProps(obj); return obj; }
+
+        public async Task<List<Team>> GetBySeason(Season season)
+        {
+            List<Team> list = [];
+            List<Entry> listEntries = await entryService.GetChildObjects(typeof(Season), season.Id);
+            foreach (Entry entry in listEntries) { if (!Scripts.ListContainsId(list, entry.Team)) { list.Add(entry.Team); } }
+            return list;
+        }
+
+        public async Task<List<Team>> GetViolationsMinEntriesPerTeam(Season season, bool isGetViolationsMaxEntriesPerTeam = false)
+        {
+            List<Team> list = [];
+            List<Team> listAll = await GetAll();
+            foreach (Team team in listAll)
+            {
+                AddDto<Entry> addDtoEntry = new() { Dto = new EntryAddDto() { SeasonId = season.Id, TeamId = team.Id } };
+                List<Entry> listEntries = await entryService.GetByProps(addDtoEntry);
+                if (listEntries.Count > 0)
+                {
+                    if (!isGetViolationsMaxEntriesPerTeam && listEntries.Count < season.MinEntriesPerTeam) { list.Add(team); }
+                    else if (isGetViolationsMaxEntriesPerTeam && listEntries.Count > season.MaxEntriesPerTeam) { list.Add(team); }
+                }
+            }
+            return list;
+        }
     }
 }

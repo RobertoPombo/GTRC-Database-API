@@ -1,5 +1,4 @@
-﻿using Castle.Components.DictionaryAdapter.Xml;
-using GTRC_Basics;
+﻿using GTRC_Basics;
 using GTRC_Basics.Models;
 using GTRC_Basics.Models.DTOs;
 using GTRC_Database_API.Services.Interfaces;
@@ -247,6 +246,55 @@ namespace GTRC_Database_API.Services
                 }
             }
             return carChangeCount;
+        }
+
+        public async Task<List<Entry>> GetViolationsMinDriversPerEntryEvent(Season season, bool isGetViolationsMaxDriversPerEntryEvent = false)
+        {
+            List<Entry> list = [];
+            List<Entry> listAll = await GetChildObjects(typeof(Season), season.Id);
+            List<Event> listEvents = await eventService.GetChildObjects(typeof(Season), season.Id);
+            foreach (Entry entry in listAll)
+            {
+                foreach (Event _event in listEvents)
+                {
+                    List<User> userList = await userService.GetByEntryEvent(entry.Id, _event.Id);
+                    if (!isGetViolationsMaxDriversPerEntryEvent && userList.Count < season.MinDriversPerEntryEvent && !list.Contains(entry)) { list.Add(entry); }
+                    else if (isGetViolationsMaxDriversPerEntryEvent && userList.Count > season.MaxDriversPerEntryEvent && !list.Contains(entry)) { list.Add(entry); }
+                }
+            }
+            return list;
+        }
+
+        public async Task<List<Entry>> GetViolationsAllowDriverLineupPerEvent(Season season)
+        {
+            List<Entry> list = [];
+            if (season.AllowDriverLineupPerEvent) { return list; }
+            List<Entry> listAll = await GetChildObjects(typeof(Season), season.Id);
+            List<Event> listEvents = await eventService.GetChildObjects(typeof(Season), season.Id);
+            Event? firstEvent = await eventService.GetFirst(season.Id);
+            foreach (Entry entry in listAll)
+            {
+                List<User> userListFirstEvent = await userService.GetByEntryEvent(entry.Id, firstEvent?.Id ?? GlobalValues.NoId);
+                foreach (Event _event in listEvents)
+                {
+                    List<User> userList = await userService.GetByEntryEvent(entry.Id, _event.Id);
+                    foreach (User user in userList) { if (!Scripts.ListContainsId(userListFirstEvent, user) && !list.Contains(entry)) { list.Add(entry); } }
+                    foreach (User user in userListFirstEvent) { if (!Scripts.ListContainsId(userList, user) && !list.Contains(entry)) { list.Add(entry); } }
+                }
+            }
+            return list;
+        }
+
+        public async Task<List<Entry>> GetViolationsDateStartRegistration(Season season, bool isGetViolationsDateEndRegistration = false)
+        {
+            List<Entry> list = [];
+            List<Entry> listAll = await GetChildObjects(typeof(Season), season.Id);
+            foreach (Entry entry in listAll)
+            {
+                if (!isGetViolationsDateEndRegistration && entry.RegisterDate < season.DateStartRegistration) { list.Add(entry); }
+                else if (isGetViolationsDateEndRegistration && entry.RegisterDate > season.DateEndRegistration) { list.Add(entry); }
+            }
+            return list;
         }
     }
 }

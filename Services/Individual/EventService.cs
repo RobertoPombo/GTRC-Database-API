@@ -136,7 +136,7 @@ namespace GTRC_Database_API.Services
         {
             Event? next = null;
             List<Event> list = Scripts.SortByDate(await GetChildObjects(typeof(Season), seasonId));
-            foreach (Event obj in list) { next = obj; if (obj.Date > date) { return next; } }
+            foreach (Event obj in list) { next = obj; if (obj.Date > date && !obj.IsPreQualifying) { return next; } }
             return next;
         }
 
@@ -146,7 +146,10 @@ namespace GTRC_Database_API.Services
             List<Event> events = await GetChildObjects(typeof(Season), seasonId);
             foreach (Event _eventCandidate in events)
             {
-                if (_event is null || (!isGetFinal && _event.Date > _eventCandidate.Date) || (isGetFinal && _event.Date < _eventCandidate.Date)) { _event = _eventCandidate; }
+                if (!_eventCandidate.IsPreQualifying && (_event is null || (!isGetFinal && _event.Date > _eventCandidate.Date) || (isGetFinal && _event.Date < _eventCandidate.Date)))
+                {
+                    _event = _eventCandidate;
+                }
             }
             return _event;
         }

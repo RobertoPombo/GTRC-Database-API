@@ -14,8 +14,8 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
-            if (obj.MinDriversPerEntry < Season.MinMinDriversPerEntry) { obj.MinDriversPerEntry = Season.MinMinDriversPerEntry; isValid = false; }
-            if (obj.MaxDriversPerEntry < obj.MinDriversPerEntry) { obj.MaxDriversPerEntry = obj.MinDriversPerEntry; isValid = false; }
+            if (obj.MinDriversPerEntryEvent < Season.MinMinDriversPerEntryEvent) { obj.MinDriversPerEntryEvent = Season.MinMinDriversPerEntryEvent; isValid = false; }
+            if (obj.MaxDriversPerEntryEvent < obj.MinDriversPerEntryEvent) { obj.MaxDriversPerEntryEvent = obj.MinDriversPerEntryEvent; isValid = false; }
             if (obj.MinEntriesPerTeam < Season.MinMinEntriesPerTeam) { obj.MinEntriesPerTeam = Season.MinMinEntriesPerTeam; isValid = false; }
             if (obj.MaxEntriesPerTeam < obj.MinEntriesPerTeam) { obj.MaxEntriesPerTeam = obj.MinEntriesPerTeam; isValid = false; }
             if (obj.DateStartRegistration < GlobalValues.DateTimeMinValue) { obj.DateStartRegistration = GlobalValues.DateTimeMinValue; isValid = false; }

@@ -5,9 +5,11 @@ using GTRC_Database_API.Services;
 using GTRC_Database_API.Services.Interfaces;
 using GTRC_Database_API.EfcContext;
 using GTRC_Basics.Configs;
+using GTRC_Basics;
 
 
 
+Scripts.CreateDirectories();
 SqlConnectionConfig.LoadJson();
 SqlConnectionConfig? sqlConCfg = SqlConnectionConfig.GetActiveConnection();
 if (sqlConCfg is null) { sqlConCfg = SqlConnectionConfig.List[0]; sqlConCfg.IsActive = true; }

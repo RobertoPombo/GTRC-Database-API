@@ -5,6 +5,8 @@ using GTRC_Database_API.Services.Interfaces;
 namespace GTRC_Database_API.Services
 {
     public class CarclassService(ICarclassContext iCarclassContext,
+        EventService eventService,
+        EventCarclassService eventCarclassService,
         IBaseContext<Carclass> iBaseContext) : BaseService<Carclass>(iBaseContext)
     {
         public bool Validate(Carclass? obj)
@@ -41,5 +43,20 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<Carclass?> GetTemp() { Carclass obj = new(); await ValidateUniqProps(obj); return obj; }
+
+        public async Task<List<Carclass>> GetBySeason(Season season)
+        {
+            List<Carclass> list = [];
+            List<Event> listEvents = await eventService.GetChildObjects(typeof(Season), season.Id);
+            foreach (Event _event in listEvents)
+            {
+                List<EventCarclass> listEventCarclasses = await eventCarclassService.GetChildObjects(typeof(Event), _event.Id);
+                foreach (EventCarclass eventCarclass in listEventCarclasses)
+                {
+                    if (!Scripts.ListContainsId(list, eventCarclass.Carclass)) { list.Add(eventCarclass.Carclass); }
+                }
+            }
+            return list;
+        }
     }
 }

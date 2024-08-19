@@ -65,9 +65,6 @@ builder.Services.AddScoped<ISeriesContext, SeriesContext>();
 builder.Services.AddScoped<SeasonService>();
 builder.Services.AddScoped<ISeasonContext, SeasonContext>();
 
-builder.Services.AddScoped<SeasonCarclassService>();
-builder.Services.AddScoped<ISeasonCarclassContext, SeasonCarclassContext>();
-
 builder.Services.AddScoped<OrganizationService>();
 builder.Services.AddScoped<IOrganizationContext, OrganizationContext>();
 

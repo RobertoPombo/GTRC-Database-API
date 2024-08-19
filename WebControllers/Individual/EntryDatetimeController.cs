@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 using GTRC_Basics.Models;
 using GTRC_Database_API.Services;
 using GTRC_Basics.Models.DTOs;
-using GTRC_Basics;
 
 namespace GTRC_Database_API.Controllers
 {
@@ -80,27 +80,11 @@ namespace GTRC_Database_API.Controllers
 
         [HttpPut("Get/ByUniqProps/0/Any")] public async Task<ActionResult<EntryDatetime?>> GetAnyByUniqProps(EntryDatetimeUniqPropsDto0 objDto)
         {
-            EntryDatetimeAddDto _objDtoDto = Scripts.Map(objDto, new EntryDatetimeAddDto());
-            _objDtoDto.Date = null;
-            AddDto<EntryDatetime> _objDto = new() { Dto = _objDtoDto };
-            List<EntryDatetime> list = Scripts.SortByDate(await service.GetByProps(_objDto));
-            if (list.Count == 0 || list[0].Date > objDto.Date)
-            {
-                Entry entry = await fullService.Services[typeof(Entry)].GetById(objDto.EntryId);
-                if (entry is null) { return NotFound(null); }
-                else
-                {
-                    EntryDatetime newObj = new() { EntryId = entry.Id, Date = entry.RegisterDate, CarId = entry.CarId };
-                    await service.ValidateUniqProps(newObj);
-                    if (newObj is not null) { return Ok(newObj); }
-                    else { return StatusCode(406, newObj); }
-                }
-            }
-            else
-            {
-                for (int index = 0; index < list.Count - 1; index++) { if (list[index + 1].Date > objDto.Date) { return Ok(list[index]); } }
-                return Ok(list[^1]);
-            }
+            (HttpStatusCode status, EntryDatetime? obj) = await service.GetAnyByUniqProps(objDto);
+            if (status == HttpStatusCode.OK) { return Ok(obj); }
+            else if (status == HttpStatusCode.NotAcceptable) { return StatusCode(406, obj); }
+            else if (status == HttpStatusCode.NotFound) { return NotFound(obj); }
+            else { return StatusCode(500, obj); }
         }
     }
 }

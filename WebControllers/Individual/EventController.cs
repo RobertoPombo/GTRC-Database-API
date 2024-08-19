@@ -119,5 +119,12 @@ namespace GTRC_Database_API.Controllers
             if (_event is null) { return NotFound(null); }
             else { return Ok(_event); }
         }
+
+        [HttpGet("Get/IsOver/{id}")] public async Task<ActionResult<bool>> GetIsOver(int id)
+        {
+            Event? _event = await service.GetById(id);
+            if (_event is null) { return NotFound(false); }
+            else { return Ok(await service.GetIsOver(_event)); }
+        }
     }
 }

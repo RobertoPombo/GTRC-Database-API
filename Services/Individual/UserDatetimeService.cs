@@ -1,5 +1,8 @@
-﻿using GTRC_Basics;
+﻿using System.Net;
+
+using GTRC_Basics;
 using GTRC_Basics.Models;
+using GTRC_Basics.Models.DTOs;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
@@ -13,9 +16,9 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
-            if (obj.EloRating > User.MaxEloRating) { obj.EloRating = User.MaxEloRating; isValid = false; }
-            else if (obj.EloRating < User.MinEloRating) { obj.EloRating = User.MinEloRating; isValid = false; }
-            if (obj.SafetyRating > User.MaxSafetyRating) { obj.SafetyRating = User.MaxSafetyRating; isValid = false; }
+            if (obj.EloRating > UserDatetime.MaxEloRating) { obj.EloRating = UserDatetime.MaxEloRating; isValid = false; }
+            else if (obj.EloRating < UserDatetime.MinEloRating) { obj.EloRating = UserDatetime.MinEloRating; isValid = false; }
+            if (obj.SafetyRating > UserDatetime.MaxSafetyRating) { obj.SafetyRating = UserDatetime.MaxSafetyRating; isValid = false; }
 
             return isValid;
         }
@@ -67,5 +70,30 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<UserDatetime?> GetTemp() { UserDatetime obj = new(); await ValidateUniqProps(obj); return obj; }
+
+        public async Task<(HttpStatusCode, UserDatetime?)> GetAnyByUniqProps(UserDatetimeUniqPropsDto0 objDto)
+        {
+            UserDatetimeAddDto _objDtoDto = Scripts.Map(objDto, new UserDatetimeAddDto());
+            _objDtoDto.Date = null;
+            AddDto<UserDatetime> _objDto = new() { Dto = _objDtoDto };
+            List<UserDatetime> list = Scripts.SortByDate(await GetByProps(_objDto));
+            if (list.Count == 0 || list[0].Date > objDto.Date)
+            {
+                User? user = await iUserContext.GetById(objDto.UserId);
+                if (user is null) { return (HttpStatusCode.NotFound, null); }
+                else
+                {
+                    UserDatetime newObj = new() { UserId = user.Id, Date = user.RegisterDate };
+                    await ValidateUniqProps(newObj);
+                    if (newObj is not null) { return (HttpStatusCode.OK, newObj); }
+                    else { return (HttpStatusCode.NotAcceptable, newObj); }
+                }
+            }
+            else
+            {
+                for (int index = 0; index < list.Count - 1; index++) { if (list[index + 1].Date > objDto.Date) { return (HttpStatusCode.OK, list[index]); } }
+                return (HttpStatusCode.OK, list[^1]);
+            }
+        }
     }
 }

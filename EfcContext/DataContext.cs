@@ -20,7 +20,6 @@ namespace GTRC_Database_API.Data
         public DbSet<BopTrackCar> BopsTracksCars { get; set; }
         public DbSet<Series> Series { get; set; }
         public DbSet<Season> Seasons { get; set; }
-        public DbSet<SeasonCarclass> SeasonsCarclasses { get; set; }
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<OrganizationUser> OrganizationsUsers { get; set; }
         public DbSet<Team> Teams { get; set; }

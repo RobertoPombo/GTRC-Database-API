@@ -3,7 +3,6 @@
 using GTRC_Basics.Models;
 using GTRC_Database_API.Services;
 using GTRC_Basics.Models.DTOs;
-using GTRC_Basics;
 
 namespace GTRC_Database_API.Controllers
 {

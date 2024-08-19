@@ -23,7 +23,6 @@ namespace GTRC_Database_API.Services
         BopTrackCarService BopTrackCarService,
         SeriesService SeriesService,
         SeasonService SeasonService,
-        SeasonCarclassService SeasonCarclassService,
         OrganizationService OrganizationService,
         OrganizationUserService OrganizationUserService,
         TeamService TeamService,
@@ -60,7 +59,6 @@ namespace GTRC_Database_API.Services
             Services[typeof(BopTrackCar)] = BopTrackCarService;
             Services[typeof(Series)] = SeriesService;
             Services[typeof(Season)] = SeasonService;
-            Services[typeof(SeasonCarclass)] = SeasonCarclassService;
             Services[typeof(Organization)] = OrganizationService;
             Services[typeof(OrganizationUser)] = OrganizationUserService;
             Services[typeof(Team)] = TeamService;

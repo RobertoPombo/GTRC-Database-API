@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 using GTRC_Basics.Models;
 using GTRC_Database_API.Services;
 using GTRC_Basics.Models.DTOs;
-using GTRC_Basics;
 
 namespace GTRC_Database_API.Controllers
 {
@@ -80,30 +80,29 @@ namespace GTRC_Database_API.Controllers
 
         [HttpPut("Get/ByUniqProps/0/Any")] public async Task<ActionResult<EntryEvent?>> GetAnyByUniqProps(EntryEventUniqPropsDto0 objDto)
         {
-            UniqPropsDto<EntryEvent> uniqDto = new() { Dto = objDto };
-            EntryEvent? obj = await service.GetByUniqProps(uniqDto);
-            if (obj is not null) { return Ok(obj); }
-            else 
-            {
-                Entry entry = await fullService.Services[typeof(Entry)].GetById(objDto.EntryId);
-                Event _event = await fullService.Services[typeof(Event)].GetById(objDto.EventId);
-                if (entry is null || _event is null) { return NotFound(null); }
-                else
-                {
-                    DateTime signInDate = GlobalValues.DateTimeMaxValue;
-                    if (EntryFullDto.GetRegisterState(entry) && entry.IsPermanent) { signInDate = GlobalValues.DateTimeMinValue; }
-                    EntryEvent newObj = new()
-                    {
-                        EntryId = entry.Id,
-                        EventId = _event.Id,
-                        SignInDate = signInDate,
-                        IsPointScorer = entry.IsPointScorer
-                    };
-                    await service.ValidateUniqProps(newObj);
-                    if (newObj is not null) { return Ok(newObj); }
-                    else { return StatusCode(406, newObj); }
-                }
-            }
+            (HttpStatusCode status, EntryEvent? obj) = await service.GetAnyByUniqProps(objDto);
+            if (status == HttpStatusCode.OK) { return Ok(obj); }
+            else if (status == HttpStatusCode.NotAcceptable) { return StatusCode(406, obj); }
+            else if (status == HttpStatusCode.NotFound) { return NotFound(obj); }
+            else { return StatusCode(500, obj); }
+        }
+        
+        [HttpGet("Get/SignOutsCount/{entryId}/{eventId}")] public async Task<ActionResult<byte?>> GetSignOutsCount(int entryId, int eventId)
+        {
+            Entry? entry = await fullService.Services[typeof(Entry)].GetById(entryId);
+            if (entry is null) { return NotFound(null); }
+            Event? _event = await fullService.Services[typeof(Event)].GetById(eventId);
+            if (_event is null) { return NotFound(null); }
+            return Ok(await service.GetSignOutsCount(entry, _event));
+        }
+        
+        [HttpGet("Get/NoShowsCount/{entryId}/{eventId}")] public async Task<ActionResult<byte?>> GetNoShowsCount(int entryId, int eventId)
+        {
+            Entry? entry = await fullService.Services[typeof(Entry)].GetById(entryId);
+            if (entry is null) { return NotFound(null); }
+            Event? _event = await fullService.Services[typeof(Event)].GetById(eventId);
+            if (_event is null) { return NotFound(null); }
+            return Ok(await service.GetNoShowsCount(entry, _event));
         }
     }
 }

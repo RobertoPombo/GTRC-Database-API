@@ -24,9 +24,6 @@ namespace GTRC_Database_API.Services
             if (obj.RegisterDate > DateTime.UtcNow || obj.RegisterDate < GlobalValues.DateTimeMinValue) { obj.RegisterDate = DateTime.UtcNow; isValid = false; }
             if (obj.BanDate < obj.RegisterDate) { obj.BanDate = obj.RegisterDate; isValid = false; }
             if (obj.Name3Digits.Length == 3) { obj.Name3Digits = obj.Name3Digits.ToUpper(); } else { obj.Name3Digits = string.Empty; }
-            if (obj.EloRating > User.MaxEloRating) { obj.EloRating = User.MaxEloRating; isValid = false; }
-            else if (obj.EloRating < User.MinEloRating) { obj.EloRating = User.MinEloRating; isValid = false; }
-            if (obj.SafetyRating > User.MaxSafetyRating) { obj.SafetyRating = User.MaxSafetyRating; isValid = false; }
             obj.NickName = Scripts.RemoveSpaceStartEnd(obj.NickName);
             if (obj.NickName == string.Empty) { obj.NickName = nameof(obj.NickName); isValid = false; }
 

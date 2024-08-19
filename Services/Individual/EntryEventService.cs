@@ -1,14 +1,18 @@
-﻿using GTRC_Basics;
+﻿using System.Net;
+
+using GTRC_Basics;
 using GTRC_Basics.Models;
+using GTRC_Basics.Models.DTOs;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
 {
     public class EntryEventService(IEntryEventContext iEntryEventContext,
         IEntryContext IEntryContext,
-        IBaseContext<Entry> iEntryContext,
         IEventContext IEventContext,
+        IBaseContext<Entry> iEntryContext,
         IBaseContext<Event> iEventContext,
+        EventService eventService,
         IBaseContext<EntryEvent> iBaseContext) : BaseService<EntryEvent>(iBaseContext)
     {
         public bool Validate(EntryEvent? obj)
@@ -107,5 +111,74 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<EntryEvent?> GetTemp() { EntryEvent obj = new(); await ValidateUniqProps(obj); return obj; }
+
+        public async Task<(HttpStatusCode, EntryEvent?)> GetAnyByUniqProps(EntryEventUniqPropsDto0 objDto)
+        {
+            UniqPropsDto<EntryEvent> uniqDto = new() { Dto = objDto };
+            EntryEvent? obj = await GetByUniqProps(uniqDto);
+            if (obj is not null) { return (HttpStatusCode.OK, obj); }
+            else
+            {
+                Entry? entry = await iEntryContext.GetById(objDto.EntryId);
+                Event? _event = await iEventContext.GetById(objDto.EventId);
+                if (entry is null || _event is null) { return (HttpStatusCode.NotFound, null); }
+                else
+                {
+                    DateTime signInDate = GlobalValues.DateTimeMaxValue;
+                    if (EntryFullDto.GetRegisterState(entry) && entry.IsPermanent) { signInDate = GlobalValues.DateTimeMinValue; }
+                    EntryEvent newObj = new()
+                    {
+                        EntryId = entry.Id,
+                        EventId = _event.Id,
+                        SignInDate = signInDate,
+                        IsPointScorer = entry.IsPointScorer
+                    };
+                    await ValidateUniqProps(newObj);
+                    if (newObj is not null) { return (HttpStatusCode.OK, newObj); }
+                    else { return (HttpStatusCode.NotAcceptable, newObj); }
+                }
+            }
+        }
+
+        public async Task<byte> GetSignOutsCount(Entry entry, Event nextEvent)
+        {
+            byte count = 0;
+            List<Event> listEvents = Scripts.SortByDate(IEventContext.GetBySeason(entry.SeasonId));
+            foreach (Event _event in listEvents)
+            {
+                if (entry.RegisterDate < _event.Date)
+                {
+                    if (_event.Date >= nextEvent.Date) { return count; }
+                    if (_event.Date > entry.SignOutDate) { return count; }
+                    (HttpStatusCode status, EntryEvent? entryEvent) = await GetAnyByUniqProps(new() { EntryId = entry.Id, EventId = _event.Id });
+                    if (status == HttpStatusCode.OK && entryEvent is not null && !EntryEventFullDto.GetSignInState(entryEvent))
+                    {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+
+        public async Task<byte> GetNoShowsCount(Entry entry, Event nextEvent)
+        {
+            byte count = 0;
+            List<Event> listEvents = Scripts.SortByDate(IEventContext.GetBySeason(entry.SeasonId));
+            for (int eventNr = 0; eventNr < listEvents.Count; eventNr++)
+            {
+                if (entry.RegisterDate < listEvents[eventNr].Date)
+                {
+                    if (listEvents[eventNr].Date >= nextEvent.Date) { return count; }
+                    if (listEvents[eventNr].Date > entry.SignOutDate) { return count; }
+                    (HttpStatusCode status, EntryEvent? entryEvent) = await GetAnyByUniqProps(new() { EntryId = entry.Id, EventId = listEvents[eventNr].Id });
+                    if (status == HttpStatusCode.OK && entryEvent is not null && EntryEventFullDto.GetSignInState(entryEvent) && entryEvent.IsOnEntrylist && !entryEvent.DidAttend &&
+                        await eventService.GetIsOver(listEvents[eventNr]))
+                    {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
     }
 }

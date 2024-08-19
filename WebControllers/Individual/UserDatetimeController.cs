@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 using GTRC_Basics.Models;
 using GTRC_Database_API.Services;
 using GTRC_Basics.Models.DTOs;
-using GTRC_Basics;
 
 namespace GTRC_Database_API.Controllers
 {
@@ -76,6 +76,15 @@ namespace GTRC_Database_API.Controllers
                     return Ok(obj);
                 }
             }
+        }
+
+        [HttpPut("Get/ByUniqProps/0/Any")] public async Task<ActionResult<UserDatetime?>> GetAnyByUniqProps(UserDatetimeUniqPropsDto0 objDto)
+        {
+            (HttpStatusCode status, UserDatetime? obj) = await service.GetAnyByUniqProps(objDto);
+            if (status == HttpStatusCode.OK) { return Ok(obj); }
+            else if (status == HttpStatusCode.NotAcceptable) { return StatusCode(406, obj); }
+            else if (status == HttpStatusCode.NotFound) { return NotFound(obj); }
+            else { return StatusCode(500, obj); }
         }
     }
 }

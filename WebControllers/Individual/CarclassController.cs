@@ -77,5 +77,12 @@ namespace GTRC_Database_API.Controllers
                 }
             }
         }
+
+        [HttpGet("Get/BySeason/{seasonId}")] public async Task<ActionResult<List<Carclass>>> GetBySeason(int seasonId)
+        {
+            Season? season = await fullService.Services[typeof(Season)].GetById(seasonId);
+            if (season is null) { return NotFound(new List<Carclass>()); }
+            return Ok(await service.GetBySeason(season));
+        }
     }
 }

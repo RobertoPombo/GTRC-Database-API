@@ -1,5 +1,8 @@
-﻿using GTRC_Basics;
+﻿using System.Net;
+
+using GTRC_Basics;
 using GTRC_Basics.Models;
+using GTRC_Basics.Models.DTOs;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
@@ -74,5 +77,30 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<EntryDatetime?> GetTemp() { EntryDatetime obj = new(); await ValidateUniqProps(obj); return obj; }
+
+        public async Task<(HttpStatusCode, EntryDatetime?)> GetAnyByUniqProps(EntryDatetimeUniqPropsDto0 objDto)
+        {
+            EntryDatetimeAddDto _objDtoDto = Scripts.Map(objDto, new EntryDatetimeAddDto());
+            _objDtoDto.Date = null;
+            AddDto<EntryDatetime> _objDto = new() { Dto = _objDtoDto };
+            List<EntryDatetime> list = Scripts.SortByDate(await GetByProps(_objDto));
+            if (list.Count == 0 || list[0].Date > objDto.Date)
+            {
+                Entry? entry = await iEntryContext.GetById(objDto.EntryId);
+                if (entry is null) { return (HttpStatusCode.NotFound, null); }
+                else
+                {
+                    EntryDatetime newObj = new() { EntryId = entry.Id, Date = entry.RegisterDate, CarId = entry.CarId };
+                    await ValidateUniqProps(newObj);
+                    if (newObj is not null) { return (HttpStatusCode.OK, newObj); }
+                    else { return (HttpStatusCode.NotAcceptable, newObj); }
+                }
+            }
+            else
+            {
+                for (int index = 0; index < list.Count - 1; index++) { if (list[index + 1].Date > objDto.Date) { return (HttpStatusCode.OK, list[index]); } }
+                return (HttpStatusCode.OK, list[^1]);
+            }
+        }
     }
 }

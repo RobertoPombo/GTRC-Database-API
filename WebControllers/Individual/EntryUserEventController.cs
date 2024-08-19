@@ -76,26 +76,5 @@ namespace GTRC_Database_API.Controllers
                 }
             }
         }
-
-        [HttpPut("Get/ByUniqProps/0/Any")] public async Task<ActionResult<EntryUserEvent?>> GetAnyByUniqProps(EntryUserEventUniqPropsDto0 objDto)
-        {
-            UniqPropsDto<EntryUserEvent> uniqDto = new() { Dto = objDto };
-            EntryUserEvent? obj = await service.GetByUniqProps(uniqDto);
-            if (obj is not null) { return Ok(obj); }
-            else
-            {
-                Entry entry = await fullService.Services[typeof(Entry)].GetById(objDto.EntryId);
-                User user = await fullService.Services[typeof(User)].GetById(objDto.UserId);
-                Event _event = await fullService.Services[typeof(Event)].GetById(objDto.EventId);
-                if (entry is null || user is null || _event is null) { return NotFound(null); }
-                else
-                {
-                    EntryUserEvent newObj = new() { EntryId = entry.Id, UserId = user.Id, EventId = _event.Id };
-                    await service.ValidateUniqProps(newObj);
-                    if (newObj is not null) { return Ok(newObj); }
-                    else { return StatusCode(406, newObj); }
-                }
-            }
-        }
     }
 }

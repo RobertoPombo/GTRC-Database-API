@@ -8,6 +8,8 @@ namespace GTRC_Database_API.Services
     public class EventService(IEventContext iEventContext,
         IBaseContext<Season> iSeasonContext,
         IBaseContext<Track> iTrackContext,
+        SessionService sessionService,
+        ResultsfileService resultsfileService,
         IBaseContext<Event> iBaseContext) : BaseService<Event>(iBaseContext)
     {
         public bool Validate(Event? obj)
@@ -152,6 +154,19 @@ namespace GTRC_Database_API.Services
                 }
             }
             return _event;
+        }
+
+        public async Task<bool> GetIsOver(Event _event, bool onlyWhereIsObligatedAttendance = false)
+        {
+            SessionAddDto addDtoSea = new() { EventId = _event.Id };
+            if (onlyWhereIsObligatedAttendance) { addDtoSea.IsObligatedAttendance = true; }
+            List<Session> listSessions = await sessionService.GetByProps(new() { Dto = addDtoSea });
+            foreach (Session session in listSessions)
+            {
+                List<Resultsfile> listResultsfiles = await resultsfileService.GetChildObjects(typeof(Session), session.Id);
+                if (listResultsfiles.Count == 0) { return false; }
+            }
+            return true;
         }
     }
 }

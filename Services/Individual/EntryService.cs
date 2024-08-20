@@ -109,6 +109,8 @@ namespace GTRC_Database_API.Services
         public async Task<List<Entry>> UpdateRaceNumbers(int seasonId) // Not yet implemented: Nur Meister der Vorsaison darf #1 haben
         {
             List<Entry> updatedEntries = [];
+            Season? season = await seasonService.GetById(seasonId);
+            if (season is null || season.DateEndAutoGenerateRaceNumbers < DateTime.UtcNow) { return updatedEntries; }
             DateTime seasonStartDate = (await eventService.GetFirst(seasonId))?.Date ?? DateTime.MaxValue;
             int seriesId = (await iSeasonContext.GetById(seasonId))?.SeriesId ?? GlobalValues.NoId;
             List<Season> seasons = await seasonService.GetChildObjects(typeof(Series), seriesId);

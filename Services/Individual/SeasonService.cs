@@ -19,9 +19,13 @@ namespace GTRC_Database_API.Services
             if (obj.MinEntriesPerTeam < Season.MinMinEntriesPerTeam) { obj.MinEntriesPerTeam = Season.MinMinEntriesPerTeam; isValid = false; }
             if (obj.MaxEntriesPerTeam < obj.MinEntriesPerTeam) { obj.MaxEntriesPerTeam = obj.MinEntriesPerTeam; isValid = false; }
             if (obj.DateStartRegistration < GlobalValues.DateTimeMinValue) { obj.DateStartRegistration = GlobalValues.DateTimeMinValue; isValid = false; }
+            else if(obj.DateStartRegistration > GlobalValues.DateTimeMaxValue) { obj.DateStartRegistration = GlobalValues.DateTimeMaxValue; isValid = false; }
             if (obj.DateEndRegistration < obj.DateStartRegistration) { obj.DateEndRegistration = obj.DateStartRegistration; isValid = false; }
+            else if(obj.DateEndRegistration > GlobalValues.DateTimeMaxValue) { obj.DateEndRegistration = GlobalValues.DateTimeMaxValue; isValid = false; }
             if (obj.DateStartCarRegistrationLimit < GlobalValues.DateTimeMinValue) { obj.DateStartCarRegistrationLimit = GlobalValues.DateTimeMinValue; isValid = false; }
+            else if(obj.DateStartCarRegistrationLimit > GlobalValues.DateTimeMaxValue) { obj.DateStartCarRegistrationLimit = GlobalValues.DateTimeMaxValue; isValid = false; }
             if (obj.DateStartCarChangeLimit < GlobalValues.DateTimeMinValue) { obj.DateStartCarChangeLimit = GlobalValues.DateTimeMinValue; isValid = false; }
+            else if(obj.DateStartCarChangeLimit > GlobalValues.DateTimeMaxValue) { obj.DateStartCarChangeLimit = GlobalValues.DateTimeMaxValue; isValid = false; }
             Bop? bop = null;
             if (obj.Bop is not null) { bop = iBopContext.GetById(obj.BopId).Result; };
             if (bop is null)
@@ -32,6 +36,11 @@ namespace GTRC_Database_API.Services
             }
             else { obj.Bop = bop; }
             if (obj.DateBoPFreeze < GlobalValues.DateTimeMinValue) { obj.DateBoPFreeze = GlobalValues.DateTimeMinValue; isValid = false; }
+            else if (obj.DateBoPFreeze > GlobalValues.DateTimeMaxValue) { obj.DateBoPFreeze = GlobalValues.DateTimeMaxValue; isValid = false; }
+            if (obj.DateEndAutoGenerateRaceNumbers < GlobalValues.DateTimeMinValue) { obj.DateEndAutoGenerateRaceNumbers = GlobalValues.DateTimeMinValue; isValid = false; }
+            else if (obj.DateEndAutoGenerateRaceNumbers > GlobalValues.DateTimeMaxValue) { obj.DateEndAutoGenerateRaceNumbers = GlobalValues.DateTimeMaxValue; isValid = false; }
+            if (obj.DateEndChangeTeam < GlobalValues.DateTimeMinValue) { obj.DateEndChangeTeam = GlobalValues.DateTimeMinValue; isValid = false; }
+            else if (obj.DateEndChangeTeam > GlobalValues.DateTimeMaxValue) { obj.DateEndChangeTeam = GlobalValues.DateTimeMaxValue; isValid = false; }
 
             return isValid;
         }

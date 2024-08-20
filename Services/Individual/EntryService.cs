@@ -268,7 +268,7 @@ namespace GTRC_Database_API.Services
         public async Task<List<Entry>> GetViolationsAllowDriverLineupPerEvent(Season season)
         {
             List<Entry> list = [];
-            if (season.AllowDriverLineupPerEvent) { return list; }
+            if (season.IsAllowedDriverLineupPerEvent) { return list; }
             List<Entry> listAll = await GetChildObjects(typeof(Season), season.Id);
             List<Event> listEvents = await eventService.GetChildObjects(typeof(Season), season.Id);
             Event? firstEvent = await eventService.GetFirst(season.Id);

@@ -22,7 +22,7 @@ namespace GTRC_Database_API.Services
             obj.LastName = Scripts.RemoveSpaceStartEnd(obj.LastName);
             if (obj.LastName == string.Empty) { obj.LastName = nameof(obj.LastName); isValid = false; }
             if (obj.RegisterDate > DateTime.UtcNow || obj.RegisterDate < GlobalValues.DateTimeMinValue) { obj.RegisterDate = DateTime.UtcNow; isValid = false; }
-            if (obj.BanDate < obj.RegisterDate) { obj.BanDate = obj.RegisterDate; isValid = false; }
+            if (obj.BanDate > GlobalValues.DateTimeMaxValue || obj.BanDate < obj.RegisterDate) { obj.BanDate = GlobalValues.DateTimeMaxValue; isValid = false; }
             if (obj.Name3Digits.Length == 3) { obj.Name3Digits = obj.Name3Digits.ToUpper(); } else { obj.Name3Digits = string.Empty; }
             obj.NickName = Scripts.RemoveSpaceStartEnd(obj.NickName);
             if (obj.NickName == string.Empty) { obj.NickName = nameof(obj.NickName); isValid = false; }
@@ -218,8 +218,8 @@ namespace GTRC_Database_API.Services
         public async Task<List<User>> GetViolationsAllowEntriesShareDriver(Season season, bool onlyIfSameEvent = false)
         {
             List<User> list = [];
-            if (!onlyIfSameEvent && season.AllowEntriesShareDriver) { return list; }
-            else if (onlyIfSameEvent && season.AllowEntriesShareDriverSameEvent) { return list; }
+            if (!onlyIfSameEvent && season.IsAllowedEntriesShareDriver) { return list; }
+            else if (onlyIfSameEvent && season.IsAllowedEntriesShareDriverSameEvent) { return list; }
             List<Event> listEvents = await eventService.GetChildObjects(typeof(Season), season.Id);
             List<EntryUserEvent> allEue = [];
             foreach (Event _event in listEvents)

@@ -167,16 +167,28 @@ namespace GTRC_Database_API.Services
                             }
                         }
                     }
-                    bool[] grantRaceNumber = [registrationEntryCount[0] > registrationEntryCount[1], registrationEntryCount[1] > registrationEntryCount[0]];
+                    bool[] grantRaceNumber = [entry.SignOutDate > DateTime.UtcNow, entryRival.SignOutDate > DateTime.UtcNow];
                     if (grantRaceNumber[0] == grantRaceNumber[1])
                     {
-                        grantRaceNumber = [dateFirstRegistration[0] < dateFirstRegistration[1], dateFirstRegistration[1] < dateFirstRegistration[0]];
+                        grantRaceNumber = [entry.IsPointScorer, entryRival.IsPointScorer];
                         if (grantRaceNumber[0] == grantRaceNumber[1])
                         {
-                            grantRaceNumber = [registrationUserCount[0] > registrationUserCount[1], registrationUserCount[1] > registrationUserCount[0]];
+                            grantRaceNumber = [entry.IsPermanent, entryRival.IsPermanent];
                             if (grantRaceNumber[0] == grantRaceNumber[1])
                             {
-                                grantRaceNumber = [entry.RegisterDate < entryRival.RegisterDate, entryRival.RegisterDate < entry.RegisterDate];
+                                grantRaceNumber = [registrationEntryCount[0] > registrationEntryCount[1], registrationEntryCount[1] > registrationEntryCount[0]];
+                                if (grantRaceNumber[0] == grantRaceNumber[1])
+                                {
+                                    grantRaceNumber = [dateFirstRegistration[0] < dateFirstRegistration[1], dateFirstRegistration[1] < dateFirstRegistration[0]];
+                                    if (grantRaceNumber[0] == grantRaceNumber[1])
+                                    {
+                                        grantRaceNumber = [registrationUserCount[0] > registrationUserCount[1], registrationUserCount[1] > registrationUserCount[0]];
+                                        if (grantRaceNumber[0] == grantRaceNumber[1])
+                                        {
+                                            grantRaceNumber = [entry.RegisterDate < entryRival.RegisterDate, entryRival.RegisterDate < entry.RegisterDate];
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

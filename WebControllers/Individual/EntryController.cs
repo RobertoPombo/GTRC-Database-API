@@ -88,7 +88,24 @@ namespace GTRC_Database_API.Controllers
         {
             Season? season = await fullService.Services[typeof(Season)].GetById(seasonId);
             if (season is null) { return NotFound(new List<Entry>()); }
-            return Ok(await service.UpdateRaceNumbers(season.Id));
+            List<Entry> entriesToBeUpdated = await service.GetToBeUpdatedRaceNumbers(season.Id);
+            bool isBadRequest = false;
+            bool is208 = false;
+            bool is406 = false;
+            foreach (Entry obj in entriesToBeUpdated)
+            {
+                int id = obj.Id;
+                bool isValid = service.Validate(obj);
+                bool isValidUniqProps = await service.ValidateUniqProps(obj);
+                if (obj is null) { isBadRequest = true; }
+                else if (!isValidUniqProps) { is208 = true; }
+                else if (!isValid) { is406 = true; }
+                else { await service.Update(obj); await fullService.UpdateChildObjects(typeof(Entry), obj); }
+            }
+            if (isBadRequest) { return BadRequest(entriesToBeUpdated); }
+            else if (is208) { return StatusCode(208, entriesToBeUpdated); }
+            else if (is406) { return StatusCode(406, entriesToBeUpdated); }
+            else { return Ok(entriesToBeUpdated); }
         }
 
         [HttpGet("Get/ByUserSeason/{userId}/{seasonId}")] public async Task<ActionResult<List<Entry>>> GetByUserSeason(int userId, int seasonId)
@@ -109,14 +126,11 @@ namespace GTRC_Database_API.Controllers
             return Ok(await service.GetByUserEvent(user, _event));
         }
         
-        [HttpGet("Get/CarChangeCount/{entryId}/{eventId}")] public async Task<ActionResult<byte>> GetCarChangeCount(int entryId, int eventId)
+        [HttpGet("Get/DateLatestCarChange/{entryId}")] public async Task<ActionResult<DateTime>> GetCarChangeCount(int entryId, DateTime date)
         {
             Entry? entry = await fullService.Services[typeof(Entry)].GetById(entryId);
             if (entry is null) { return NotFound(byte.MinValue); }
-            Event? _event = await fullService.Services[typeof(Event)].GetById(eventId);
-            if (_event is null) { return NotFound(byte.MinValue); }
-            if (entry.SeasonId != _event.SeasonId) { return StatusCode(406, byte.MinValue); }
-            return Ok(await service.GetCarChangeCount(entry, _event));
+            return Ok(await service.GetDateLatestCarChange(entry, date));
         }
 
         [HttpGet("Get/Violations/MinDriversPerEntryEvent/{seasonId}")] public async Task<ActionResult<List<Entry>>> GetViolationsMinDriversPerEntryEvent(int seasonId)

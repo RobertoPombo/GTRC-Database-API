@@ -76,5 +76,58 @@ namespace GTRC_Database_API.Controllers
                 }
             }
         }
+
+        [HttpGet("Update/Count/{eventId}")] public async Task<ActionResult<List<EventCar>>> UpdateCount(int eventId)
+        {
+            Event? _event = await fullService.Services[typeof(Event)].GetById(eventId);
+            if (_event is null) { return NotFound(new List<EventCar>()); }
+            List<EventCar> list = [];
+            (List<EventCar> eventCarsToBeAdded, List<EventCar> eventCarsToBeUpdated) = await service.CountCars(_event);
+            bool isNotFound = false;
+            bool isBadRequest = false;
+            bool is208 = false;
+            bool is406 = false;
+            foreach (EventCar obj in eventCarsToBeUpdated) { list.Add(obj); }
+            foreach (EventCar obj in eventCarsToBeAdded)
+            {
+                int id = obj.Id;
+                bool isValid = service.Validate(obj);
+                bool isValidUniqProps = await service.ValidateUniqProps(obj);
+                if (obj is null) { isBadRequest = true; }
+                else if (!isValidUniqProps) { is208 = true; }
+                else if (!isValid) { is406 = true; }
+                else
+                {
+                    await service.Add(obj);
+                    UniqPropsDto<EventCar> uniqPropsDto = new();
+                    uniqPropsDto.Dto.Model2Dto(obj);
+                    EventCar? _obj = await service.GetByUniqProps(uniqPropsDto);
+                    if (_obj is null) { isNotFound = true; }
+                    else { list.Add(_obj); }
+                }
+            }
+            if (isNotFound) { return NotFound(list); }
+            else if (isBadRequest) { return BadRequest(list); }
+            else if (is208) { return StatusCode(208, list); }
+            else if (is406) { return StatusCode(406, list); }
+            else
+            {
+                list = await service.CalculateBop(list);
+                foreach (EventCar obj in list)
+                {
+                    int id = obj.Id;
+                    bool isValid = service.Validate(obj);
+                    bool isValidUniqProps = await service.ValidateUniqProps(obj);
+                    if (obj is null) { isBadRequest = true; }
+                    else if (!isValidUniqProps) { is208 = true; }
+                    else if (!isValid) { is406 = true; }
+                    else { await service.Update(obj); await fullService.UpdateChildObjects(typeof(Entry), obj); }
+                }
+                if (isBadRequest) { return BadRequest(list); }
+                else if (is208) { return StatusCode(208, list); }
+                else if (is406) { return StatusCode(406, list); }
+                else { return Ok(list); }
+            }
+        }
     }
 }

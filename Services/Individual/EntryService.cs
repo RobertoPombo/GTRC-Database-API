@@ -106,11 +106,11 @@ namespace GTRC_Database_API.Services
             return list;
         }
 
-        public async Task<List<Entry>> UpdateRaceNumbers(int seasonId) // Not yet implemented: Nur Meister der Vorsaison darf #1 haben
+        public async Task<List<Entry>> GetToBeUpdatedRaceNumbers(int seasonId) // Not yet implemented: Nur Meister der Vorsaison darf #1 haben
         {
-            List<Entry> updatedEntries = [];
+            List<Entry> entriesToBeUpdated = [];
             Season? season = await seasonService.GetById(seasonId);
-            if (season is null || season.DateEndAutoGenerateRaceNumbers < DateTime.UtcNow) { return updatedEntries; }
+            if (season is null || season.DateEndAutoGenerateRaceNumbers < DateTime.UtcNow) { return entriesToBeUpdated; }
             DateTime seasonStartDate = (await eventService.GetFirst(seasonId))?.Date ?? DateTime.MaxValue;
             int seriesId = (await iSeasonContext.GetById(seasonId))?.SeriesId ?? GlobalValues.NoId;
             List<Season> seasons = await seasonService.GetChildObjects(typeof(Series), seriesId);
@@ -129,9 +129,8 @@ namespace GTRC_Database_API.Services
                 if (entryRival is null)
                 {
                     entry.RaceNumber = entry.RaceNumberPreference;
-                    await Update(entry);
-                    for (int index = 0; index < updatedEntries.Count; index++) { if (updatedEntries[index].Id == entry.Id) { updatedEntries.RemoveAt(index); break; } }
-                    updatedEntries.Add(entry);
+                    for (int index = 0; index < entriesToBeUpdated.Count; index++) { if (entriesToBeUpdated[index].Id == entry.Id) { entriesToBeUpdated.RemoveAt(index); break; } }
+                    entriesToBeUpdated.Add(entry);
                 }
                 else
                 {
@@ -195,17 +194,14 @@ namespace GTRC_Database_API.Services
                     if (grantRaceNumber[0])
                     {
                         entry.RaceNumber = entry.RaceNumberPreference;
-                        await Update(entry);
-                        for (int index =  0; index < updatedEntries.Count; index++) { if (updatedEntries[index].Id == entry.Id) { updatedEntries.RemoveAt(index); break; } }
-                        updatedEntries.Add(entry);
-                        await ValidateUniqProps(entryRival);
-                        await Update(entryRival);
-                        for (int index = 0; index < updatedEntries.Count; index++) { if (updatedEntries[index].Id == entryRival.Id) { updatedEntries.RemoveAt(index); break; } }
-                        updatedEntries.Add(entryRival);
+                        for (int index =  0; index < entriesToBeUpdated.Count; index++) { if (entriesToBeUpdated[index].Id == entry.Id) { entriesToBeUpdated.RemoveAt(index); break; } }
+                        entriesToBeUpdated.Add(entry);
+                        for (int index = 0; index < entriesToBeUpdated.Count; index++) { if (entriesToBeUpdated[index].Id == entryRival.Id) { entriesToBeUpdated.RemoveAt(index); break; } }
+                        entriesToBeUpdated.Add(entryRival);
                     }
                 }
             }
-            return updatedEntries;
+            return entriesToBeUpdated;
         }
 
         public async Task<List<Entry>> GetByUserSeason(User user, Season season)
@@ -260,6 +256,26 @@ namespace GTRC_Database_API.Services
                 }
             }
             return carChangeCount;
+        }
+
+        public async Task<DateTime> GetDateLatestCarChange(Entry entry, DateTime _date)
+        {
+            DateTime date = entry.RegisterDate;
+            bool GroupCarLimits = entry.Season.GroupCarRegistrationLimits;
+            List<EntryDatetime> listEntryDatetimes = await entryDatetimeService.GetByProps(new() { Dto = new EntryDatetimeAddDto() { EntryId = entry.Id } });
+            Car car0 = entry.Car;
+            for (int index = 0; index < listEntryDatetimes.Count; index++)
+            {
+                if (listEntryDatetimes[index].Date > _date) { return date; }
+                Car car1 = listEntryDatetimes[index].Car;
+                bool IgnoreCarChange = entry.Season.DaysIgnoreCarRegistrationLimit > (listEntryDatetimes[index].Date - car1.ReleaseDate.ToDateTime(TimeOnly.MinValue)).Days;
+                if (car1.Id != car0.Id && ((!GroupCarLimits && !IgnoreCarChange) || car1.CarclassId != car0.CarclassId || car1.ManufacturerId != car0.ManufacturerId))
+                {
+                    date = listEntryDatetimes[index].Date;
+                }
+                car0 = car1;
+            }
+            return date;
         }
 
         public async Task<List<Entry>> GetViolationsMinDriversPerEntryEvent(Season season, bool isGetViolationsMaxDriversPerEntryEvent = false)

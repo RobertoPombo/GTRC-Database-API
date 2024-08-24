@@ -77,7 +77,7 @@ namespace GTRC_Database_API.Controllers
             }
         }
 
-        [HttpGet("Update/Count/{eventId}")] public async Task<ActionResult<List<EventCar>>> UpdateCount(int eventId)
+        [HttpGet("Update/Bop/{eventId}")] public async Task<ActionResult<List<EventCar>>> UpdateBop(int eventId)
         {
             Event? _event = await fullService.Services[typeof(Event)].GetById(eventId);
             if (_event is null) { return NotFound(new List<EventCar>()); }

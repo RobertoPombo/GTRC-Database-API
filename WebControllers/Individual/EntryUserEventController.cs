@@ -76,5 +76,29 @@ namespace GTRC_Database_API.Controllers
                 }
             }
         }
+
+        [HttpGet("Update/Names3Digits/{eventId}")] public async Task<ActionResult<List<EntryUserEvent>>> UpdateNames3Digits(int eventId)
+        {
+            Event? _event = await fullService.Services[typeof(Event)].GetById(eventId);
+            if (_event is null) { return NotFound(new List<EntryUserEvent>()); }
+            List<EntryUserEvent> euesToBeUpdated = await service.GetNames3Digits(_event.Id);
+            bool isBadRequest = false;
+            bool is208 = false;
+            bool is406 = false;
+            foreach (EntryUserEvent obj in euesToBeUpdated)
+            {
+                int id = obj.Id;
+                bool isValid = service.Validate(obj);
+                bool isValidUniqProps = await service.ValidateUniqProps(obj);
+                if (obj is null) { isBadRequest = true; }
+                else if (!isValidUniqProps) { is208 = true; }
+                else if (!isValid) { is406 = true; }
+                else { await service.Update(obj); await fullService.UpdateChildObjects(typeof(EntryUserEvent), obj); }
+            }
+            if (isBadRequest) { return BadRequest(euesToBeUpdated); }
+            else if (is208) { return StatusCode(208, euesToBeUpdated); }
+            else if (is406) { return StatusCode(406, euesToBeUpdated); }
+            else { return Ok(euesToBeUpdated); }
+        }
     }
 }

@@ -5,8 +5,10 @@ namespace GTRC_Database_API.Services
 {
     public class EntryUserEventService(IEntryUserEventContext iEntryUserEventContext,
         IBaseContext<User> iUserContext,
+        UserService userService,
         IEntryContext IEntryContext,
         IBaseContext<Entry> iEntryContext,
+        EntryService entryService,
         IEventContext IEventContext,
         IBaseContext<Event> iEventContext,
         IBaseContext<EntryUserEvent> iBaseContext) : BaseService<EntryUserEvent>(iBaseContext)
@@ -128,5 +130,56 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<EntryUserEvent?> GetTemp() { EntryUserEvent obj = new(); await ValidateUniqProps(obj); return obj; }
+
+        public async Task<List<EntryUserEvent>> GetNames3Digits(int eventId)
+        {
+            List<EntryUserEvent> listEues = await GetChildObjects(typeof(Event), eventId);
+            bool allUnique = false;
+            int number = 0;
+            foreach (EntryUserEvent eue in listEues) { eue.Name3Digits = userService.GetName3DigitsOptions(eue.User)[0]; }
+            while (!allUnique)
+            {
+                allUnique = true;
+                foreach (EntryUserEvent eue in listEues)
+                {
+                    List<EntryUserEvent> identicalN3D = [];
+                    string currentN3D = eue.Name3Digits;
+                    foreach (EntryUserEvent eue2 in listEues) { if (currentN3D == eue2.Name3Digits) { identicalN3D.Add(eue2); } }
+                    if (identicalN3D.Count > 1)
+                    {
+                        int lvlsMax = -1;
+                        List<EntryUserEvent> identicalN3D_0 = [];
+                        List<EntryUserEvent> identicalN3D_1 = [];
+                        foreach (EntryUserEvent eue2 in identicalN3D)
+                        {
+                            List<string> eue2Name3DigitsOptions = userService.GetName3DigitsOptions(eue2.User);
+                            if (eue2Name3DigitsOptions.IndexOf(currentN3D) == 0) { identicalN3D_0.Add(eue2); }
+                            int lvlsMaxTemp = eue2Name3DigitsOptions.Count - eue2Name3DigitsOptions.IndexOf(currentN3D);
+                            if (lvlsMaxTemp > lvlsMax) { lvlsMax = lvlsMaxTemp; identicalN3D_1 = [eue2]; }
+                        }
+                        if (identicalN3D_0.Count > 0) { identicalN3D = identicalN3D_0; } else { identicalN3D = identicalN3D_1; }
+                        foreach (EntryUserEvent eue2 in identicalN3D)
+                        {
+                            List<string> eue2Name3DigitsOptions = userService.GetName3DigitsOptions(eue2.User);
+                            int currentLvl = eue2Name3DigitsOptions.IndexOf(currentN3D) + 1;
+                            int lvlMax = eue2Name3DigitsOptions.Count;
+                            if (currentLvl == lvlMax) { eue2.Name3Digits = number.ToString(); number++; }
+                            else { eue2.Name3Digits = eue2Name3DigitsOptions[currentLvl]; }
+                        }
+                        allUnique = false;
+                        break;
+                    }
+                }
+            }
+            foreach (EntryUserEvent eue in listEues)
+            {
+                if (int.TryParse(eue.Name3Digits, out number))
+                {
+                    List<string> eueName3DigitsOptions = userService.GetName3DigitsOptions(eue.User);
+                    eue.Name3Digits = eueName3DigitsOptions[0];
+                }
+            }
+            return listEues;
+        }
     }
 }

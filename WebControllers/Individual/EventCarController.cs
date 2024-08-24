@@ -121,7 +121,7 @@ namespace GTRC_Database_API.Controllers
                     if (obj is null) { isBadRequest = true; }
                     else if (!isValidUniqProps) { is208 = true; }
                     else if (!isValid) { is406 = true; }
-                    else { await service.Update(obj); await fullService.UpdateChildObjects(typeof(Entry), obj); }
+                    else { await service.Update(obj); await fullService.UpdateChildObjects(typeof(EventCar), obj); }
                 }
                 if (isBadRequest) { return BadRequest(list); }
                 else if (is208) { return StatusCode(208, list); }

@@ -62,20 +62,21 @@ namespace GTRC_Database_API.Services
 
         public List<string> GetName3DigitsOptions(User obj)
         {
-            List<string> listFirstNames; List<string> listLastNames;
+            List<string> listFirstNames;
+            List<string> listLastNames;
             List<string> tempListN3D = [];
             listFirstNames = FilterLetters4N3D(obj.FirstName);
             listLastNames = FilterLetters4N3D(obj.LastName);
             List<string> listAllNames = [.. listFirstNames, .. listLastNames];
-            tempListN3D = AddN3D(tempListN3D, obj.Name3Digits ?? "");
-            string n3D = "";
+            tempListN3D = AddN3D(tempListN3D, obj.Name3Digits);
+            string n3D = string.Empty;
             foreach (string _name in listLastNames) { n3D += _name[0]; }
             tempListN3D = AddN3D(tempListN3D, n3D);
-            n3D = "";
+            n3D = string.Empty;
             foreach (string _name in listAllNames) { n3D += _name[0]; }
             tempListN3D = AddN3D(tempListN3D, n3D);
             foreach (string _name in listLastNames) { tempListN3D = AddN3D(tempListN3D, _name); }
-            n3D = "";
+            n3D = string.Empty;
             foreach (string _name in listLastNames) { n3D += _name; }
             tempListN3D = AddN3D(tempListN3D, n3D);
             foreach (string _fname in listFirstNames)
@@ -84,7 +85,7 @@ namespace GTRC_Database_API.Services
                 foreach (string _name in listLastNames) { n3D += _name; }
                 tempListN3D = AddN3D(tempListN3D, n3D);
             }
-            n3D = "";
+            n3D = string.Empty;
             foreach (string _name in listLastNames)
             {
                 n3D += _name[..1] + Scripts.StrRemoveVocals(_name[1..]);
@@ -100,7 +101,7 @@ namespace GTRC_Database_API.Services
                 tempListN3D = AddN3D(tempListN3D, n3D);
             }
             foreach (string _fname in listFirstNames) { tempListN3D = AddN3D(tempListN3D, _fname); }
-            n3D = "";
+            n3D = string.Empty;
             foreach (string _name in listLastNames)
             {
                 n3D += _name[..1] + Scripts.StrRemoveVocals(_name[1..]);
@@ -130,7 +131,7 @@ namespace GTRC_Database_API.Services
                     }
                 }
             }
-            n3D = "";
+            n3D = string.Empty;
             foreach (string _name in listLastNames) { n3D += Scripts.StrRemoveVocals(_name[1..]); }
             if (n3D.Length > 2)
             {
@@ -154,7 +155,7 @@ namespace GTRC_Database_API.Services
                     }
                 }
             }
-            n3D = "";
+            n3D = string.Empty;
             foreach (string _name in listAllNames) { n3D += _name; }
             n3D += "XXX";
             return AddN3D(tempListN3D, n3D);

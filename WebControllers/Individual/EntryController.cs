@@ -126,7 +126,17 @@ namespace GTRC_Database_API.Controllers
             return Ok(await service.GetByUserEvent(user, _event));
         }
         
-        [HttpGet("Get/DateLatestCarChange/{entryId}")] public async Task<ActionResult<DateTime>> GetCarChangeCount(int entryId, DateTime date)
+        [HttpGet("Get/CarChangeCount/{entryId}/{eventId}")] public async Task<ActionResult<byte>> GetCarChangeCount(int entryId, int eventId)
+        {
+            Entry? entry = await fullService.Services[typeof(Entry)].GetById(entryId);
+            if (entry is null) { return NotFound(byte.MinValue); }
+            Event? _event = await fullService.Services[typeof(Event)].GetById(eventId);
+            if (_event is null) { return NotFound(byte.MinValue); }
+            if (entry.SeasonId != _event.SeasonId) { return StatusCode(406, byte.MinValue); }
+            return Ok(await service.GetCarChangeCount(entry, _event));
+        }
+        
+        [HttpGet("Get/DateLatestCarChange/{entryId}")] public async Task<ActionResult<DateTime>> GetDateLatestCarChange(int entryId, DateTime date)
         {
             Entry? entry = await fullService.Services[typeof(Entry)].GetById(entryId);
             if (entry is null) { return NotFound(byte.MinValue); }

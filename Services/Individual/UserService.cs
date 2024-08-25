@@ -253,7 +253,10 @@ namespace GTRC_Database_API.Services
                 foreach (User user in userListFull)
                 {
                     bool isInOrganization = false;
-                    foreach (OrganizationUser organizationUser in userListOrganization) { if (organizationUser.User.Id == user.Id) { isInOrganization = true; break; } }
+                    foreach (OrganizationUser organizationUser in userListOrganization)
+                    {
+                        if (organizationUser.User.Id == user.Id && !organizationUser.IsInvited) { isInOrganization = true; break; }
+                    }
                     if (!isInOrganization && !list.Contains(user) && !Scripts.ListContainsId(list, user)) { list.Add(user); }
                 }
             }

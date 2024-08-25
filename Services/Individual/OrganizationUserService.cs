@@ -13,8 +13,8 @@ namespace GTRC_Database_API.Services
             bool isValid = true;
             if (obj is null) { return false; }
 
-            if (obj.IsInvited) { obj.IsAdmin = false; isValid = false; }
-            List<OrganizationUser> listOrganizationUsers = GetAdmins(obj.Organization.Id);
+            if (obj.IsInvited && obj.IsAdmin) { obj.IsAdmin = false; isValid = false; }
+            List<OrganizationUser> listOrganizationUsers = GetAdmins(obj.OrganizationId);
             if (listOrganizationUsers.Count == 0 || (listOrganizationUsers.Count == 1 && listOrganizationUsers[0].UserId == obj.UserId))
             {
                 if (!obj.IsAdmin || obj.IsInvited) { obj.IsInvited = false; obj.IsAdmin = true; isValid = false; }

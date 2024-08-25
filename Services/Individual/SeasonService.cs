@@ -1,5 +1,6 @@
 ﻿using GTRC_Basics;
 using GTRC_Basics.Models;
+using GTRC_Basics.Models.DTOs;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
@@ -97,6 +98,29 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<Season?> GetTemp() { Season obj = new(); await ValidateUniqProps(obj); return obj; }
+
+        public async Task<int?> GetNr(int id)
+        {
+            Season? obj = await GetById(id);
+            if (obj is null) { return null; }
+            else
+            {
+                int seasonNr = 0;
+                AddDto<Season> objDto = new();
+                objDto.Dto.SeriesId = obj.SeriesId;
+                List<Season> list = Scripts.SortByDate(await GetByProps(objDto));
+                foreach (Season _obj in list) { seasonNr++; if (_obj.Id == obj.Id) { return seasonNr; } }
+                return null;
+            }
+        }
+
+        public async Task<Season?> GetByNr(int seriesId, int nr)
+        {
+            List<Season> list = Scripts.SortByDate(await GetChildObjects(typeof(Series), seriesId));
+            int seasonNr = 0;
+            foreach (Season obj in list) { seasonNr++; if (seasonNr == nr) { return obj; } }
+            return null;
+        }
 
         public async Task<Season?> GetCurrent(int seriesId, DateTime date)
         {

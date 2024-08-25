@@ -130,7 +130,7 @@ namespace GTRC_Database_API.Services
         {
             List<Event> list = Scripts.SortByDate(await GetChildObjects(typeof(Season), seasonId));
             int eventNr = 0;
-            foreach (Event _event in list) { if (!_event.IsPreQualifying) { eventNr++; if (eventNr == nr) { return _event; } } }
+            foreach (Event obj in list) { if (!obj.IsPreQualifying) { eventNr++; if (eventNr == nr) { return obj; } } }
             return null;
         }
 

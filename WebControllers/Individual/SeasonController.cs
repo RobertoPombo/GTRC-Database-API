@@ -77,6 +77,20 @@ namespace GTRC_Database_API.Controllers
             }
         }
 
+        [HttpGet("Get/Nr/{id}")] public async Task<ActionResult<int?>> GetNr(int id)
+        {
+            int? nr = await service.GetNr(id);
+            if (nr is null) { return NotFound(nr); }
+            else { return Ok(nr); }
+        }
+
+        [HttpGet("Get/ByNr/{seriesId}/{nr}")] public async Task<ActionResult<Season?>> GetByNr(int seriesId, int nr)
+        {
+            Season? obj = await service.GetByNr(seriesId, nr);
+            if (obj is null) { return NotFound(obj); }
+            else { return Ok(obj); }
+        }
+
         [HttpGet("Get/Current/{seriesId}")] public async Task<ActionResult<Season?>> GetCurrent(int seriesId, DateTime date)
         {
             Season? obj = await service.GetCurrent(seriesId, date);

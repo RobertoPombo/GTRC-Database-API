@@ -3,6 +3,7 @@
 using GTRC_Basics.Models;
 using GTRC_Database_API.Services;
 using GTRC_Basics.Models.DTOs;
+using GTRC_Basics;
 
 namespace GTRC_Database_API.Controllers
 {
@@ -139,7 +140,7 @@ namespace GTRC_Database_API.Controllers
         [HttpGet("Get/DateLatestCarChange/{entryId}")] public async Task<ActionResult<DateTime>> GetDateLatestCarChange(int entryId, DateTime date)
         {
             Entry? entry = await fullService.Services[typeof(Entry)].GetById(entryId);
-            if (entry is null) { return NotFound(byte.MinValue); }
+            if (entry is null) { return NotFound(GlobalValues.DateTimeMinValue); }
             return Ok(await service.GetDateLatestCarChange(entry, date));
         }
 

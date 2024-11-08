@@ -90,7 +90,7 @@ namespace GTRC_Database_API.Services
                 if (entry is null) { return (HttpStatusCode.NotFound, null); }
                 else
                 {
-                    EntryDatetime newObj = new() { EntryId = entry.Id, Date = entry.RegisterDate, CarId = entry.CarId };
+                    EntryDatetime newObj = new() { EntryId = entry.Id, Date = entry.RegisterDate, CarId = entry.CarId, IsPermanent = entry.IsPermanent };
                     await ValidateUniqProps(newObj);
                     if (newObj is not null) { return (HttpStatusCode.OK, newObj); }
                     else { return (HttpStatusCode.NotAcceptable, newObj); }

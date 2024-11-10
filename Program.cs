@@ -103,14 +103,20 @@ builder.Services.AddScoped<IPointssystemContext, PointssystemContext>();
 builder.Services.AddScoped<PointssystemPositionService>();
 builder.Services.AddScoped<IPointssystemPositionContext, PointssystemPositionContext>();
 
-builder.Services.AddScoped<StintAnalysisMethodService>();
-builder.Services.AddScoped<IStintAnalysisMethodContext, StintAnalysisMethodContext>();
+builder.Services.AddScoped<StintanalysismethodService>();
+builder.Services.AddScoped<IStintanalysismethodContext, StintanalysismethodContext>();
 
 builder.Services.AddScoped<ServerService>();
 builder.Services.AddScoped<IServerContext, ServerContext>();
 
 builder.Services.AddScoped<SessionService>();
 builder.Services.AddScoped<ISessionContext, SessionContext>();
+
+builder.Services.AddScoped<PerformancerequirementService>();
+builder.Services.AddScoped<IPerformancerequirementContext, PerformancerequirementContext>();
+
+builder.Services.AddScoped<PrequalifyingService>();
+builder.Services.AddScoped<IPrequalifyingContext, PrequalifyingContext>();
 
 builder.Services.AddScoped<ResultsfileService>();
 builder.Services.AddScoped<IResultsfileContext, ResultsfileContext>();

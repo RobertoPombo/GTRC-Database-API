@@ -27,6 +27,8 @@ namespace GTRC_Database_API.Services
             else if(obj.DateStartCarRegistrationLimit > GlobalValues.DateTimeMaxValue) { obj.DateStartCarRegistrationLimit = GlobalValues.DateTimeMaxValue; isValid = false; }
             if (obj.DateStartCarChangeLimit < GlobalValues.DateTimeMinValue) { obj.DateStartCarChangeLimit = GlobalValues.DateTimeMinValue; isValid = false; }
             else if(obj.DateStartCarChangeLimit > GlobalValues.DateTimeMaxValue) { obj.DateStartCarChangeLimit = GlobalValues.DateTimeMaxValue; isValid = false; }
+            if (obj.DateStartResetPointsForCarChange < GlobalValues.DateTimeMinValue) { obj.DateStartResetPointsForCarChange = GlobalValues.DateTimeMinValue; isValid = false; }
+            else if (obj.DateStartResetPointsForCarChange > GlobalValues.DateTimeMaxValue) { obj.DateStartResetPointsForCarChange = GlobalValues.DateTimeMaxValue; isValid = false; }
             Bop? bop = null;
             if (obj.Bop is not null) { bop = iBopContext.GetById(obj.BopId).Result; };
             if (bop is null)
@@ -36,8 +38,8 @@ namespace GTRC_Database_API.Services
                 else { obj.Bop = list[0]; obj.BopId = list[0].Id; isValid = false; }
             }
             else { obj.Bop = bop; }
-            if (obj.DateBoPFreeze < GlobalValues.DateTimeMinValue) { obj.DateBoPFreeze = GlobalValues.DateTimeMinValue; isValid = false; }
-            else if (obj.DateBoPFreeze > GlobalValues.DateTimeMaxValue) { obj.DateBoPFreeze = GlobalValues.DateTimeMaxValue; isValid = false; }
+            if (obj.DateBopFreeze < GlobalValues.DateTimeMinValue) { obj.DateBopFreeze = GlobalValues.DateTimeMinValue; isValid = false; }
+            else if (obj.DateBopFreeze > GlobalValues.DateTimeMaxValue) { obj.DateBopFreeze = GlobalValues.DateTimeMaxValue; isValid = false; }
             if (obj.DateEndAutoGenerateRaceNumbers < GlobalValues.DateTimeMinValue) { obj.DateEndAutoGenerateRaceNumbers = GlobalValues.DateTimeMinValue; isValid = false; }
             else if (obj.DateEndAutoGenerateRaceNumbers > GlobalValues.DateTimeMaxValue) { obj.DateEndAutoGenerateRaceNumbers = GlobalValues.DateTimeMaxValue; isValid = false; }
             if (obj.DateEndChangeTeam < GlobalValues.DateTimeMinValue) { obj.DateEndChangeTeam = GlobalValues.DateTimeMinValue; isValid = false; }

@@ -123,7 +123,7 @@ namespace GTRC_Database_API.Services
                 if (statusEntEve == HttpStatusCode.OK && entry.RegisterDate < _event.Date && entry.IsPointScorer)
                 {
                     DateTime carChangeDateMax = _event.Date;
-                    if (season.DateBoPFreeze < _event.Date) { carChangeDateMax = season.DateBoPFreeze; }
+                    if (season.DateBopFreeze < _event.Date) { carChangeDateMax = season.DateBopFreeze; }
                     Car car = entry.Car;
                     Car carAtFreeze = entry.Car;
                     (HttpStatusCode statusEntDat, EntryDatetime? entryDatetime) = await entryDatetimeService.GetAnyByUniqProps(new() { EntryId = entry.Id, Date = _event.Date });
@@ -159,8 +159,8 @@ namespace GTRC_Database_API.Services
                     bool respectsRegLimitAtFreeze0 = carChangeDateAtFreeze < season.DateStartCarRegistrationLimit;
                     bool respectsRegLimitAtFreeze = respectsRegLimitAtFreeze0 || carCountBop < season.CarRegistrationLimit;
                     bool isRegistered = entry.SignOutDate > _event.Date;
-                    bool isRegisteredAtFreeze0 = entry.RegisterDate < season.DateBoPFreeze;
-                    bool isRegisteredAtFreeze = isRegisteredAtFreeze0 && (entry.SignOutDate > season.DateBoPFreeze || entry.SignOutDate > _event.Date);
+                    bool isRegisteredAtFreeze0 = entry.RegisterDate < season.DateBopFreeze;
+                    bool isRegisteredAtFreeze = isRegisteredAtFreeze0 && (entry.SignOutDate > season.DateBopFreeze || entry.SignOutDate > _event.Date);
                     if (isRegisteredAtFreeze && respectsRegLimitAtFreeze) { eventCarAtFreeze.CountBop++; }
                     if (isRegistered && respectsRegLimit) { eventCarAtFreeze.Count++; }  //not yet implemented: Hier war im CommunityManager eine Änderung der EventsEntries vorgesehen
                 }

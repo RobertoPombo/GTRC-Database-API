@@ -35,9 +35,11 @@ namespace GTRC_Database_API.Services
         EntryUserEventService EntryUserEventService,
         PointssystemService PointssystemService,
         PointssystemPositionService PointssystemPositionService,
-        StintAnalysisMethodService StintAnalysisMethodService,
+        StintanalysismethodService StintanalysismthodService,
         ServerService ServerService,
         SessionService SessionService,
+        PerformancerequirementService PerformancerequirementService,
+        PrequalifyingService PrequalifyingService,
         ResultsfileService ResultsfileService,
         LapService LapService,
         LeaderboardlineService LeaderboardlineService,
@@ -71,9 +73,11 @@ namespace GTRC_Database_API.Services
             Services[typeof(EntryUserEvent)] = EntryUserEventService;
             Services[typeof(Pointssystem)] = PointssystemService;
             Services[typeof(PointssystemPosition)] = PointssystemPositionService;
-            Services[typeof(StintAnalysisMethod)] = StintAnalysisMethodService;
+            Services[typeof(Stintanalysismethod)] = StintanalysismthodService;
             Services[typeof(Server)] = ServerService;
             Services[typeof(Session)] = SessionService;
+            Services[typeof(Performancerequirement)] = PerformancerequirementService;
+            Services[typeof(Prequalifying)] = PrequalifyingService;
             Services[typeof(Resultsfile)] = ResultsfileService;
             Services[typeof(Lap)] = LapService;
             Services[typeof(Leaderboardline)] = LeaderboardlineService;

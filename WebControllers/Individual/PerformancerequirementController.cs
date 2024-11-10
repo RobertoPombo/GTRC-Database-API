@@ -7,39 +7,39 @@ using GTRC_Basics.Models.DTOs;
 namespace GTRC_Database_API.Controllers
 {
     [ApiController]
-    [Route(nameof(Stintanalysismethod))]
-    public class StintanalysismethodController(StintanalysismethodService service, BaseService<Stintanalysismethod> baseService, FullService<Stintanalysismethod> fullService) : BaseController<Stintanalysismethod>(baseService, fullService)
+    [Route(nameof(Performancerequirement))]
+    public class PerformancerequirementController(PerformancerequirementService service, BaseService<Performancerequirement> baseService, FullService<Performancerequirement> fullService) : BaseController<Performancerequirement>(baseService, fullService)
     {
-        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Stintanalysismethod?>> GetByUniqProps(StintanalysismethodUniqPropsDto0 objDto)
+        [HttpPut("Get/ByUniqProps/0")] public async Task<ActionResult<Performancerequirement?>> GetByUniqProps(PerformancerequirementUniqPropsDto0 objDto)
         {
-            UniqPropsDto<Stintanalysismethod> _objDto = new() { Index = 0, Dto = objDto };
-            Stintanalysismethod? obj = await service.GetByUniqProps(_objDto);
+            UniqPropsDto<Performancerequirement> _objDto = new() { Index = 0, Dto = objDto };
+            Performancerequirement? obj = await service.GetByUniqProps(_objDto);
             if (obj is null) { return NotFound(obj); }
             else { return Ok(obj); }
         }
 
-        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<Stintanalysismethod>>> GetByProps(StintanalysismethodAddDto objDto)
+        [HttpPut("Get/ByProps")] public async Task<ActionResult<List<Performancerequirement>>> GetByProps(PerformancerequirementAddDto objDto)
         {
-            AddDto<Stintanalysismethod> _objDto = new() { Dto = objDto };
+            AddDto<Performancerequirement> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByProps(_objDto));
         }
 
-        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<Stintanalysismethod>>> GetByFilter(StintanalysismethodFilterDtos objDto)
+        [HttpPut("Get/ByFilter")] public async Task<ActionResult<List<Performancerequirement>>> GetByFilter(PerformancerequirementFilterDtos objDto)
         {
-            FilterDtos<Stintanalysismethod> _objDto = new() { Dto = objDto };
+            FilterDtos<Performancerequirement> _objDto = new() { Dto = objDto };
             return Ok(await service.GetByFilter(_objDto.Filter, _objDto.FilterMin, _objDto.FilterMax));
         }
 
-        [HttpGet("Get/Temp")] public async Task<ActionResult<Stintanalysismethod?>> GetTemp()
+        [HttpGet("Get/Temp")] public async Task<ActionResult<Performancerequirement?>> GetTemp()
         {
-            Stintanalysismethod? obj = await service.GetTemp();
+            Performancerequirement? obj = await service.GetTemp();
             if (obj is null) { return BadRequest(obj); }
             else { return Ok(obj); }
         }
 
-        [HttpPost("Add")] public async Task<ActionResult<Stintanalysismethod?>> Add(StintanalysismethodAddDto objDto)
+        [HttpPost("Add")] public async Task<ActionResult<Performancerequirement?>> Add(PerformancerequirementAddDto objDto)
         {
-            Stintanalysismethod? obj = objDto.Dto2Model();
+            Performancerequirement? obj = objDto.Dto2Model();
             bool isValid = service.Validate(obj);
             bool isValidUniqProps = await service.ValidateUniqProps(obj);
             if (obj is null) { return BadRequest(obj); }
@@ -48,7 +48,7 @@ namespace GTRC_Database_API.Controllers
             else
             {
                 await service.Add(obj);
-                UniqPropsDto<Stintanalysismethod> uniqPropsDto = new();
+                UniqPropsDto<Performancerequirement> uniqPropsDto = new();
                 uniqPropsDto.Dto.Model2Dto(obj);
                 obj = await service.GetByUniqProps(uniqPropsDto);
                 if (obj is null) { return NotFound(obj); }
@@ -56,9 +56,9 @@ namespace GTRC_Database_API.Controllers
             }
         }
 
-        [HttpPut("Update")] public async Task<ActionResult<Stintanalysismethod?>> Update(StintanalysismethodUpdateDto objDto)
+        [HttpPut("Update")] public async Task<ActionResult<Performancerequirement?>> Update(PerformancerequirementUpdateDto objDto)
         {
-            Stintanalysismethod? obj = await service.GetById(objDto.Id);
+            Performancerequirement? obj = await service.GetById(objDto.Id);
             if (obj is null) { return NotFound(obj); }
             else
             {
@@ -71,7 +71,7 @@ namespace GTRC_Database_API.Controllers
                 else
                 {
                     await service.Update(obj);
-                    await fullService.UpdateChildObjects(typeof(Stintanalysismethod), obj);
+                    await fullService.UpdateChildObjects(typeof(Performancerequirement), obj);
                     return Ok(obj);
                 }
             }

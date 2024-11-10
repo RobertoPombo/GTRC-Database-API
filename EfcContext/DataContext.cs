@@ -32,9 +32,11 @@ namespace GTRC_Database_API.Data
         public DbSet<EntryUserEvent> EntriesUsersEvents { get; set; }
         public DbSet<Pointssystem> Pointssystems { get; set; }
         public DbSet<PointssystemPosition> PointssystemsPositions { get; set; }
-        public DbSet<StintAnalysisMethod> StintAnalysisMethods { get; set; }
+        public DbSet<Stintanalysismethod> Stintanalysismethods { get; set; }
         public DbSet<Server> Servers { get; set; }
         public DbSet<Session> Sessions { get; set; }
+        public DbSet<Performancerequirement> Performancerequirements { get; set; }
+        public DbSet<Prequalifying> Prequalifyings { get; set; }
         public DbSet<Resultsfile> Resultsfiles { get; set; }
         public DbSet<Lap> Laps { get; set; }
         public DbSet<Leaderboardline> Leaderboardlines { get; set; }

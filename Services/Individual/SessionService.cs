@@ -8,7 +8,7 @@ namespace GTRC_Database_API.Services
     public class SessionService(ISessionContext iSessionContext,
         IBaseContext<Event> iEventContext,
         IBaseContext<Pointssystem> iPointssystemContext,
-        IBaseContext<StintAnalysisMethod> iStintAnalysisMethodContext,
+        IBaseContext<Stintanalysismethod> iStintanalysismethodContext,
         IBaseContext<Session> iBaseContext) : BaseService<Session>(iBaseContext)
     {
         public bool Validate(Session? obj)
@@ -24,15 +24,15 @@ namespace GTRC_Database_API.Services
                 obj.DurationMin = (ushort)Math.Min(Math.Abs((GlobalValues.DateTimeMaxValue - obj.Event.Date).TotalMinutes - (obj.SessionsCount * obj.StartTimeOffsetMin)), ushort.MaxValue);
                 isValid = false;
             }
-            StintAnalysisMethod? stintAnalysisMethod = null;
-            if (obj.StintAnalysisMethod is not null) { stintAnalysisMethod = iStintAnalysisMethodContext.GetById(obj.StintAnalysisMethodId).Result; };
+            Stintanalysismethod? stintAnalysisMethod = null;
+            if (obj.Stintanalysismethod is not null) { stintAnalysisMethod = iStintanalysismethodContext.GetById(obj.StintanalysismethodId).Result; };
             if (stintAnalysisMethod is null)
             {
-                List<StintAnalysisMethod> list = iStintAnalysisMethodContext.GetAll().Result;
+                List<Stintanalysismethod> list = iStintanalysismethodContext.GetAll().Result;
                 if (list.Count == 0) { obj = null; return false; }
-                else { obj.StintAnalysisMethod = list[0]; obj.StintAnalysisMethodId = list[0].Id; isValid = false; }
+                else { obj.Stintanalysismethod = list[0]; obj.StintanalysismethodId = list[0].Id; isValid = false; }
             }
-            else { obj.StintAnalysisMethod = stintAnalysisMethod; }
+            else { obj.Stintanalysismethod = stintAnalysisMethod; }
             Pointssystem? pointssystem = null;
             if (obj.Pointssystem is not null) { pointssystem = iPointssystemContext.GetById(obj.PointssystemId).Result; };
             if (pointssystem is null)
@@ -66,6 +66,9 @@ namespace GTRC_Database_API.Services
             if (obj.DayOfWeekend > Session.MaxDayOfWeekend) { obj.DayOfWeekend = Session.MaxDayOfWeekend; isValid = false; }
             if (obj.TimeMultiplier < Session.MinTimeMultiplier) { obj.TimeMultiplier = Session.MinTimeMultiplier; isValid = false; }
             if (obj.TimeMultiplier > Session.MaxTimeMultiplier) { obj.TimeMultiplier = Session.MaxTimeMultiplier; isValid = false; }
+            if (obj.CloudLevel > Session.MaxCloudLevel) { obj.CloudLevel = Session.MaxCloudLevel; isValid = false; }
+            if (obj.RainLevel > Session.MaxRainLevel) { obj.RainLevel = Session.MaxRainLevel; isValid = false; }
+            if (obj.WeatherRandomness > Session.MaxWeatherRandomness) { obj.WeatherRandomness = Session.MaxWeatherRandomness; isValid = false; }
             if (obj.EntrylistType == EntrylistType.None && obj.ForceEntrylist) { obj.ForceEntrylist = false; isValid = false; }
             if (obj.EntrylistType != EntrylistType.Season && obj.ForceCarModel) { obj.ForceCarModel = false; isValid = false; }
             obj.ServerName = Scripts.RemoveSpaceStartEnd(obj.ServerName);

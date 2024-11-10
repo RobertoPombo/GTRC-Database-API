@@ -126,5 +126,12 @@ namespace GTRC_Database_API.Controllers
             if (_event is null) { return NotFound(false); }
             else { return Ok(await service.GetIsOver(_event)); }
         }
+
+        [HttpGet("Get/HasSessionScorePoints/{id}")] public async Task<ActionResult<bool>> GetHasSessionScorePoints(int id)
+        {
+            Event? _event = await service.GetById(id);
+            if (_event is null) { return NotFound(false); }
+            else { return Ok(await service.GetHasSessionScorePoints(_event)); }
+        }
     }
 }

@@ -10,6 +10,7 @@ namespace GTRC_Database_API.Services
         IBaseContext<Track> iTrackContext,
         SessionService sessionService,
         ResultsfileService resultsfileService,
+        PointssystemPositionService pointssystemPositionService,
         IBaseContext<Event> iBaseContext) : BaseService<Event>(iBaseContext)
     {
         public bool Validate(Event? obj)
@@ -26,9 +27,6 @@ namespace GTRC_Database_API.Services
                 else { obj.Track = list[0]; obj.TrackId = list[0].Id; isValid = false; }
             }
             else { obj.Track = track; }
-            if (obj.CloudLevel > Event.MaxCloudLevel) { obj.CloudLevel = Event.MaxCloudLevel; isValid = false; }
-            if (obj.RainLevel > Event.MaxRainLevel) { obj.RainLevel = Event.MaxRainLevel; isValid = false; }
-            if (obj.WeatherRandomness > Event.MaxWeatherRandomness) { obj.WeatherRandomness = Event.MaxWeatherRandomness; isValid = false; }
 
             return isValid;
         }
@@ -113,13 +111,13 @@ namespace GTRC_Database_API.Services
             else
             {
                 int eventNr = 0;
-                if (obj.IsPreQualifying) { return eventNr; }
+                if (!await GetHasSessionScorePoints(obj)) { return eventNr; }
                 AddDto<Event> objDto = new();
                 objDto.Dto.SeasonId = obj.SeasonId;
                 List<Event> list = Scripts.SortByDate(await GetByProps(objDto));
                 foreach (Event _obj in list)
                 {
-                    if (!_obj.IsPreQualifying) { eventNr++; }
+                    if (await GetHasSessionScorePoints(obj)) { eventNr++; }
                     if (_obj.Id == obj.Id) { return eventNr; }
                 }
                 return null;
@@ -130,7 +128,7 @@ namespace GTRC_Database_API.Services
         {
             List<Event> list = Scripts.SortByDate(await GetChildObjects(typeof(Season), seasonId));
             int eventNr = 0;
-            foreach (Event obj in list) { if (!obj.IsPreQualifying) { eventNr++; if (eventNr == nr) { return obj; } } }
+            foreach (Event obj in list) { if (await GetHasSessionScorePoints(obj)) { eventNr++; if (eventNr == nr) { return obj; } } }
             return null;
         }
 
@@ -138,7 +136,7 @@ namespace GTRC_Database_API.Services
         {
             Event? next = null;
             List<Event> list = Scripts.SortByDate(await GetChildObjects(typeof(Season), seasonId));
-            foreach (Event obj in list) { next = obj; if (obj.Date > date && !obj.IsPreQualifying) { return next; } }
+            foreach (Event obj in list) { next = obj; if (obj.Date > date && await GetHasSessionScorePoints(obj)) { return next; } }
             return next;
         }
 
@@ -148,7 +146,8 @@ namespace GTRC_Database_API.Services
             List<Event> events = await GetChildObjects(typeof(Season), seasonId);
             foreach (Event _eventCandidate in events)
             {
-                if (!_eventCandidate.IsPreQualifying && (_event is null || (!isGetFinal && _event.Date > _eventCandidate.Date) || (isGetFinal && _event.Date < _eventCandidate.Date)))
+                if (await GetHasSessionScorePoints(_eventCandidate) &&
+                    (_event is null || (!isGetFinal && _event.Date > _eventCandidate.Date) || (isGetFinal && _event.Date < _eventCandidate.Date)))
                 {
                     _event = _eventCandidate;
                 }
@@ -167,6 +166,20 @@ namespace GTRC_Database_API.Services
                 if (listResultsfiles.Count == 0) { return false; }
             }
             return true;
+        }
+
+        public async Task<bool> GetHasSessionScorePoints(Event _event)
+        {
+            List<Session> listSessions = await sessionService.GetChildObjects(typeof(Event), _event.Id);
+            foreach (Session session in listSessions)
+            {
+                List<PointssystemPosition> listPsP = await pointssystemPositionService.GetChildObjects(typeof(Pointssystem), session.PointssystemId);
+                foreach (PointssystemPosition pointssystemPosition in listPsP)
+                {
+                    if (pointssystemPosition.Points > 0) { return true; }
+                }
+            }
+            return false;
         }
     }
 }

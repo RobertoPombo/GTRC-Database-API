@@ -5,7 +5,7 @@ using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.EfcContext
 {
-    public class StintanalysismethodContext(DataContext db) : IStintanalysismethodContext
+    public class PrequalifyingContext(DataContext db) : IPrequalifyingContext
     {
 
     }

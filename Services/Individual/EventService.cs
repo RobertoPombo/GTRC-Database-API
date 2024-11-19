@@ -117,7 +117,7 @@ namespace GTRC_Database_API.Services
                 List<Event> list = Scripts.SortByDate(await GetByProps(objDto));
                 foreach (Event _obj in list)
                 {
-                    if (await GetHasSessionScorePoints(obj)) { eventNr++; }
+                    if (await GetHasSessionScorePoints(_obj)) { eventNr++; }
                     if (_obj.Id == obj.Id) { return eventNr; }
                 }
                 return null;

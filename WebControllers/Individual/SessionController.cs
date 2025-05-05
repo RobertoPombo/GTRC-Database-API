@@ -76,5 +76,12 @@ namespace GTRC_Database_API.Controllers
                 }
             }
         }
+
+        [HttpGet("Get/Related/{sessionId}")] public async Task<ActionResult<List<Session>>> GetRelated(int sessionId)
+        {
+            Session? _session = await service.GetById(sessionId);
+            if (_session is null) { return NotFound(null); }
+            else { return Ok(await service.GetRelated(_session, [_session])); }
+        }
     }
 }

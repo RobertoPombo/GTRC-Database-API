@@ -139,5 +139,19 @@ namespace GTRC_Database_API.Services
         }
 
         public async Task<Session?> GetTemp() { Session obj = new(); await ValidateUniqProps(obj); return obj; }
+
+        public async Task<List<Session>> GetRelated(Session session, List<Session> relatedSessions)
+        {
+            List<Session> sessions = await GetChildObjects(typeof(Event), session.EventId);
+            foreach (Session _sessionCandidate in sessions)
+            {
+                if (!Scripts.ListContainsId(relatedSessions, _sessionCandidate) && (_sessionCandidate.Id == session.PreviousSessionId || _sessionCandidate.PreviousSessionId == session.Id))
+                {
+                    relatedSessions.Add(_sessionCandidate);
+                    relatedSessions = await GetRelated(_sessionCandidate, relatedSessions);
+                }
+            }
+            return relatedSessions;
+        }
     }
 }

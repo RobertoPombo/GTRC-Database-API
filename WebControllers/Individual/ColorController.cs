@@ -19,6 +19,14 @@ namespace GTRC_Database_API.Controllers
             else { return Ok(obj); }
         }
 
+        [HttpPut("Get/ByUniqProps/1")] public async Task<ActionResult<Color?>> GetByUniqProps(ColorUniqPropsDto1 objDto)
+        {
+            UniqPropsDto<Color> _objDto = new() { Index = 1, Dto = objDto };
+            Color? obj = await service.GetByUniqProps(_objDto);
+            if (obj is null) { return NotFound(obj); }
+            else { return Ok(obj); }
+        }
+
         [HttpPut("Get/ByProps")] public async Task<ActionResult<List<Color>>> GetByProps(ColorAddDto objDto)
         {
             AddDto<Color> _objDto = new() { Dto = objDto };

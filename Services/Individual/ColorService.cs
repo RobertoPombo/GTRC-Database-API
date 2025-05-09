@@ -1,4 +1,5 @@
-﻿using GTRC_Basics.Models;
+﻿using GTRC_Basics;
+using GTRC_Basics.Models;
 using GTRC_Database_API.Services.Interfaces;
 
 namespace GTRC_Database_API.Services
@@ -18,6 +19,22 @@ namespace GTRC_Database_API.Services
         {
             bool isValidUniqProps = true;
             if (obj is null) { return false; }
+
+            obj.Purpose = Scripts.RemoveSpaceStartEnd(obj.Purpose);
+            if (obj.Purpose == string.Empty) { obj.Purpose = Color.DefaultPurpose; isValidUniqProps = false; }
+
+            int nr = 1;
+            string delimiter = " #";
+            string defPurpose = obj.Purpose;
+            string[] defPurposeList = defPurpose.Split(delimiter);
+            if (defPurposeList.Length > 1 && int.TryParse(defPurposeList[^1], out _)) { defPurpose = defPurpose[..^(defPurposeList[^1].Length + delimiter.Length)]; }
+            while (!await IsUnique(obj, 0))
+            {
+                isValidUniqProps = false;
+                obj.Purpose = defPurpose + delimiter + nr.ToString();
+                nr++;
+                if (nr == int.MaxValue) { obj = null; return false; }
+            }
 
             if (obj.Alpha == byte.MinValue) { obj.Alpha = byte.MaxValue; } else { obj.Alpha--; }
             if (obj.Red == byte.MinValue) { obj.Red = byte.MaxValue; } else { obj.Red--; }
